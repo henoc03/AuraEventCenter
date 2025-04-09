@@ -42,6 +42,7 @@
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.4);
+  height: 100vh;
   z-index: 2;
 }
 
@@ -59,7 +60,7 @@
 
 .hero h2 {
   position: relative;
-  color: var(--line-color);
+  color: #fff;
   font-size: 1.1rem;
   font-weight: 100;
   z-index: 3;
