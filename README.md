@@ -1,6 +1,6 @@
 # Proyecto: Centro de Eventos
 
-# Estructura de Proyecto - BugBusters
+## Estructura de Proyecto - BugBusters
 ```
 bugbusters/
 ├── frontend/     # Aplicación cliente hecha en React + Vite
