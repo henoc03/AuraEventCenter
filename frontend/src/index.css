@@ -18,13 +18,11 @@
 }
 
 /*------------------------------------------------------------------------Nav/Hero---------------------------------------------------------------*/
-.hero{
-  background-image: url(images/background.png);
+.hero {
+  background-image: url(assets/images/background.png);
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
-  top:0;
-  left: 0;
   height: 100vh;
   width: 100%;
   display: flex;
@@ -32,6 +30,7 @@
   justify-content: center;
   align-items: center;
   text-align: center;
+  padding: 0 5vw;
 }
 
 .hero::before {
@@ -53,7 +52,7 @@
   justify-content: center;
   align-items: center;
   z-index: 3;
-  font-size: 4rem;
+  font-size: clamp(2.5rem, 5vw, 5rem);
   font-weight: 700;
   margin-bottom: 1.5rem;
 }
@@ -61,7 +60,7 @@
 .hero h2 {
   position: relative;
   color: #fff;
-  font-size: 1.1rem;
+  font-size: clamp(1rem, 2vw, 1.5rem);
   font-weight: 100;
   z-index: 3;
   max-width: 80%;
@@ -80,14 +79,14 @@
   justify-content: space-between;
   align-items: center;
   margin: auto;
-  max-width: 90rem;
-  padding: 20px 70px 20px 70px;
+  padding: 1rem 4vw;
 }
 
 .nav.scrolled {
   background-color:  rgba(0, 0, 0, 0.7);;
   backdrop-filter: blur(10px);
 }
+
 .nav-links {
   display: flex;
   align-items: center;
@@ -103,6 +102,7 @@
   color: var(--blue-logo);
   border-bottom: 3px solid var(--blue-logo);
 }
+
 .nav ul {
   list-style-type: none;
 }
@@ -178,18 +178,59 @@
 /*------------------------------------------------------------------------About Us---------------------------------------------------------------*/
 .about-us-container {
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  justify-content: center;
   align-items: center;
-  gap: 20px;
-  padding: 20px;
+  gap: 2rem;
+  padding: 20p5vwx;
 }
 
 .about-us {
-  height: 100vh;
+  height: 115vh;
   display: flex;
   justify-content:flex-start;
   align-items: center;
   padding: 2.3rem;
+}
+
+.about-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1;
+  min-width: 300px;
+  max-width: 600px;
+  margin-left: 10%;
+}
+.about-text h2 {
+font-size: clamp(1.8rem, 3vw, 2.5rem);
+  color: #ffff;
+  margin-bottom: 1rem;
+}
+
+.about-text p {
+  font-size: clamp(0.8rem, 1.5vw, 1rem);
+  color: var(--background-color);
+  line-height: 1.5;
+  text-align: justify;
+}
+
+.about-text button {
+  font-size: clamp(0.9rem, 1.2vw, 1.1rem);
+  margin-top: 20px;
+  padding: 0.6rem 1rem;
+  color: black;
+  background-color: var(--blue-logo);
+  border: 2px solid var(--blue-logo);
+  border-radius:10px ;
+  transition: 0.3s ease-in-out;
+  box-shadow: 0 0 15px var(--blue-logo);
+}
+
+.about-text button:hover {
+color: #ffff;
+transform:scale(1.05);
+box-shadow: 0 0 50px var(--blue-logo);
 }
 
 .social-container {
@@ -216,19 +257,11 @@
 
 .follow-us {
   margin-top: 1.5rem;
-  font-size: 1.2rem;
+  font-size: clamp(1rem, 2vw, 1.2rem);
   writing-mode: vertical-rl;
   transform: rotate(180deg);
   text-align: center;
   color: var(--background-color);
-}
-
-.about-text {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  max-width: 600px;
-  margin-left: 10%;
 }
 
 .line-container {
@@ -245,39 +278,10 @@
   width: 50px;
 }
 
-.about-text h2 {
-  font-size: 2rem;
-  color: #ffff;
-  margin-bottom: 1rem;
-}
-
-.about-text p {
-  font-size: 1rem;
-  color: var(--background-color);
-  line-height: 1.5;
-  text-align: justify;
-}
-
-.about-text button {
-  margin-top: 20px;
-  padding: 7px 10px 7px 10px;
-  color: black;
-  background-color: var(--blue-logo);
-  border: 2px solid var(--blue-logo);
-  border-radius:10px ;
-  transition: 0.3s ease-in-out;
-  box-shadow: 0 0 15px var(--blue-logo);
-}
-
-.about-text button:hover {
-color: #ffff;
-transform:scale(1.05);
-box-shadow: 0 0 50px var(--blue-logo);
-}
-
 .carousel-container {
   flex: 1;
-  max-width: 85%;
+  min-width: 300px;
+  max-width: 440px;
   height: auto;
   margin-left: 20px;
 }
@@ -293,7 +297,7 @@ box-shadow: 0 0 50px var(--blue-logo);
 .footer-content {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0.5rem;
+  padding: 1rem 5vw;
 }
 
 .footer-logo h2 {

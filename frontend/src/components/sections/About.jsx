@@ -1,5 +1,5 @@
 import React from 'react';
-import Carousel from '../../utils/CarouselFade';
+import Carousel from '../utils/CarouselFade';
 
 
 function About() {

@@ -1,7 +1,7 @@
 import Carousel from 'react-bootstrap/Carousel';
-import salaLiberia from "../images/salas/sala1.png"
-import salaCahuita from "../images/salas/sala2.png"
-import salaGrecia from "../images/salas/sala3.png"
+import salaLiberia from "../../assets/images/salas/sala1.png"
+import salaCahuita from "../../assets/images/salas/sala2.png"
+import salaGrecia from "../../assets/images/salas/sala3.png"
 
 
 function CarouselFadeExample() {

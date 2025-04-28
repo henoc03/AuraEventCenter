@@ -2,27 +2,27 @@ const navigationLinks = [
     { 
         id: 1,
         link: 'Inicio',
-        href: '#' 
+        href: 'inicio' 
     },
     { 
         id: 2,
         link: 'Salas',
-        href: '#' 
+        href: 'salas' 
     },
     { 
         id: 3,
         link: 'Servicios',
-        href: '#' 
+        href: 'servicios' 
     },
     { 
         id: 4,
         link: 'Cotización',
-        href: '#' 
+        href: 'cotizacion' 
     },
     { 
         id: 5,
         link: 'Contacto',
-        href: '#' 
+        href: 'contacto' 
     },
   ];
   export default navigationLinks;
