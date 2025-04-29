@@ -336,6 +336,55 @@ box-shadow: 0 0 50px var(--blue-logo);
   color: #95a5a6;
 }
 
+/*--------------------------------------------------------------------------404--------------------------------------------------------------*/
+.not-found {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f7f7f7;
+  color: #333;
+}
+
+.not-found-content {
+  text-align: center;
+}
+
+.not-found-title {
+  font-size: 6rem;
+  font-weight: bold;
+  color: var(--blue-logo);
+}
+
+.not-found-message {
+  font-size: 2rem;
+  margin-top: 0.5rem;
+  color: #555;
+}
+
+.not-found-description {
+  font-size: 1.2rem;
+  margin-top: 1rem;
+  color: #777;
+}
+
+.not-found-link {
+  display: inline-block;
+  margin-top: 2rem;
+  font-size: 1.2rem;
+  color: var(--blue-logo);
+  text-decoration: none;
+  padding: 10px 20px;
+  border: 2px solid var(--blue-logo);
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.not-found-link:hover {
+  background-color: var(--blue-logo);
+  color: white;
+}
+
 
 /*--------------------------------------------------------------------------@MEDIA--------------------------------------------------------------*/
 @media (max-width: 768px) {

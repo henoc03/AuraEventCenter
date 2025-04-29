@@ -35,7 +35,6 @@ bugbusters/
 │   ├── middleware/    # Middlewares de Express (autenticación, validaciones, manejo de errores)
 │   ├── models/        # Modelos para interactuar con Oracle DB (consultas, estructuras)
 │   ├── routes/        # Definición de rutas API (por ejemplo /salas, /servicios, /reservas)
-│   ├── node_modules/  # Módulos de Node.js
 │   ├── server.js      # Archivo principal que levanta el servidor Express
 │   ├── package.json   # Dependencias del backend
 │   └── package-lock.json

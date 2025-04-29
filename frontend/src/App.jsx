@@ -4,7 +4,8 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 // Páginas
 import Home from './pages/Home'; // Página de inicio
 import SignIn from './pages/SignIn'; // Página de iniciar sesión
-import NotFound from './pages/Notfound';
+import Register from './pages/Register'; // Página de registro
+import NotFound from './pages/Notfound'; // Página de 404
 
 
 function App() {
@@ -16,24 +17,17 @@ function App() {
         <Route path="/" element={<Home />} />
 
         {/* Ruta para la página de inicio de sesión */}
-        <Route path="/signin" element={<SignIn />} />
+        <Route path="/iniciarsesion" element={<SignIn />} />
+
+        {/* Ruta para la página de registro */}
+        <Route path="/registro" element={<Register />} />
 
         {/* Ruta para la página de inicio */}
         <Route path="/inicio" element={<Home />} />
+        
 
-        {/* POR EL MOMENTO RUTAS QUE MUESTRAN UNA PAGINA 404 */}
-
-        {/* Ruta para la página de salas */}
-        <Route path="/salas" element={<NotFound />} />
-
-        {/* Ruta para la página de servicios */}
-        <Route path="/servicios" element={<NotFound />} />
-
-        {/* Ruta para la página de cotizacion */}
-        <Route path="/cotizacion" element={<NotFound />} />
-
-        {/* Ruta para la página de contacto */}
-        <Route path="/contacto" element={<NotFound />} />
+        {/* Ruta para 404 para paginas no definidas */}
+        <Route path="*" element={<NotFound />} />
         
       </Routes>
     </Router>
