@@ -1,6 +1,42 @@
 # Proyecto: Centro de Eventos
 
-## Estructura de Proyecto - BugBusters
+## 1. Introducción
+
+Este proyecto tiene como objetivo el desarrollo de una aplicación web para gestionar la reserva de diferentes zonas dentro de un centro de eventos. Los usuarios podrán:
+
+- Consultar la disponibilidad de las salas.
+- Hacer cotizaciones personalizadas según el tipo de evento.
+- Seleccionar opciones adicionales como el servicio de catering.
+- Realizar las reservas de las zonas seleccionadas.
+
+Los administradores del sitio tendrán acceso para gestionar:
+
+- Las reservas.
+- Los servicios adicionales.
+- Consultar el historial de eventos.
+
+---
+
+## 2. Descripción General
+
+El sistema será una aplicación web para un centro de eventos con múltiples salas y áreas que pueden ser alquiladas para diferentes tipos de eventos. Los usuarios podrán:
+
+- Seleccionar la zona de su preferencia.
+- Hacer una cotización en línea.
+- Agregar servicios adicionales como catering.
+- Realizar una reserva si lo desean.
+
+El sistema también permitirá a los administradores gestionar:
+
+- Las zonas.
+- Los servicios adicionales.
+- Las cotizaciones.
+- Las reservas de los usuarios.
+
+---
+
+## 3. Estructura del Proyecto
+
 ```
 bugbusters/
 ├── frontend/     # Aplicación cliente hecha en React + Vite
@@ -42,38 +78,38 @@ bugbusters/
 ├── .gitignore          # Archivos y carpetas que Git debe ignorar
 ├── README.md           # Documentación del proyecto
 ```
-## 1. Introducción
+---
+## 4. Flujo de Trabajo en Git
 
-Este proyecto tiene como objetivo el desarrollo de una aplicación web para gestionar la reserva de diferentes zonas dentro de un centro de eventos. Los usuarios podrán:
+### Ramas principales
 
-- Consultar la disponibilidad de las salas.
-- Hacer cotizaciones personalizadas según el tipo de evento.
-- Seleccionar opciones adicionales como el servicio de catering.
-- Realizar las reservas de las zonas seleccionadas.
+- **`main`**: Rama protegida. Siempre contiene código listo para producción.
+  - No se puede hacer `push` directo.
+  - Solo se actualiza mediante **Merge Requests** (MRs) aprobados.
+  
+- **`devBranch`**: Rama de desarrollo.
+  - Todos trabajamos aquí.
+  - Los cambios se integran haciendo `push` o `merge` a esta rama.
 
-Los administradores del sitio tendrán acceso para gestionar:
+### ¿Cómo trabajamos?
 
-- Las reservas.
-- Los servicios adicionales.
-- Consultar el historial de eventos.
+1. **Siempre trabajar en `devBranch`**:
+   ```bash
+   git checkout devBranch
+   git pull origin devBranch
+2. **Antes de hacer cambios, crear una nueva rama**:
+   ```bash
+   git checkout -b feature/nombre-del-feature
+3. **Subir cambios**:
+   ```bash
+    git add .
+    git commit -m "Descripción breve del cambio"
+    git push origin feature/nombre-del-feature
+4. **Crear Merge Request desde `feature/` hacia `devBranch`.**
+5. **Pasar de devBranch a main solo con autorización de Maintainers mediante Merge Request aprobado.
 
-## 2. Descripción General
-
-El sistema será una aplicación web para un centro de eventos con múltiples salas y áreas que pueden ser alquiladas para diferentes tipos de eventos. Los usuarios podrán:
-
-- Seleccionar la zona de su preferencia.
-- Hacer una cotización en línea.
-- Agregar servicios adicionales como catering.
-- Realizar una reserva si lo desean.
-
-El sistema también permitirá a los administradores gestionar:
-
-- Las zonas.
-- Los servicios adicionales.
-- Las cotizaciones.
-- Las reservas de los usuarios.
-
-### Tecnologías Utilizadas
+---
+## 5. Tecnologías Utilizadas
 
 #### - **Frontend:**
 - React
@@ -84,8 +120,9 @@ El sistema también permitirá a los administradores gestionar:
 - Node.js
 - Express.js
 - OracleDB (paquete oracledb)
+---
 
-## 3. Cómo Ejecutar el Proyecto
+## 6. Cómo Ejecutar el Proyecto
 
 ### Requisitos
 
@@ -135,13 +172,16 @@ Esto lanzará el frontend, y podrás acceder a la aplicación web abriendo tu na
 3. **Ejecutar el proyecto**:
     ```bash
     node server.js
-
 Esto lanzará el backend, y podrás acceder a la aplicación web abriendo tu navegador y dirigiéndote a http://localhost:3000.
 
+---
+
+## 7. Tutoriales de ayuda
 Si tienes dudas de cómo instalar Node.js, visita [este video tutorial](https://www.youtube.com/watch?v=29mihvA_zEA&ab_channel=CarlosMasterWeb).
 
+---
 
-### Colaboradores
+## 8. Colaboradores
 
 - **Jorge Quirós** - C26161
 - **Henoc Rojas** - C26764
