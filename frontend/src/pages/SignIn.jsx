@@ -16,10 +16,10 @@ const SignIn = () => {
   return (
     <Auth title="Iniciar sesión">
       <form onSubmit={handleSubmit(onSubmit)} className="auth-form">
-        {errors.email && <span className="error">{errors.email.message}</span>}
+        <label htmlFor="email">Correo electrónico *</label>
         <input
           type="email"
-          placeholder="Email"
+          placeholder=""
           {...register('email', {
             required: 'Email requerido',
             pattern: {
@@ -28,20 +28,22 @@ const SignIn = () => {
             }
           })}
         />
+        {errors.email && <span className="error">{errors.email.message}</span>}
 
-        {errors.password && <span className="error">{errors.password.message}</span>}
+        <label htmlFor="password">Contraseña *</label>
         <input
           type="password"
-          placeholder="Contraseña"
+          placeholder=""
           {...register('password', { required: 'Contraseña requerida' })}
         />
+        {errors.password && <span className="error">{errors.password.message}</span>}
 
-        <button type="submit" disabled={!isValid} className={`submit-button ${isValid ? 'active' : ''}`}>
+        <button type="submit" disabled={!isValid} className={`submit-button ${isValid ? 'active' : ''}`}  style={{ marginTop: '30px' }}>
           Iniciar sesión
         </button>
 
         <div className="forgot-password">
-          <a href="/recover-password">¿Olvidaste tu contraseña?</a>
+          <a href="/recuperar-contraseña">¿Olvidaste tu contraseña?</a>
         </div>
         
         <div className="auth-links">

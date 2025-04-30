@@ -30,7 +30,7 @@ function Navigation() {
 
   // Función para redirigir al Sign In
   const handleSignInClick = () => {
-    navigate('/iniciarsesion');
+    navigate('/iniciar-sesion');
   };
 
   // Hook para escuchar el evento de scroll
