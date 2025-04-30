@@ -31,7 +31,7 @@ html {
   padding: 0.7rem 0.8rem;
   border-radius: 10px;
   width: 100%;
-  max-width: 480px;
+  max-width: 75vh;
   max-height: 97vh;
   overflow-y: auto;
   text-align: center;
