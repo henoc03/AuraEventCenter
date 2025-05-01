@@ -6,31 +6,33 @@ import Home from './pages/Home'; // Página de inicio
 import SignIn from './pages/SignIn'; // Página de iniciar sesión
 import Register from './pages/Register'; // Página de registro
 import NotFound from './pages/Notfound'; // Página de 404
+import Header from './components/common/Header.jsx'
 
 
 function App() {
   return (
-    
-    <Router>
-      <Routes>
-        {/* Ruta para la página de inicio */}
-        <Route path="/" element={<Home />} />
+    <Header/>
 
-        {/* Ruta para la página de inicio de sesión */}
-        <Route path="/iniciarsesion" element={<SignIn />} />
+    // <Router>
+    //   <Routes>
+    //     {/* Ruta para la página de inicio */}
+    //     <Route path="/" element={<Home />} />
 
-        {/* Ruta para la página de registro */}
-        <Route path="/registro" element={<Register />} />
+    //     {/* Ruta para la página de inicio de sesión */}
+    //     <Route path="/iniciarsesion" element={<SignIn />} />
 
-        {/* Ruta para la página de inicio */}
-        <Route path="/inicio" element={<Home />} />
+    //     {/* Ruta para la página de registro */}
+    //     <Route path="/registro" element={<Register />} />
+
+    //     {/* Ruta para la página de inicio */}
+    //     <Route path="/inicio" element={<Home />} />
         
 
-        {/* Ruta para 404 para paginas no definidas */}
-        <Route path="*" element={<NotFound />} />
+    //     {/* Ruta para 404 para paginas no definidas */}
+    //     <Route path="*" element={<NotFound />} />
         
-      </Routes>
-    </Router>
+    //   </Routes>
+    // </Router>
   );
 }
 
