@@ -3,7 +3,7 @@ import DefaultProfilePhoto from '../../assets/images/default-profile-photo.png'
 
 const DEFAULT_ROUTE = 'http://localhost:3000'
 
-function ProfilePhoto({width = 30, height = 30}) {
+function ProfilePhoto({width = 70, height = 70}) {
   const [currentUser, setCurrentUser] = useState([]);
 
   useEffect(() => {

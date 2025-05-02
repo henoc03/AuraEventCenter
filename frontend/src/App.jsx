@@ -11,28 +11,33 @@ import Header from './components/common/Header.jsx'
 
 function App() {
   return (
-    <Header/>
+    <>    
+      <Header/>
 
-    // <Router>
-    //   <Routes>
-    //     {/* Ruta para la página de inicio */}
-    //     <Route path="/" element={<Home />} />
+      <Router>
+        <Routes>
+          {/* Ruta para la página de inicio */}
+          <Route path="/" element={<Home />} />
 
-    //     {/* Ruta para la página de inicio de sesión */}
-    //     <Route path="/iniciarsesion" element={<SignIn />} />
+          {/* Ruta para la página de inicio de sesión */}
+          <Route path="/iniciarsesion" element={<SignIn />} />
 
-    //     {/* Ruta para la página de registro */}
-    //     <Route path="/registro" element={<Register />} />
+          {/* Ruta para la página de registro */}
+          <Route path="/registro" element={<Register />} />
 
-    //     {/* Ruta para la página de inicio */}
-    //     <Route path="/inicio" element={<Home />} />
-        
+          {/* Ruta para la página de inicio */}
+          <Route path="/inicio" element={<Home />} />
 
-    //     {/* Ruta para 404 para paginas no definidas */}
-    //     <Route path="*" element={<NotFound />} />
-        
-    //   </Routes>
-    // </Router>
+          {/* Ruta para la página de inicio */}
+          <Route path="/profile" element={<Home />} />
+          
+
+          {/* Ruta para 404 para paginas no definidas */}
+          <Route path="*" element={<NotFound />} />
+          
+        </Routes>
+      </Router>
+    </>
   );
 }
 
