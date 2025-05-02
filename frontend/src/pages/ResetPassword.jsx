@@ -1,4 +1,3 @@
-// src/pages/ResetPassword.jsx
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import Auth from '../components/common/Auth';
@@ -10,7 +9,6 @@ const ResetPassword = () => {
 
   const onSubmit = (data) => {
     console.log("Nueva contraseña:", data);
-    // Aquí se llamaría al backend para guardar la nueva contraseña
   };
 
   return (

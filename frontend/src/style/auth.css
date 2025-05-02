@@ -253,7 +253,7 @@ html {
 }
 
 .primary-btn {
-  background-color: #475569; /* Azul más claro por defecto */
+  background-color: #475569;
   color: white;
   padding: 0.75rem 1.5rem;
   font-weight: bold;

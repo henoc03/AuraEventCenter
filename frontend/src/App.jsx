@@ -6,8 +6,8 @@ import Home from './pages/Home'; // Página de inicio
 import SignIn from './pages/SignIn'; // Página de iniciar sesión
 import Register from './pages/Register'; // Página de registro
 import RecoverEmail from './pages/RecoverEmail'; // Página de recuperar contraseña
-import VerifyCode from './pages/VerifyCode';
-import ResetPassword from './pages/ResetPassword';
+import VerifyCode from './pages/VerifyCode'; // Página de validación de codigo
+import ResetPassword from './pages/ResetPassword'; // Página de contraseña nueva
 import NotFound from './pages/Notfound'; // Página de 404
 
 function App() {
@@ -27,10 +27,10 @@ function App() {
         {/* Ruta para la página de recuperar contraseña */}
         <Route path="/recuperar-contraseña" element={<RecoverEmail />} />
 
-        {/* Ruta para la página de recuperar contraseña */}
+        {/* Ruta para la página de validación de codigo */}
         <Route path="/verificar-codigo" element={<VerifyCode />} />
 
-        {/* Ruta para la página de recuperar contraseña */}
+        {/* Ruta para la página de contraseña nueva */}
         <Route path="/cambiar-contraseña" element={<ResetPassword />} />
 
         {/* Ruta para la página de inicio */}
