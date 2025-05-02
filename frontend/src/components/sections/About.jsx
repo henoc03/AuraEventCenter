@@ -10,8 +10,8 @@ function About() {
   };
   return (
     <div className="about-us-container">
-    <section data-aos="fade-right" data-aos-duration="3000" data-aos-delay="200" className="about-us">
-      <div className="social-container">
+    <section className="about-us">
+      <div data-aos="fade-right" data-aos-duration="3000" data-aos-delay="200" className="social-container">
         <div className="social-icons">
           <a href="https://facebook.com" className="social-icon">
             <i className="fab fa-facebook-f"></i>
@@ -25,8 +25,9 @@ function About() {
         </div>
         <p className="follow-us">Síguenos</p>
       </div>
-      <div className="about-text">
-      <div className="line-container">
+  
+      <div data-aos="fade-right" data-aos-duration="3000" data-aos-delay="200" className="about-text">
+        <div className="line-container">
           <hr className="line" />
           <h2>Conócenos</h2>
         </div>
@@ -35,11 +36,13 @@ function About() {
         </p>
         <button onClick={handleClick}>Aprende más acerca de nosotros</button>
       </div>
+  
+      <div data-aos="fade-left" data-aos-duration="3000" data-aos-delay="200" className="carousel-container">
+        <Carousel />
+      </div>
     </section>
-    <div data-aos="fade-left" data-aos-duration="3000" data-aos-delay="200" className="carousel-container">
-    <Carousel/>
-    </div>
-    </div>
+  </div>
+  
   );
 }
 
