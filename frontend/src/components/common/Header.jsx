@@ -18,7 +18,7 @@ function Header() {
 
   return (
     <header className='header-container'>
-      <Logo className='logo'/>
+      <a href="/"><Logo className='logo'/></a>
       <div className='right-content-container'>
         <ProfilePhoto/>
         <div className='user-info-container'>
