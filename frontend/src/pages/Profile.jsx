@@ -4,6 +4,7 @@ import Header from "../components/common/Header";
 import Main from "../components/common/Main.jsx";
 import SideBar from "../components/common/SideBar.jsx";
 import ProfilePhoto from "../components/icons/ProfilePhoto.jsx";
+import '../style/auth.css';
 import '../style/profile.css';
 
 function Profile() {
@@ -31,8 +32,8 @@ function Profile() {
           <div className="profile-container">
             <h1>Información de perfil</h1>
             <div className="image-form-container">
-              <div className="image-container"><ProfilePhoto width='250' height='250'/></div>
-              <div className="user-info-container">
+              <div className="image-container"><ProfilePhoto width='300' height='300'/></div>
+              <div className="user-info-form">
                 <form onSubmit={handleSubmit(onSubmit)} className="auth-form">
                   <label htmlFor="name">Nombre *</label>
                   <input
