@@ -17,17 +17,19 @@ const Register = () => {
   return (
     <Auth title="Registrarse">
       <form onSubmit={handleSubmit(onSubmit)} className="auth-form">
-        {errors.name && <span className="error">{errors.name.message}</span>}
+        
+        <label htmlFor="name">Nombre completo *</label>
         <input
           type="text"
-          placeholder="Nombre completo *"
+          placeholder=""
           {...register('name', { required: 'Nombre requerido' })}
         />
-
-        {errors.email && <span className="error">{errors.email.message}</span>}
+        {errors.name && <span className="error">{errors.name.message}</span>}
+        
+        <label htmlFor="email">Correo electrónico *</label>
         <input
           type="email"
-          placeholder="Email *"
+          placeholder=""
           {...register('email', {
             required: 'Email requerido',
             pattern: {
@@ -36,11 +38,13 @@ const Register = () => {
             }
           })}
         />
+        {errors.email && <span className="error">{errors.email.message}</span>}
 
-        {errors.phone && <span className="error">{errors.phone.message}</span>}
+
+        <label htmlFor="phone">Número telefónico *</label>
         <input
           type="tel"
-          placeholder="Número telefónico *"
+          placeholder=""
           {...register('phone', {
             required: 'Teléfono requerido',
             pattern: {
@@ -49,11 +53,12 @@ const Register = () => {
             }
           })}
         />
+        {errors.phone && <span className="error">{errors.phone.message}</span>}
 
-        {errors.password && <span className="error">{errors.password.message}</span>}
+        <label htmlFor="password">Contraseña *</label>
         <input
           type="password"
-          placeholder="Contraseña *"
+          placeholder=""
           {...register('password', {
             required: 'Contraseña requerida',
             pattern: {
@@ -62,6 +67,7 @@ const Register = () => {
             }
           })}
         />
+        {errors.password && <span className="error">{errors.password.message}</span>}
 
         <div className="terms">
           <input
@@ -72,12 +78,12 @@ const Register = () => {
           <label htmlFor="terms">He leído y acepto los términos y condiciones</label>
         </div>
 
-        <button type="submit" disabled={!isValid || !termsAccepted} className={`submit-button ${isValid && termsAccepted ? 'active' : ''}`}>
+        <button type="submit" disabled={!isValid || !termsAccepted} className={`submit-button ${isValid && termsAccepted ? 'active' : ''}`} >
           Registrarse
         </button>
 
         <div className="auth-links">
-          <p>¿Ya tienes una cuenta? <a href="/iniciarsesion">Inicia sesión</a></p>
+          <p>¿Ya tienes una cuenta? <a href="/iniciar-sesion">Inicia sesión</a></p>
         </div>
       </form>
     </Auth>

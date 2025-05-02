@@ -7,7 +7,7 @@ const Auth = ({ title, children }) => {
     <div className="auth-container">
       <div className="auth-box">
         <div className="auth-header">
-        <Logo className= "auth-logo"alt="Aura Event Center Logo" width={280} height={40}></Logo>
+        <a href="/"><Logo className= "auth-logo"alt="Aura Event Center Logo" width={260} height={35}></Logo></a>
           <h2 className="auth-title">{title}</h2>
 
         </div>

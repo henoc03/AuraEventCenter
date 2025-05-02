@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+//import React, { useEffect, useState } from 'react';
 import Logo from '../icons/Logo.jsx';
 import ProfilePhoto from '../icons/ProfilePhoto.jsx'
 import '../../style/header.css'
@@ -6,15 +6,15 @@ import '../../style/header.css'
 const DEFAULT_ROUTE = 'http://localhost:3000'
 
 function Header() {
-  const [currentUser, setCurrentUser] = useState([]);
+  //const [currentUser, setCurrentUser] = useState([]);
 
   // Traer informacion del usuario activo desde la api
-  useEffect(() => {
-    fetch(`${DEFAULT_ROUTE}/api/current_user`)
-     .then(res=>res.json())
-     .then(data => setCurrentUser(data))
-     .catch(error => console.error('Error fetching user data:', error));
-  },[]);
+  // useEffect(() => {
+  //   fetch(`${DEFAULT_ROUTE}/api/current_user`)
+  //    .then(res=>res.json())
+  //    .then(data => setCurrentUser(data))
+  //    .catch(error => console.error('Error fetching user data:', error));
+  // },[]);
 
   return (
     <header className='header-container'>
