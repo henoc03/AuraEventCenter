@@ -1,0 +1,80 @@
+.admin-dashboard {
+    display: flex;
+    min-height: 100vh;
+  }
+  
+  .dashboard-content {
+    flex: 1;
+    padding: 2rem;
+    background-color: #f5f7fa;
+  }
+  
+  .dashboard-content h2 {
+    margin-bottom: 1.5rem;
+  }
+  
+  .dashboard-cards {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .card {
+    flex: 1;
+    background-color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  }
+  
+  .card p {
+    font-size: 0.9rem;
+    color: #555;
+  }
+  
+  .card h3 {
+    margin-top: 0.5rem;
+    font-size: 1.5rem;
+  }
+  
+  .dashboard-sections {
+    display: grid;
+    grid-template-columns: 2fr 1.2fr;
+    gap: 2rem;
+  }
+  
+  .chart-section,
+  .reservations-section {
+    background-color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  }
+  
+  .placeholder {
+    text-align: center;
+    color: #888;
+    padding: 2rem;
+    font-size: 0.95rem;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+  }
+  
+  th, td {
+    padding: 0.6rem;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+  }
+  
+  .view-more {
+    text-align: right;
+    margin-top: 0.8rem;
+    font-size: 0.9rem;
+    color: #007bff;
+    cursor: pointer;
+  }
+  
