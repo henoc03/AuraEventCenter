@@ -17,6 +17,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
     font-size: 1rem;
     color: white;
 }
@@ -47,8 +48,13 @@
     margin-bottom: 0px;
 }
 
+#collapse-button:active, #collapse-button:focus{
+    outline: none !important;
+    box-shadow: none !important;
+}
+
 .submenu {
-    top: 11.5%;
+    top: 100%;
 }
 
 .card {
@@ -114,10 +120,13 @@
     }
 
     .submenu {
-        top: 7.2%;
-        background-color: none;
+        top: 113%;
+        left: 11%;
     }
 
+    .card {
+        width: 20px;
+    }
     .user-info-container h2 {
         font-size: 1rem;
     }

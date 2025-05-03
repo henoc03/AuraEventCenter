@@ -1,13 +1,25 @@
-import React from "react";
-import { useForm } from 'react-hook-form';
+import React, {useEffect, useState } from "react";
+import { useForm} from 'react-hook-form';
 import Header from "../components/common/Header";
-import Main from "../components/common/Main.jsx";
 import SideBar from "../components/common/SideBar.jsx";
-import ProfilePhoto from "../components/icons/ProfilePhoto.jsx";
+import DefaultProfilePhoto from '../assets/images/default-profile-photo.png'
 import '../style/auth.css';
 import '../style/profile.css';
 
+const DEFAULT_ROUTE = 'http://localhost:3000'
+
 function Profile() {
+  const [currentUser, setCurrentUser] = useState([]);
+
+  useEffect(() => {
+    fetch(`${DEFAULT_ROUTE}/api/current_user`)
+      .then(res => res.json())
+      .then(data => setCurrentUser(data))
+      .catch(error => console.error('Error fetching user data:', error));
+  }, []);
+
+  const editableProfilePhoto = currentUser?.profile_photo || DefaultProfilePhoto;
+
   const {register, handleSubmit, formState: { errors, isValid } } = useForm({ mode: 'onChange' });
 
   const onSubmit = (data) => {
@@ -15,16 +27,16 @@ function Profile() {
   };
 
   return (
-    <>    
+    <>   
       <Header/>
       <div className="main-container">
         <SideBar className="side-bar">
           <ul>
-            <li><a href="/profile"><i class="bi bi-person-fill"></i><span>Perfil</span></a></li>
-            <li><a href="/account"><i class="bi bi-gear"></i><span>Cuenta</span></a></li>
-            <li><a href="/privacy"><i class="bi bi-lock-fill"></i><span>Privacidad</span></a></li>
-            <li><a href="/notifications"><i class="bi bi-bell-fill"></i><span>Notificaciones</span></a></li>
-            <li><a href="/appareance"><i class="bi bi-eye"></i><span>Apariencia</span></a></li>
+            <li><a href="/profile"><i className="bi bi-person-fill"></i><span>Perfil</span></a></li>
+            <li><a href="/account"><i className="bi bi-gear"></i><span>Cuenta</span></a></li>
+            <li><a href="/privacy"><i className="bi bi-lock-fill"></i><span>Privacidad</span></a></li>
+            <li><a href="/*"><i className="bi bi-bell-fill"></i><span>Notificaciones</span></a></li>
+            <li><a href="/*"><i className="bi bi-eye"></i><span>Apariencia</span></a></li>
           </ul>
         </SideBar>
 
@@ -32,7 +44,10 @@ function Profile() {
           <div className="profile-container">
             <h1>Información de perfil</h1>
             <div className="image-form-container">
-              <div className="image-container"><ProfilePhoto width='300' height='300'/></div>
+              <div className="image-container">
+                <img src={editableProfilePhoto} alt="Foto de perfil editable" className="editable-profile-photo" width='400' height='400'/>
+                <i className="bi bi-pencil edit-icon"></i>
+              </div>
               <div className="user-info-form">
                 <form onSubmit={handleSubmit(onSubmit)} className="auth-form">
                   <label htmlFor="name">Nombre *</label>

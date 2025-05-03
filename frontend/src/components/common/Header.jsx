@@ -40,7 +40,7 @@ function Header() {
           </button>
 
           <div className="collapse submenu" id="collapseMenu" 
-          style={{ position: 'absolute', zIndex: 1000, marginTop: 47, right: '0%'}}>
+          style={{ position: 'absolute', zIndex: 1000, right: '-10%'}}>
             <div className='card card-body'>
               <div className='dropdown-user-info'>
                 <p className='user-email'>

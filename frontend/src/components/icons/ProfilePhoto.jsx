@@ -16,11 +16,21 @@ function ProfilePhoto({width = 70, height = 70}) {
   const profilePhoto = currentUser?.profile_photo || DefaultProfilePhoto;
 
   return (
-
-    <div className='imageContainer'>
-      <img src={profilePhoto} alt="Imagen de perfil" width={width} height={height}/>
+    <div className='image' style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: `${50}px` }}>
+      <img 
+        src={profilePhoto} 
+        alt="Imagen de perfil" 
+        style={{ 
+          width: '100%', 
+          maxWidth: `${width}px`, 
+          height: 'auto', 
+          maxHeight: `${height}px`, 
+          objectFit: 'cover',
+          borderRadius: `${50}px`
+        }} 
+      />
     </div>
-  )
+  );
 }
 
 export default ProfilePhoto;
