@@ -10,7 +10,7 @@ app.use(cors());
 app.use(express.json());
 
 app.get('/', (req, res) => {
-  res.send('API Centro de Eventos funcionando 🚀');
+  res.send('API Centro de Eventos funcionando');
 });
 
 app.listen(PORT, () => {
