@@ -28,7 +28,16 @@ function Profile() {
 
   return (
     <>   
-      <Header/>
+      <Header>
+        <ul>
+          <li><a href="/profile"><i className="bi bi-person-fill"></i><span>Perfil</span></a></li>
+          <li><a href="/account"><i className="bi bi-gear"></i><span>Cuenta</span></a></li>
+          <li><a href="/privacy"><i className="bi bi-lock-fill"></i><span>Privacidad</span></a></li>
+          <li><a href="/*"><i className="bi bi-bell-fill"></i><span>Notificaciones</span></a></li>
+          <li><a href="/*"><i className="bi bi-eye"></i><span>Apariencia</span></a></li>
+        </ul>
+      </Header>
+
       <div className="main-container">
         <SideBar className="side-bar">
           <ul>
