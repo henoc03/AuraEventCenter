@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import '../../style/admin-dashboard.css';
+import '../../style/side-nav.css';
 
 export default function SideNav({ sections = [] }) {
   const location = useLocation();
@@ -10,15 +10,17 @@ export default function SideNav({ sections = [] }) {
 
   return (
     <aside className="sidenav">
-      <div className="logo">Aura Event Center</div>
       {sections.map(({ title, links }, index) => (
         <div key={title}>
           {index !== 0 && <hr className="sidenav-divider" />}
           <h4 className="sidenav-title">{title}</h4>
           <ul className="sidenav-list">
-            {links.map(({ id, label, href }) => (
+            {links.map(({ id, label, href, icon }) => (
               <li key={id} className={location.pathname === href ? 'active' : ''}>
-                <button onClick={() => handleClick(href)}>{label}</button>
+                <button onClick={() => handleClick(href)} className="sidenav-button">
+                  <span className="sidenav-icon">{icon}</span>
+                  <span>{label}</span>
+                </button>
               </li>
             ))}
           </ul>

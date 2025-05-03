@@ -1,0 +1,78 @@
+
+:root {
+    --icon-color: #C7C7C7 ;
+    --nav-link-color: #666666 ;
+}
+.sidenav {
+    width: 250px;
+    background-color: #fff;
+    color: var(--nav-link-color);
+    padding: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    border-right: 4px solid #dbd6d682;
+  }
+  
+  .sidenav-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    padding-left: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .sidenav-divider {
+    border: 2px solid #BEB3B3 ;
+    margin: 1rem 0;
+  }
+  
+  .sidenav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidenav-button {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    width: 90%;
+    padding: 0.3rem 0.9rem;
+    font-size: 0.95rem;
+    color: var(--nav-link-color);
+    background: none;
+    border: none;
+    border-radius: 8px;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  
+  .sidenav-button:hover {
+    background-color: #C3D6EA;
+    color: #fff;
+  }
+  
+  .sidenav-icon {
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    color: var(--icon-color);
+  }
+
+  .sidenav-list .active .sidenav-button {
+    background-color: #C3D6EA;
+    color: #fff;
+    font-weight: 600;
+  }
+  .sidenav-button:hover .sidenav-icon {
+    color: #fff;
+  }
+  
