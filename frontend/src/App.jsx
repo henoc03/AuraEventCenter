@@ -8,6 +8,7 @@ import Register from './pages/Register'; // Página de registro
 import RecoverEmail from './pages/RecoverEmail'; // Página de recuperar contraseña
 import VerifyCode from './pages/VerifyCode'; // Página de validación de codigo
 import ResetPassword from './pages/ResetPassword'; // Página de contraseña nueva
+import RoomsAdmin from './pages/RoomsAdmin';
 import NotFound from './pages/Notfound'; // Página de 404
 
 function App() {
@@ -35,8 +36,10 @@ function App() {
 
         {/* Ruta para la página de inicio */}
         <Route path="/inicio" element={<Home />} />
-        
 
+        {/* Ruta para la página de las salas */}
+        <Route path="/rooms-admin" element={<RoomsAdmin />} />
+        
         {/* Ruta para 404 para paginas no definidas */}
         <Route path="*" element={<NotFound />} />
         
