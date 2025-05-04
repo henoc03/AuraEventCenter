@@ -75,10 +75,40 @@ function RoomsAdmin() {
           </div>
 
           <main className="rooms-container">
-            <RoomCard name="Sala Grecia" image={RoomPhoto} state={true}/>
-            <RoomCard name="Sala Grecia" image={RoomPhoto} state={true}/>
-            <RoomCard name="Sala Grecia" image={RoomPhoto} state={true}/>
-            <RoomCard name="Sala Grecia" image={RoomPhoto} state={true}/>
+            <RoomCard 
+              name="Sala Grecia" 
+              image={RoomPhoto} 
+              state={true} 
+              capacity={300} 
+              type={"Recreativa"} 
+              description={"Diseñada para inspirar, Grecia combina elegancia y practicidad, siendo perfecta para conferencias, seminarios y presentaciones. Su espacio adaptable permite recibir hasta 300 personas cómodamente."}
+            />
+
+            <RoomCard 
+              name="Sala Grecia" 
+              image={RoomPhoto} 
+              state={true} 
+              capacity={300} 
+              type={"Recreativa"} 
+              description={"Diseñada para inspirar, Grecia combina elegancia y practicidad, siendo perfecta para conferencias, seminarios y presentaciones. Su espacio adaptable permite recibir hasta 300 personas cómodamente."}
+            />
+            <RoomCard 
+              name="Sala Grecia" 
+              image={RoomPhoto} 
+              state={true} 
+              capacity={300} 
+              type={"Recreativa"} 
+              description={"Diseñada para inspirar, Grecia combina elegancia y practicidad, siendo perfecta para conferencias, seminarios y presentaciones. Su espacio adaptable permite recibir hasta 300 personas cómodamente."}
+            />
+            
+            <RoomCard 
+              name="Sala Grecia" 
+              image={RoomPhoto} 
+              state={true} 
+              capacity={300} 
+              type={"Recreativa"} 
+              description={"Diseñada para inspirar, Grecia combina elegancia y practicidad, siendo perfecta para conferencias, seminarios y presentaciones. Su espacio adaptable permite recibir hasta 300 personas cómodamente."}
+            />
           </main>
         </div>
 
