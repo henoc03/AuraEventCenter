@@ -1,11 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Dropdown } from 'react-bootstrap';
 import Header from '../components/common/Header.jsx';
 import SideBar from '../components/common/SideBar.jsx';
 import RoomCard from '../components/common/RoomCard.jsx';
+import AddEditRoomModal from '../components/common/AddEditRoomModal.jsx';
 import RoomPhoto from '../assets/images/salas/sala2.png'
 import '../style/roomsAdmin.css'
 
 function RoomsAdmin() {
+  const [isAddEditOpen, setIsAddEditOpen] = useState(false);
+
   return (
     <>
       <Header className="header">
@@ -36,7 +40,7 @@ function RoomsAdmin() {
           </ul>
       </Header>
 
-      <div className="main-container">
+      <div className={`main-container ${isAddEditOpen ? 'modal-open' : ''}`}>
         <SideBar className="side-bar">
           <h3>GENERAL</h3>
           <ul>
@@ -67,7 +71,7 @@ function RoomsAdmin() {
         <div className='add-button-rooms-container'>
           <div className='title-button-container'>
             <h1>Salas</h1>
-            <button className="add-room-button">Agregar Sala</button>
+            <button className="add-room-button" onClick={() => setIsAddEditOpen(!isAddEditOpen)}>Agregar Sala</button>
           </div>
 
           <main className="rooms-container">
@@ -77,6 +81,14 @@ function RoomsAdmin() {
             <RoomCard name="Sala Grecia" image={RoomPhoto} state={true}/>
           </main>
         </div>
+
+        {/* Modal */}
+        {isAddEditOpen && (
+          <AddEditRoomModal 
+            isModalOpen={true} 
+            onClose={() => setIsAddEditOpen(false)} 
+          />
+        )}
       </div>
     </>
   )

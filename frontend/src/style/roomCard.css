@@ -60,6 +60,10 @@
   border: solid 1px white;
 }
 
+.deleted {
+  display: none;
+}
+
 @media(max-width: 768px) {
   .side-bar {
       display: none;
