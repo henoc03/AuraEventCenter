@@ -75,4 +75,6 @@
   .sidenav-button:hover .sidenav-icon {
     color: #fff;
   }
-  
+  .sidenav-list .active .sidenav-icon {
+    color: #fff;
+  }

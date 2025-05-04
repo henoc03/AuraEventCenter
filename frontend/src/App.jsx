@@ -39,7 +39,7 @@ function App() {
         <Route path="/inicio" element={<Home />} />
         
         {/* Ruta para la página de inicio */}
-        <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
 
         {/* Ruta para 404 para paginas no definidas */}
         <Route path="*" element={<NotFound />} />
