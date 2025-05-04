@@ -141,8 +141,12 @@ function AddEditRoomModal({ isModalOpen, onClose }) {
               style={{ display: 'none' }}
             />
 
-            <button type="submit" disabled={!isValid} className={`save-button ${isValid ? 'active' : ''}`} >
-              Guardar
+            <button 
+              type="submit" 
+              disabled={!isValid} 
+              className={`save-button ${isValid ? 'active' : ''}`} 
+              onClick={handleClose}>
+                Guardar
             </button>
           </form>
         </div>

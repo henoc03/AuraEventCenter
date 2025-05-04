@@ -1,11 +1,12 @@
-.card {
+.room-card {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   border-radius: 16px;
-  height: 330px;
-  margin: 15px 20px;
+  height: 340px;
+  margin: 15px 30px 10px 30px;
+  padding: 0;
 }
 
-.card h2{
+.room-card h2{
   background-color: #2f3e51;
   color: white;
   text-align: center;
@@ -18,7 +19,7 @@
   padding: 17px 0;
 }
 
-.card img {
+.room-card img {
   width: 380px;
   height: 145px;
   border-radius: 0;
@@ -69,7 +70,7 @@
       display: none;
   }
 
-  .card, .card img {
+  .room-card, .room-card img {
       width: 300px;
   }
 

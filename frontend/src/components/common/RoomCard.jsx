@@ -9,7 +9,7 @@ function RoomCard ({name, image, state}) {
 
   return (
     <>
-      <div className={`card ${isDeleted ? "deleted":""}`}>
+      <div className={`room-card ${isDeleted ? "deleted":""}`}>
         <h2>{state ? "Publicada" : "No publicada"}</h2>
         <img src={image} className="card-img-top" alt={`Imagen de la sala ${name}`} />
         <div className="card-body">

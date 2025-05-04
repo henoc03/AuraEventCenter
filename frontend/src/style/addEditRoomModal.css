@@ -8,8 +8,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
-  }
+    z-index: 4000;
+    overflow-y: scroll;
+}
   
 .modal-content {
     background-color: #fff;
@@ -110,6 +111,7 @@
 
 .categories-dropdown .dropdown-item {
     width: 100%;
+    font-family: 'Merriweather Sans', sans-serif;
 }
 
 .dropdown-menu {

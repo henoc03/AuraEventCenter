@@ -12,7 +12,7 @@ function RoomsAdmin() {
 
   return (
     <>
-      <Header className="header">
+      <Header>
         {/*Menu de hamburguesa*/}
         <h3>GENERAL</h3>
           <ul>
