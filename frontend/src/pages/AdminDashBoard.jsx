@@ -3,17 +3,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faChartSimple } from '@fortawesome/free-solid-svg-icons';
 
 import SideNav from '../components/common/SideNav';
-import sections from '../components/utils/admin-nav';
 import Header from '../components/common/Header';
 import '../style/admin-dashboard.css';
 
-const AdminDashboard = () => {
+const AdminDashboard = ({ sections }) => {
   const [stats, setStats] = useState(null);
   const [topRooms, setTopRooms] = useState([]);
   const [weeklyReservations, setWeeklyReservations] = useState([]);
 
   useEffect(() => {
-    // Simulaciones iniciales
     setStats({
       users: 150,
       activeRooms: 12,

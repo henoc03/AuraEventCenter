@@ -2,7 +2,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faTableColumns, faBookmark, faBellConcierge, faChampagneGlasses, faCalendar, faChartPie, faGear } from '@fortawesome/free-solid-svg-icons';
 
-const sections = [
+const SectionAdmin = [
   {
     title: 'GENERAL',
     links: [
@@ -10,7 +10,7 @@ const sections = [
       { id: 2, label: 'Reservas', icon: <FontAwesomeIcon icon={faBookmark} />, href: '/admin/reservas' },
       { id: 3, label: 'Salas', icon: <FontAwesomeIcon icon={faBellConcierge} />, href: '/admin/salas' },
       { id: 4, label: 'Servicios', icon: <FontAwesomeIcon icon={faChampagneGlasses} />, href: '/admin/servicios' },
-      { id: 5, label: 'Clientes', icon: <FontAwesomeIcon icon={faUser} />, href: '/admin/clientes' },
+      { id: 5, label: 'Clientes', icon: <FontAwesomeIcon icon={faUser} />, href: '/admin/clientes' }
     ],
   },
   {
@@ -28,4 +28,4 @@ const sections = [
   },
 ];
 
-export default sections;
+export default SectionAdmin;
