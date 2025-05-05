@@ -1,4 +1,3 @@
-// src/constants/adminNav.js
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faTableColumns, faBookmark, faBellConcierge, faChampagneGlasses, faCalendar, faChartPie, faGear } from '@fortawesome/free-solid-svg-icons';
 
