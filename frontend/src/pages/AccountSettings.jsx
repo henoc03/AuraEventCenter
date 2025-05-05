@@ -1,53 +1,44 @@
-import React, { useState } from "react";
-import "../style/accountSettings.css"
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import "../style/accountSettings.css";
 
-export default function AccountSettings() {
-const [showPassword, setShowPassword] = useState(false);
-const [password, setPassword] = useState("********");
+const AccountSettings = () => {
+  const navigate = useNavigate();
 
-const togglePasswordVisibility = () => {
-  setShowPassword((prev) => !prev);
-};
+  const handleEditClick = () => {
+    navigate('/cliente/cuenta/verificar-codigo');
+  };
 
-const handlePasswordChange = (e) => {
-  setPassword(e.target.value);
-};
+  return (
+    <div className="settings-container">
 
-return (
-  <div className="account-settings-container">
-    <h2>Configuración de la cuenta</h2>
+      <div className="settings-content">
+        <h3 className="settings-title">Configuración de la cuenta</h3>
 
-    <div className="card">
+        <div className="settings-box">
+          <div className="password-section">
+            <label className="settings-subtitle">Contraseña</label>
+            <div className="password-input-wrapper">
+              <input type="password" value="************" readOnly></input>
+              <button 
+                className="icon-button"
+                onClick={handleEditClick}  
+              >
+              <i className="bi bi-pencil-fill"></i>
+              </button>
+            </div>
+          </div>
 
-      <label htmlFor="password">Contraseña</label>
-      <div className="password-field">
-        <input
-          id="password"
-          type={showPassword ? "text" : "password"}
-          value={password}
-          onChange={handlePasswordChange}
-        />
-        <button
-          className="icon-button"
-          onClick={togglePasswordVisibility}
-          aria-label="Mostrar/ocultar contraseña"
-        >
-          <i className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}></i>
-        </button>
-        <button className="icon-button edit-button" aria-label="Editar">
-          <i className="bi bi-pencil"></i>
-        </button>
+          <div className="two-factor-section">
+            <p className="settings-subtitle">Verificación en 2 pasos</p>
+            <a href="" className="blue-link">Cambiar configuración de verificación en 2 pasos</a>
+          </div>
+
+          <button className="delete-account-button">Eliminar cuenta</button>
+        </div>
       </div>
-
-      <div className="two-step-section">
-        <p>Verificación en 2 pasos</p>
-        <a href="#" className="change-link">
-          Cambiar configuración de verificación en 2 pasos
-        </a>
-      </div>
-
-      <button className="delete-button">Eliminar cuenta</button>
     </div>
-  </div>
-);
-}
+  );
+};
+
+export default AccountSettings;

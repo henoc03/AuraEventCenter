@@ -1,2 +1,260 @@
+body {
+  background-color: white;
+  color: #333;
+  min-height: 100vh;
+}
 
+.settings-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  width: 100%;
+  margin-top: 4%;
+}
 
+.settings-content {
+  width: 100%;
+  max-width: 800px;
+}
+
+.settings-title {
+  font-size: 30px;
+  font-weight: bolder;
+  margin-bottom: 24px;
+  color: #333;
+}
+
+.settings-box {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 32px;
+  border: 1px solid #e5e7eb;
+}
+
+.password-section {
+  margin-bottom: 32px;
+}
+
+.settings-subtitle {
+  display: block;
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.password-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.password-input-wrapper input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 16px;
+  outline: none;
+}
+
+.password-input-wrapper input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.icon-button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+}
+
+.icon-button:hover {
+  background-color: #f3f4f6;
+}
+
+.two-factor-section {
+  margin-bottom: 32px;
+}
+
+.two-step-ver-message {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.blue-link {
+  color: #3b82f6;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+.blue-link:hover {
+  text-decoration: underline;
+}
+
+.delete-account-button {
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: regular;
+  cursor: pointer;
+  display: block;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 250px;
+  text-align: center;
+}
+
+.delete-account-button:hover {
+  background-color: #b91c1c;
+  transform: scale(1.04);
+}
+
+.otp-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 30px 0;
+  gap: 12px;
+}
+
+.otp-input {
+  width: 60px;
+  height: 60px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 24px;
+  text-align: center;
+  outline: none;
+}
+
+.otp-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.resend-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  justify-content: center;
+}
+
+/* Botón "Continuar" */
+.continue-button {
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 0.6rem;
+  background-color: #475569; /* azul */
+  color: white;
+  cursor: not-allowed;
+  opacity: 0.6;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.continue-button.active {
+  background-color: #1e40af;
+  cursor: pointer;
+  opacity: 1;
+}
+
+.continue-button.active:hover {
+  background-color: #162d86;
+  transform: scale(1.04);
+}
+
+/* Botón "Reenviar código" */
+.resend-button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border: 1px solid #0074d9;
+  border-radius: 0.6rem;
+  background-color: white;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.resend-button:hover {
+  background-color:#0074d9;
+  color: white;
+  transform: scale(1.04);
+}
+
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  text-align: left;
+  margin-bottom: 1rem;
+}
+
+.settings-form label {
+  font-size: 16px;
+  font-weight: 500;
+  margin-top: 1rem;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.settings-form input {
+  margin-bottom: 0.2rem;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 16px;
+  width: 100%;
+  outline: none;
+}
+
+.settings-form input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.change-password-error {
+  margin-top: 0.11rem;      
+  padding: 0.5rem 1rem;
+  background-color: #fdecea;
+  color: #d32f2f;
+  font-size: 0.85rem;
+  border-radius: 0.4rem;
+  line-height: 1.4;
+}
+
+.change-button {
+  margin-top: 2rem;
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 0.6rem;
+  background-color: #475569; /* azul */
+  color: white;
+  cursor: not-allowed;
+  opacity: 0.6;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.change-button.active {
+  background-color: #1e40af;
+  cursor: pointer;
+  opacity: 1;
+}
+
+.change-button.active:hover {
+  background-color: #162d86;
+  transform: scale(1.04);
+}

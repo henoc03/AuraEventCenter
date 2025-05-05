@@ -44,8 +44,8 @@ function App() {
         
         <Route path="/cliente" element={<ClientLayout />}>
           <Route path="cuenta" element={<AccountSettings />} />
-          <Route path="verificar-codigo" element={<VerifyAccountCode />} />
-          <Route path="cambiar-contraseña" element={<ChangePassword />} />
+          <Route path="cuenta/verificar-codigo" element={<VerifyAccountCode />} />
+          <Route path="cuenta/cambiar-contraseña" element={<ChangePassword />} />
         </Route>
 
         {/* Ruta para 404 para paginas no definidas */}
