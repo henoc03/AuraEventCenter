@@ -135,27 +135,26 @@ exports.login = async (req, res) => {
   let conn;
 
   try {
-
     conn = await getConnection();
 
-    // const result = await conn.execute(
-    //   `SELECT * FROM CLIENT_SCHEMA.USERS WHERE EMAIL = :email`,
-    //   [email],
-    //   { outFormat: oracledb.OUT_FORMAT_OBJECT }
-    // );
-    // const user = result.rows[0];
+    const result = await conn.execute(
+      `SELECT * FROM CLIENT_SCHEMA.USERS WHERE EMAIL = :email`,
+      [email],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+    const user = result.rows[0];
 
-    // if (!user || user.password !== password) {
-    //   return res.status(401).json({ message: 'Credenciales inválidas' });
-    // }
+    if (!user || user.PASSWORD !== password) {
+      return res.status(401).json({ message: 'Credenciales inválidas' });
+    }
 
-    // const token = jwt.sign(
-    //   { id: user.USER_ID, email: user.EMAIL }, 
-    //   secretKey, 
-    //   { expiresIn: '2h' }
-    // );
+    const token = jwt.sign(
+      { id: user.USER_ID, email: user.EMAIL }, 
+      secretKey, 
+      { expiresIn: '2h' }
+    );
 
-    // res.json({ token });
+    res.json({ token });
   } catch (err) {
     console.error('❌ Error al iniciar sesión:', err);
     res.status(500).json({ error: err.message });

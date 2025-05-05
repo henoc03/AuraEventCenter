@@ -10,12 +10,12 @@ const SignIn = () => {
   const { register, handleSubmit, formState: { errors, isValid } } = useForm({ mode: 'onChange' });
   const navigate = useNavigate();
 
-  const onSubmit = async ({data}) => {
+  const onSubmit = async (data) => {
     try {
       const res = await fetch(`${PORT}/users/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({data})
+        body: JSON.stringify(data)
       });
 
       if (!res.ok) {
@@ -24,7 +24,7 @@ const SignIn = () => {
         return;
       }
 
-      const access = await res.json(); // Leer el cuerpo como JSON directamente
+      const access = await res.json();
       localStorage.setItem('token', access.token);
 
       console.log("Sesión iniciada");
