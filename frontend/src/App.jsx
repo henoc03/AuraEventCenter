@@ -8,7 +8,7 @@ import Register from './pages/Register'; // Página de registro
 import RecoverEmail from './pages/RecoverEmail'; // Página de recuperar contraseña
 import VerifyCode from './pages/VerifyCode'; // Página de validación de codigo
 import ResetPassword from './pages/ResetPassword'; // Página de contraseña nueva
-import Profile from './pages/Profile'; // Página de registro
+import RoomsAdmin from './pages/RoomsAdmin';
 import NotFound from './pages/Notfound'; // Página de 404
 import SectionAdmin from '../src/components/utils/admin-nav'; // Lista de secciones que van en el nav para administradores
 import SectionRoot from '../src/components/utils/root-nav'; // Lista de secciones que van en el nav para root admins
@@ -39,11 +39,13 @@ function App() {
 
           {/* Ruta para la página de inicio */}
           <Route path="/inicio" element={<Home />} />
+  
+          {/* Ruta para la página de las salas */}
+          <Route path="/admin/rooms" element={<RoomsAdmin sections={SectionAdmin}/>} />
 
-          {/* Ruta para la página de inicio */}
-          <Route path="/perfil" element={<Profile sections={SectionProfile}/>} />
-          
-
+          {/* Ruta para la página de las salas */}
+          <Route path="/root-admin/rooms" element={<RoomsAdmin sections={SectionRoot}/>} />
+        
           {/* Ruta para 404 para paginas no definidas */}
           <Route path="*" element={<NotFound />} />
           
