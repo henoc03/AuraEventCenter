@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import Header from '../components/common/Header';
-import SideBar from '../components/common/SideBar';
+import SideNav from '../components/common/SideNav';
 import '../style/privacy.css'
 
-function Privacy() {
+function Privacy({sections}) {
   const [isCookiesOn, setIsCookiesOn] = useState(false);
   const [isNewsOn, setIsNewsOn] = useState(false);
   const [isNotificationsOn, setIsNotificationsOn] = useState(false);
@@ -12,25 +12,13 @@ function Privacy() {
     <>
       <Header>
         {/*Menu de hamburguesa*/}
-        <ul>
-          <li><a href="/profile"><i className="bi bi-person-fill"></i><span>Perfil</span></a></li>
-          <li><a href="/account"><i className="bi bi-gear"></i><span>Cuenta</span></a></li>
-          <li><a href="/privacy"><i className="bi bi-lock-fill"></i><span>Privacidad</span></a></li>
-          <li><a href="/*"><i className="bi bi-bell-fill"></i><span>Notificaciones</span></a></li>
-          <li><a href="/*"><i className="bi bi-eye"></i><span>Apariencia</span></a></li>
-        </ul>
+        <SideNav id="side-nav-mobile" sections={sections} />
       </Header>
 
       <div className="main-container">
-        <SideBar className="side-bar">
-          <ul>
-            <li><a href="/profile"><i className="bi bi-person-fill"></i><span>Perfil</span></a></li>
-            <li><a href="/account"><i className="bi bi-gear"></i><span>Cuenta</span></a></li>
-            <li><a href="/privacy"><i className="bi bi-lock-fill"></i><span>Privacidad</span></a></li>
-            <li><a href="/*"><i className="bi bi-bell-fill"></i><span>Notificaciones</span></a></li>
-            <li><a href="/*"><i className="bi bi-eye"></i><span>Apariencia</span></a></li>
-          </ul>
-        </SideBar>
+        <div id="side-nav-desktop">
+          <SideNav sections={sections} />
+        </div>
 
         <main className="main">
           <div className='inside-container'>
