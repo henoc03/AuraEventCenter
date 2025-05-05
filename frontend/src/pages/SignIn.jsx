@@ -38,7 +38,7 @@ const SignIn = () => {
         />
         {errors.password && <span className="error">{errors.password.message}</span>}
 
-        <button type="submit" disabled={!isValid} className={`submit-button ${isValid ? 'active' : ''}`}  style={{ marginTop: '30px' }}>
+        <button type="submit" disabled={!isValid} className={`submit-button ${isValid ? 'active' : ''}`}  style={{ marginTop: '20px' }}>
           Iniciar sesión
         </button>
 
