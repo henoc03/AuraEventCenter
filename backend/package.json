@@ -13,7 +13,10 @@
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
+    "err": "^2.1.13",
     "express": "^5.1.0",
-    "oracledb": "^6.8.0"
+    "jsonwebtoken": "^9.0.2",
+    "oracledb": "^6.8.0",
+    "throw": "^1.1.1"
   }
 }
