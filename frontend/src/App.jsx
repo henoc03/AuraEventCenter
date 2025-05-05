@@ -8,7 +8,13 @@ import Register from './pages/Register'; // Página de registro
 import RecoverEmail from './pages/RecoverEmail'; // Página de recuperar contraseña
 import VerifyCode from './pages/VerifyCode'; // Página de validación de codigo
 import ResetPassword from './pages/ResetPassword'; // Página de contraseña nueva
+import AccountSettings from './pages/AccountSettings';
+import VerifyAccountCode from './pages/VerifyAccountCode';
+import ChangePassword from './pages/ChangePassword';
 import NotFound from './pages/Notfound'; // Página de 404
+
+import ClientLayout from './layouts/ClientLayout';
+import AdminLayout from './layouts/AdminLayout';
 
 function App() {
   return (
@@ -36,6 +42,11 @@ function App() {
         {/* Ruta para la página de inicio */}
         <Route path="/inicio" element={<Home />} />
         
+        <Route path="/cliente" element={<ClientLayout />}>
+          <Route path="cuenta" element={<AccountSettings />} />
+          <Route path="verificar-codigo" element={<VerifyAccountCode />} />
+          <Route path="cambiar-contraseña" element={<ChangePassword />} />
+        </Route>
 
         {/* Ruta para 404 para paginas no definidas */}
         <Route path="*" element={<NotFound />} />
