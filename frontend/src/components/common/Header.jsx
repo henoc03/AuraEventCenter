@@ -71,7 +71,7 @@ function Header({children}) {
           <ProfilePhoto/>
           <div className='user-info-container'>
             <h2>{/*currentUser?.name8*/}Brayan Rivera</h2>
-            <p>{/*currentUser?.role != 'client' ? currentUser?.role : ''*/}Administrador</p>
+            <p>{/*currentUser?.role != 'client' ? currentUser?.role : ''*/}Cliente</p>
           </div>
 
           <div className='drop-down-menu'>
