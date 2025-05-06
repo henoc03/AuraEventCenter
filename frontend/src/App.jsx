@@ -10,6 +10,9 @@ import VerifyCode from './pages/VerifyCode'; // Página de validación de codigo
 import ResetPassword from './pages/ResetPassword'; // Página de contraseña nueva
 import NotFound from './pages/Notfound'; // Página de 404
 
+import { AuthProvider } from './context/AuthContext';
+import PrivateRoute from './components/context/PrivateRoute'; // Una mausque herramineta que nos servira mas adelante
+
 function App() {
   return (
     

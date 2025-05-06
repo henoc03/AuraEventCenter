@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import Auth from "../components/common/Auth";
+import AlertMessage from '../components/common/AlertMessage';
 import '../style/auth.css';
 
 const PORT = "http://localhost:1522";
@@ -9,6 +10,8 @@ const PORT = "http://localhost:1522";
 const SignIn = () => {
   const { register, handleSubmit, formState: { errors, isValid } } = useForm({ mode: 'onChange' });
   const navigate = useNavigate();
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState('');
 
   const onSubmit = async (data) => {
     try {
@@ -25,17 +28,42 @@ const SignIn = () => {
       }
 
       const access = await res.json();
-      localStorage.setItem('token', access.token);
+      
+      const decoded = JSON.parse(atob(access.token.split('.')[1]));
+      localStorage.setItem('user', JSON.stringify(decoded));
 
-      console.log("Sesión iniciada");
-      navigate('/');
+      localStorage.setItem('token', access.token);
+      
+      window.dispatchEvent(new Event('userUpdated'));
+      
+      navigate(decoded.userType === 'admin' ? '/admin/tablero' : '/');
     } catch (error) {
       console.error('Error en login:', error);
       alert('Ocurrió un error al iniciar sesión.');
     }
   };
 
+  useEffect(() => {
+    const storedMessage = sessionStorage.getItem('authSuccessMessage');
+    const storedType = sessionStorage.getItem('authMessageType');
+    
+    if (storedMessage) {
+      setMessage(storedMessage);
+      setMessageType(storedType || 'success');
+
+      sessionStorage.removeItem('authSuccessMessage');
+      sessionStorage.removeItem('authMessageType');
+    }
+  }, []);
   return (
+    <div className="signin">
+      <AlertMessage
+        message={message}
+        type={messageType}
+        onClose={() => setMessage('')}
+        duration={3000}
+        className="alert-floating"
+      />
     <Auth title="Iniciar sesión">
       <form onSubmit={handleSubmit(onSubmit)} className="auth-form">
         <label htmlFor="email">Correo electrónico *</label>
@@ -73,6 +101,7 @@ const SignIn = () => {
         </div>
       </form>
     </Auth>
+    </div>
   );
 };
 
