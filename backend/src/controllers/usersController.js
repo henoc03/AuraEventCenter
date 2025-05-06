@@ -33,6 +33,7 @@ exports.getUserById = async (req, res) => {
       [req.params.id],
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
+
     res.json(result.rows[0] || {});
   } catch (err) {
     console.error('❌ Error al obtener usuario:', err);
@@ -104,6 +105,34 @@ exports.updateUser = async (req, res) => {
     res.sendStatus(204);
   } catch (err) {
     console.error('❌ Error al actualizar usuario:', err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
+// Query para actualizar usuario
+exports.updateUserProfile = async (req, res) => {
+  const {firstName, lastName1, lastName2, email, phone} = req.body;
+  console.log(lastName2)
+
+  let conn;
+  try {
+    conn = await getConnection();
+    await conn.execute(
+      `UPDATE CLIENT_SCHEMA.USERS SET 
+        FIRST_NAME = :firstName,
+        LAST_NAME_1 = :lastName1,
+        LAST_NAME_2 = :lastName2,
+        EMAIL = :email,
+        PHONE = :phone
+       WHERE USER_ID = :user_id`,
+      [firstName, lastName1, lastName2, email, phone, req.params.id],
+      { autoCommit: true }
+    );
+    res.sendStatus(204);
+  } catch (err) {
+    console.error('❌ Error al actualizar el perfil de usuario usuario:', err);
     res.status(500).json({ error: err.message });
   } finally {
     if (conn) await conn.close();

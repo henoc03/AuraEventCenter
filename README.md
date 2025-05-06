@@ -78,7 +78,9 @@ bugbusters/
 ├── .gitignore          # Archivos y carpetas que Git debe ignorar
 ├── README.md           # Documentación del proyecto
 ```
+
 ---
+
 ## 4. Flujo de Trabajo en Git
 
 ### Ramas principales
@@ -86,7 +88,6 @@ bugbusters/
 - **`main`**: Rama protegida. Siempre contiene código listo para producción.
   - No se puede hacer `push` directo.
   - Solo se actualiza mediante **Merge Requests** (MRs) aprobados.
-  
 - **`devBranch`**: Rama de desarrollo.
   - Todos trabajamos aquí.
   - Los cambios se integran haciendo `push` o `merge` a esta rama.
@@ -97,29 +98,36 @@ bugbusters/
    ```bash
    git checkout devBranch
    git pull origin devBranch
+   ```
 2. **Antes de hacer cambios, crear una nueva rama**:
    ```bash
    git checkout -b feature/nombre-del-feature
+   ```
 3. **Subir cambios**:
    ```bash
     git add .
     git commit -m "Descripción breve del cambio"
     git push origin feature/nombre-del-feature
+   ```
 4. **Crear Merge Request desde `feature/` hacia `devBranch`.**
-5. **Pasar de devBranch a main solo con autorización de Maintainers mediante Merge Request aprobado.
+5. \*\*Pasar de devBranch a main solo con autorización de Maintainers mediante Merge Request aprobado.
 
 ---
+
 ## 5. Tecnologías Utilizadas
 
 #### - **Frontend:**
+
 - React
 - Vite
 - React Router
 
 #### - **Backend:**
+
 - Node.js
 - Express.js
 - OracleDB (paquete oracledb)
+
 ---
 
 ## 6. Cómo Ejecutar el Proyecto
@@ -138,45 +146,56 @@ Para ejecutar este proyecto en tu máquina local, necesitarás tener instalado:
    ```bash
    git clone https://git.ucr.ac.cr/JORGE.QUIROSANDERSON/bugbusters.git
 
+   ```
+
 2. **Acceder al directorio del proyecto:**
 
    ```bash
     cd centro-de-eventos
 
+   ```
+
 3. **Instalar las dependencias** del proyecto:
-    ```bash
-    npm install
+   ```bash
+   npm install
+   ```
 
 #### Ejecutar el Frontend:
 
 1. Ir al directorio **frontend/**:
-    ```bash
-    cd frontend
-2.  **Instalar las dependencias** :
-    ```bash
-    npm install
+   ```bash
+   cd frontend
+   ```
+2. **Instalar las dependencias** :
+   ```bash
+   npm install
+   ```
 3. **Ejecutar el proyecto** en modo de dev:
-    ```bash
-    npm run dev
+   ```bash
+   npm run dev
+   ```
 
 Esto lanzará el frontend, y podrás acceder a la aplicación web abriendo tu navegador y dirigiéndote a http://localhost:5173.
 
 #### Ejecutar el Backend:
 
 1. Ir al directorio **backend/**:
-    ```bash
-    cd backend
-2.  **Instalar las dependencias** :
-    ```bash
-    npm install
+   ```bash
+   cd backend
+   ```
+2. **Instalar las dependencias** :
+   ```bash
+   npm install
+   ```
 3. **Ejecutar el proyecto**:
-    ```bash
-    node server.js
-Esto lanzará el backend, y podrás acceder a la aplicación web abriendo tu navegador y dirigiéndote a http://localhost:3000.
+   ```bash
+   node server.js
+   Esto lanzará el backend, y podrás acceder a la aplicación web abriendo tu navegador y dirigiéndote a http://localhost:3000.
 
 ---
 
 ## 7. Tutoriales de ayuda
+
 Si tienes dudas de cómo instalar Node.js, visita [este video tutorial](https://www.youtube.com/watch?v=29mihvA_zEA&ab_channel=CarlosMasterWeb).
 
 ---
