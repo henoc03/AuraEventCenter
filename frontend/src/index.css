@@ -402,6 +402,7 @@ box-shadow: 0 0 50px var(--blue-logo);
 }
 /*--------------------------------------------------------------------------AlertMessage--------------------------------------------------------------*/
 .alert-message {
+  font-family: 'Merriweather Sans', sans-serif;
   position: relative;
   padding: 12px 40px 12px 16px;
   border-radius: 8px;
@@ -414,6 +415,10 @@ box-shadow: 0 0 50px var(--blue-logo);
   align-items: center;
   justify-content: center;
   gap:20px
+}
+
+.alert-message span{
+  font-family: 'Merriweather Sans', sans-serif;
 }
 
 .alert-message.success {

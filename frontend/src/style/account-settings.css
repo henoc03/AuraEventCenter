@@ -5,6 +5,11 @@ body {
   font-family: 'Merriweather Sans', sans-serif;
 }
 
+.main-container {
+  position: relative;
+  z-index: 1;
+}
+
 .settings-container {
   display: flex;
   gap: 2rem;
@@ -151,7 +156,7 @@ body {
 
 .delete-account-button:hover {
   background-color: #b91c1c;
-  transform: scale(1.04);
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .otp-wrapper {
@@ -183,7 +188,6 @@ body {
   justify-content: center;
 }
 
-/* Botón "Continuar" */
 .continue-button {
   width: 60%;
   height: 40px;
@@ -207,10 +211,8 @@ body {
 .continue-button.active:hover {
   background-color: #339CFF;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-  transform: scale(1.04);
 }
 
-/* Botón "Reenviar código" */
 .resend-button {
   width: 60%;
   height: 40px;
@@ -226,7 +228,7 @@ body {
 
 .resend-button:hover {
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-  transform: scale(1.04);
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .settings-form {
@@ -297,7 +299,6 @@ body {
 .change-button.active:hover {
   background-color: #339CFF;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-  transform: scale(1.04);
 }
 
 .side-nav-desktop {
@@ -307,6 +308,57 @@ body {
 
 .side-nav-mobile {
   display: none;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+  max-width: 400px;
+  width: 90%;
+}
+
+.modal-actions {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.confirm-button,
+.cancel-button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.confirm-button {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.cancel-button {
+  background-color: #bdc3c7;
+  color: #2c3e50;
+}
+
+.error-message {
+  color: red;
+  margin-top: 0.5rem;
 }
 
 @media (max-width: 768px) {
@@ -321,7 +373,7 @@ body {
 
   .main {
     flex-direction: column;
-    align-items: stretch; /* para que no se quede centrado */
+    align-items: stretch;
     padding: 1rem;
   }
 

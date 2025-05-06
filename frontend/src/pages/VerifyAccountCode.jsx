@@ -4,7 +4,7 @@ import OTPInput from '../components/sections/OTPInput';
 import AlertMessage from '../components/common/AlertMessage';
 import DefaultProfilePhoto from '../assets/images/default-profile-photo.png'
 import SideNav from "../components/common/SideNav.jsx"
-import "../style/settings.css";
+import "../style/account-settings.css";
 import Header from "../components/common/Header.jsx";
 
 const VerifyAccountCode = ({ sections }) => {
