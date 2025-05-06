@@ -45,10 +45,10 @@ function App() {
         <Route path="/inicio" element={<Home />} />
         
         {/* Ruta para la página tablero de administradores */}
-        <Route path="/admin/dashboard" element={<AdminDashboard sections={SectionAdmin} />} />
+        <Route path="/admin/tablero" element={<AdminDashboard sections={SectionAdmin} />} />
 
         {/* Ruta para la página tablero de root administradores */}
-        <Route path="/root-admin/dashboard" element={<AdminDashboard sections={SectionRoot} />} />
+        <Route path="/root-admin/tablero" element={<AdminDashboard sections={SectionRoot} />} />
                
         {/* Ruta para la página clientes de administradores */}
         <Route path="/admin/clientes" element={<Clients sections={SectionAdmin} />} />

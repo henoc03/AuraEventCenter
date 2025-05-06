@@ -5,7 +5,7 @@ const SectionRoot = [
   {
     title: 'GENERAL',
     links: [
-      { id: 1, label: 'Tablero', icon: <FontAwesomeIcon icon={faTableColumns} />, href: '/root-admin/dashboard' },
+      { id: 1, label: 'Tablero', icon: <FontAwesomeIcon icon={faTableColumns} />, href: '/root-admin/tablero' },
       { id: 2, label: 'Reservas', icon: <FontAwesomeIcon icon={faBookmark} />, href: '/root-admin/reservas' },
       { id: 3, label: 'Salas', icon: <FontAwesomeIcon icon={faBellConcierge} />, href: '/root-admin/salas' },
       { id: 4, label: 'Servicios', icon: <FontAwesomeIcon icon={faChampagneGlasses} />, href: '/root-admin/servicios' },

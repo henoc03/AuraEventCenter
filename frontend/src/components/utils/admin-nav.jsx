@@ -5,7 +5,7 @@ const SectionAdmin = [
   {
     title: 'GENERAL',
     links: [
-      { id: 1, label: 'Tablero', icon: <FontAwesomeIcon icon={faTableColumns} />, href: '/admin/dashboard' },
+      { id: 1, label: 'Tablero', icon: <FontAwesomeIcon icon={faTableColumns} />, href: '/admin/tablero' },
       { id: 2, label: 'Reservas', icon: <FontAwesomeIcon icon={faBookmark} />, href: '/admin/reservas' },
       { id: 3, label: 'Salas', icon: <FontAwesomeIcon icon={faBellConcierge} />, href: '/admin/salas' },
       { id: 4, label: 'Servicios', icon: <FontAwesomeIcon icon={faChampagneGlasses} />, href: '/admin/servicios' },
