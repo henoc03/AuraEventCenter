@@ -2,53 +2,25 @@ import React, { useEffect, useState } from 'react';
 import Logo from '../icons/Logo.jsx';
 import DropDownMenu from './DropDownMenu.jsx'; 
 import '../../style/header.css'
-import {jwtDecode} from 'jwt-decode';
 
 const DEFAULT_ROUTE = 'http://localhost:1522'
 
-function Header({children}) {
+function Header({name, lastname, role, email, children}) {
   const [isMobile, setIsMobile] = useState(false);
   const [hamburgerMenuIsOpen, setHamburguerMenuIsOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [lastname, setLastname] = useState("");
-  const [role, setRole] = useState("");
 
-
-  // Llamado a la funcion para traer y setear el nombre y rol de usuario
   useEffect(() => {
-    getSetUserInfo();
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
-
-
-  const getSetUserInfo= async () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      return;
-    }
-    const sessionUserData = jwtDecode(token);
-
-    try {
-      const res = await fetch(`${DEFAULT_ROUTE}/users/getNameLastnameRole/${sessionUserData.id}`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        alert(errorData.message || 'Error traer la información de usuario');
-        return;
-      }
-
-      const userData = await res.json();
-
-      setName(userData.FIRST_NAME)
-      setLastname(userData.LAST_NAME_1)
-      setRole(userData.USER_TYPE)
-    } catch {
-      alert('Ocurrió un error al obtener la información de usuario.');
-      
-    }
-  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -102,7 +74,7 @@ function Header({children}) {
             <p>{role == "admin"? "Administrador" : "Cliente"}</p>
           </div>
 
-          <DropDownMenu/>
+          <DropDownMenu name={name} email={email}/>
         </div>
       </div>
     </header>

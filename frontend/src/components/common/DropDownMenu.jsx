@@ -1,57 +1,8 @@
-import React, { useEffect, useState } from 'react';
 import ProfilePhoto from '../icons/ProfilePhoto.jsx'
-import {jwtDecode} from 'jwt-decode';
 import '../../style/dropDownMenu.css'
-//import { useNavigate } from "react-router-dom";
 
-const DEFAULT_ROUTE = 'http://localhost:1522'
-
-function DropDownMenu() {
-  const [loading, setLoading] = useState(false);
-  const [name, setName] = useState(false);
-  const [email, setEmail] = useState(false);
-
-
-  // Llamado a la funcion para traer y setear el nombre y rol de usuario
-  useEffect(() => {
-    getSetUserInfo();
-  }, []);
-
-
-  const getSetUserInfo= async () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      return;
-    }
-
-    const sessionUserData = jwtDecode(token);
-
-    try {
-      const res = await fetch(`${DEFAULT_ROUTE}/users/getNameEmail/${sessionUserData.id}`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        alert(errorData.message || 'Error traer la información de usuario');
-        return;
-      }
-
-      const userData = await res.json();
-
-      setName(userData.FIRST_NAME)
-      setEmail(userData.LAST_NAME_1)
-      setLoading(true);
-    } catch {
-      alert('Ocurrió un error al obtener la información de usuario.');
-      
-    } finally {
-      () => setLoading(true)
-    }
-  };
-
-  if (loading) {return (
+function DropDownMenu({name, email}) {
+ return (
     <div className='drop-down-menu'>
       <button 
         id="collapse-button" 
@@ -83,7 +34,7 @@ function DropDownMenu() {
         </div>
       </div>
     </div>
-  )}
+  )
 }
 
 export default DropDownMenu;
