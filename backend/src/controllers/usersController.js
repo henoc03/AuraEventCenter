@@ -43,6 +43,44 @@ exports.getUserById = async (req, res) => {
   }
 };
 
+// Query para obtener correo y rol por ID
+exports.getNameEmail = async (req, res) => {
+  let conn;
+  try {
+    conn = await getConnection();
+    const result = await conn.execute(
+      `SELECT EMAIL, FIRST_NAME FROM CLIENT_SCHEMA.USERS WHERE USER_ID = :id`,
+      [req.params.id],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+    res.json(result.rows[0] || {});
+  } catch (err) {
+    console.error('❌ Error al obtener nombre y correo:', err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
+// Query para obtener nombre y rol por ID
+exports.getNameLastnameRole = async (req, res) => {
+  let conn;
+  try {
+    conn = await getConnection();
+    const result = await conn.execute(
+      `SELECT FIRST_NAME, LAST_NAME_1, USER_TYPE FROM CLIENT_SCHEMA.USERS WHERE USER_ID = :id`,
+      [req.params.id],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+    res.json(result.rows[0] || {});
+  } catch (err) {
+    console.error('❌ Error al obtener nombre y rol:', err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
 // Query para crear usuario
 exports.createUser = async (req, res) => {
   const { email, first_name, last_name_1, last_name_2, phone, password, user_type } = req.body;
