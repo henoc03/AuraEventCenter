@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+
 import Auth from "../components/common/Auth";
 import AlertMessage from '../components/common/AlertMessage';
 import '../style/auth.css';
@@ -12,6 +14,7 @@ const SignIn = () => {
   const navigate = useNavigate();
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
+  const { setCurrentUser } = useAuth();
 
   const onSubmit = async (data) => {
     try {
@@ -31,8 +34,9 @@ const SignIn = () => {
       
       const decoded = JSON.parse(atob(access.token.split('.')[1]));
       localStorage.setItem('user', JSON.stringify(decoded));
-
       localStorage.setItem('token', access.token);
+      
+      setCurrentUser(decoded); // Actualiza el estado del contexto de autenticación
       
       window.dispatchEvent(new Event('userUpdated'));
       
@@ -42,7 +46,7 @@ const SignIn = () => {
         navigate('/admin/tablero');
       } else {
         navigate('/');
-      };
+      }
 
     } catch (error) {
       console.error('Error en login:', error);

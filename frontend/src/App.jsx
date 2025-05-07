@@ -41,7 +41,7 @@ function App() {
 
           {/* Rutas protegidas para administradores comunes */}
           <Route element={<PrivateRoute allowedRoles={['admin']} />}>
-            <Route path="/admin/rooms" element={<RoomsAdmin sections={SectionAdmin}/>} />
+            <Route path="/admin/salas" element={<RoomsAdmin sections={SectionAdmin}/>} />
             <Route path="/admin/tablero" element={<AdminDashboard sections={SectionAdmin} />} />
             <Route path="/admin/clientes" element={<Clients sections={SectionAdmin} />} />
           </Route>
