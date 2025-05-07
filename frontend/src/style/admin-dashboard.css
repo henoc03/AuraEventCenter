@@ -28,7 +28,7 @@
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     border-radius: 8px;
     padding: 20px;
-    width: 120vh;
+    width: 110vh;
   }
 
   .main-content h2 { 
@@ -55,7 +55,7 @@
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     border: 1px solid #cec2c2 ;
-    width: 120vh;
+    width: 110vh;
     min-height: 200px;
   }
   
@@ -67,7 +67,7 @@
   .reservations-section {
     grid-area: reservas;
     background: #fff;
-    padding: 16px;
+    padding: 10px;
     border-radius: 8px;
     border: 1px solid #cec2c2 ;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -75,12 +75,32 @@
     flex-direction: column;
     justify-content: space-between;
     text-align: center;
-    width: 100%;
+    width: 55vh;
     min-height: 390px;
     height: auto;
     max-height: max-content;
   }
   
+  .reservations-section table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .reservations-section table th,
+  .reservations-section table td {
+    text-align: center;
+    vertical-align: middle;
+    padding: 1px 14px;
+    border: 1px solid #ddd;
+  }
+  
+  .reservations-section table th {
+    font-weight: bold;
+  }
+  
+  .reservations-section table tr:hover {
+    background-color: #f1f1f1;
+  }
   .reservations-section h3 {
     font-size: large;
     font-weight: 800;

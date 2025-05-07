@@ -36,7 +36,14 @@ const SignIn = () => {
       
       window.dispatchEvent(new Event('userUpdated'));
       
-      navigate(decoded.userType === 'admin' ? '/admin/tablero' : '/');
+      if (decoded.userType === 'root admin') {
+        navigate('/root-admin/tablero');
+      } else if (decoded.userType === 'admin') {
+        navigate('/admin/tablero');
+      } else {
+        navigate('/');
+      };
+
     } catch (error) {
       console.error('Error en login:', error);
       alert('Ocurrió un error al iniciar sesión.');

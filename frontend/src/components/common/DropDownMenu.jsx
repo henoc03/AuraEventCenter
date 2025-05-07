@@ -20,7 +20,7 @@ function DropDownMenu({ name, email, onLogout }) {
       <div 
         className="collapse submenu" 
         id="collapseMenu" 
-        style={{ position: 'absolute', zIndex: 1000, top: '96%' }}
+        style={{ position: 'absolute', zIndex: 1000, top: '110%' }}
       >
         <div className='card card-body'>
           <div className='dropdown-user-info'>

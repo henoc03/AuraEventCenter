@@ -7,7 +7,9 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^7.0.2",
-    "react-hook-form": "^7.56.1"
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-hook-form": "^7.56.1",
+    "recharts": "^2.15.3"
   }
 }
-

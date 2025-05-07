@@ -41,10 +41,13 @@ const UserModal = ({ isOpen, mode, user, onClose, onDelete, onSubmit: onSubmitPr
     }
   }, [user, isEditMode, isViewMode, reset]);
 
-  const onSubmit = (data) => {
-    console.log(isAddMode ? "Agregar usuario:" : "Editar usuario:", data);
-    onSubmitProp(data);
-    onClose();
+  const onSubmit = async (data) => {
+    try {
+      await onSubmitProp(data);
+      onClose();
+    } catch (err) {
+      console.error("❌ Error en envío de formulario:", err);
+    }
   };
   
 
@@ -102,8 +105,9 @@ const UserModal = ({ isOpen, mode, user, onClose, onDelete, onSubmit: onSubmitPr
               <label>Contraseña <span style={{ color: "red" }}>*</span></label>
               <input
                 type="password"
+                placeholder={mode === "edit" ? "Dejar en blanco para mantener actual" : ""}
                 {...register("password", {
-                  required: "Contraseña requerida",
+                  required: mode === "create" ? "Contraseña requerida" : false,  // Solo requerido en modo "create"
                   pattern: {
                     value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[\W_]).{8,}$/,
                     message: "Mínimo 8 caracteres, 1 mayúscula, 1 número, 1 símbolo",

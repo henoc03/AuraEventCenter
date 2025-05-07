@@ -6,24 +6,85 @@ import SideNav from '../components/common/SideNav';
 import Header from '../components/common/Header';
 import '../style/admin-dashboard.css';
 
+import { Bar } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Tooltip,
+  Legend
+} from 'chart.js';
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
+
+const PORT = "http://localhost:1522";
 const AdminDashboard = ({ sections }) => {
   const [stats, setStats] = useState(null);
   const [topRooms, setTopRooms] = useState([]);
   const [weeklyReservations, setWeeklyReservations] = useState([]);
 
   useEffect(() => {
-    setStats({
-      users: 150,
-      activeRooms: 12,
-      eventsThisWeek: 3,
-    });
-    setTopRooms([]);
-    setWeeklyReservations([]);
+    const fetchDashboardData = async () => {
+      try {
+        const statsRes = await fetch(`${PORT}/dashboard/stats`);
+        const statsData = await statsRes.json();
+        setStats(statsData);
+  
+        const weeklyRes = await fetch(`${PORT}/dashboard/weekly-reservations`);
+        const weeklyData = await weeklyRes.json();
+        setWeeklyReservations(weeklyData);
+  
+        const topRes = await fetch(`${PORT}/dashboard/top-rooms`);
+        const topData = await topRes.json();
+        setTopRooms(topData);
+      } catch (error) {
+        console.error('❌ Error al cargar dashboard:', error);
+      }
+    };
+  
+    fetchDashboardData();
+  }, []);
+  
+  const [currentUser, setCurrentUser] = useState(null);
+  
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded = JSON.parse(atob(token.split('.')[1]));
+        const now = Date.now();
+  
+        if (
+          decoded &&
+          decoded.firstName &&
+          decoded.lastName1 &&
+          decoded.email &&
+          decoded.userType &&
+          decoded.exp &&
+          now < decoded.exp * 1000
+        ) {
+          setCurrentUser(decoded);
+        } else {
+          localStorage.removeItem("token");
+          setCurrentUser(null);
+        }
+      } catch (err) {
+        console.error("❌ Error decoding token:", err);
+        localStorage.removeItem("token");
+        setCurrentUser(null);
+      }
+    }
   }, []);
 
   return (
     <div className="admin-dash-page">
-      <Header />
+    <Header
+      name={currentUser?.firstName}
+      lastname={`${currentUser?.lastName1} ${currentUser?.lastName2 || ''}`}
+      role={currentUser?.userType}
+      email={currentUser?.email}
+    />
  
 
       <div className="admin-dashboard">
@@ -52,11 +113,35 @@ const AdminDashboard = ({ sections }) => {
     <div className="chart-section">
       
   <div className="rooms-title"><FontAwesomeIcon icon={faChartSimple} /><h3>Salas más reservadas</h3></div>
-      {topRooms.length === 0 ? (
-        <div className="placeholder">Sin datos disponibles</div>
-      ) : (
-        <div>Gráfica aquí</div>
-      )}
+  {topRooms.length === 0 ? (
+  <div className="placeholder">Sin datos disponibles</div>
+) : (
+  <Bar
+    data={{
+      labels: topRooms.map(room => room.ROOM_NAME),
+      datasets: [
+        {
+          label: 'Reservas',
+          data: topRooms.map(room => room.RESERVATIONS),
+          backgroundColor: '#1565c0',
+        }
+      ]
+    }}
+    options={{
+      indexAxis: 'y',
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: { enabled: true }
+      },
+      scales: {
+        x: { beginAtZero: true },
+        y: { beginAtZero: true }
+      }
+    }}
+  />
+)}
+
     </div>
   </div>
 
