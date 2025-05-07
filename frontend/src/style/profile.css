@@ -1,13 +1,11 @@
-.main-container {
+.main-container-profile {
     display: flex;
     flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
     height: 85vh;
     width: 100%;
 }
 
-.side-bar {
+.profile-nav {
     box-shadow: 2px 0px 0px 0px rgba(0, 0, 0, 0.1);
     width: 30vw;
     min-width: 200px;
@@ -16,13 +14,13 @@
     padding: 30px 0px;
 }
 
-.side-bar ul{
+.profile-nav ul{
     height: 100%;
     list-style: none;
     padding: 0;
 }
 
-.side-bar ul li{
+.profile-nav ul li{
     display: flex;
     flex-wrap: nowrap;
     margin: 20px 15px;
@@ -30,7 +28,7 @@
     font-size: 1.1rem;
 }
 
-.side-bar ul li:hover{
+.profile-nav ul li:hover{
     font-weight: bold;
 }
 
@@ -85,7 +83,7 @@
     justify-content: space-between;
 }
 
-.image-container {
+.image-container-profile {
     display: flex;
     border: 1px solid #CFCFCF;
     height: fit-content;
@@ -109,7 +107,7 @@
     transition: opacity 0.3s ease;
 }
 
-.image-container:hover .editable-profile-photo {
+.image-container-profile:hover .editable-profile-photo {
     opacity: 0.4;
 }
 
@@ -117,18 +115,19 @@
     width: 22%;
     height: 20%;
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: 35%;
+    left: 40%;
     font-size: 2rem;
     color: black;
     border-radius: 50%;
     padding: 0.5rem;
     display: none;
+    cursor: pointer;
 }
 
-.image-container:hover .edit-icon {
+.image-container-profile:hover .edit-icon {
     display: block;
+    cursor: pointer;
 }
 
 .user-info-form {

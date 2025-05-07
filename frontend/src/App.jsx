@@ -22,6 +22,7 @@ import { AuthProvider } from './context/AuthContext';
 import PrivateRoute from './components/context/PrivateRoute';
 import SectionAdmin from '../src/components/utils/admin-nav';
 import SectionRoot from '../src/components/utils/root-nav';
+import SectionProfile from '../src/components/utils/profile-nav';
 
 function App() {
   return (
@@ -36,7 +37,7 @@ function App() {
           <Route path="/recuperar-contraseña" element={<RecoverEmail />} />
           <Route path="/verificar-codigo" element={<VerifyCode />} />
           <Route path="/cambiar-contraseña" element={<ResetPassword />} />
-          <Route path="/perfil" element={<Profile />} />
+          <Route path="/perfil" element={<Profile sections={SectionProfile}/>} />
 
           {/* Rutas protegidas para administradores comunes */}
           <Route element={<PrivateRoute allowedRoles={['admin']} />}>

@@ -124,9 +124,9 @@ function Profile({sections}) {
         <SideNav id="side-nav-mobile" sections={sections} />
       </Header>
 
-      <div className="main-container">
+      <div className="main-container-profile">
         <div id="side-nav-desktop">
-          <SideNav sections={sections} />
+          <SideNav className="profile-nav" sections={sections} />
         </div>
 
 
@@ -144,16 +144,12 @@ function Profile({sections}) {
           <div className="profile-container">
             <h1>Información de perfil</h1>
             <div className="image-form-container">
-              <div className="image-container">
-                <label htmlFor="image-upload" className="upload-label">
+              <div className="image-container-profile">
+                <label htmlFor="image-upload-profile" className="upload-label">
                   <i className="bi bi-pencil edit-icon"></i>
                   <img src={ProfilePhoto} alt="Foto de perfil editable" className="editable-profile-photo" width='400' height='400'/>
                 </label>
-                <input
-                  id="image-upload"
-                  type="file"
-                  accept="image/*"
-                />
+
 
               </div>
               <div className="user-info-form">

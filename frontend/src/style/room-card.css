@@ -9,6 +9,7 @@
     height: 320px;
     margin: 15px 30px 15px 0px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    
   }
   
   .room-card:hover {
@@ -102,6 +103,7 @@
     justify-content: center;
     z-index: 4000;
     overflow-y: scroll;
+
   }
   
   .modal-room-info-content {
@@ -152,6 +154,7 @@
     margin-bottom: 30px;
     font-family: "Merriweather Sans", sans-serif;
     font-size: 0.8rem;
+    
   }
   
   .room-info-content{
