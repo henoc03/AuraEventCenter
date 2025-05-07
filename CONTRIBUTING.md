@@ -44,16 +44,15 @@ Para mantener una estructura de trabajo limpia y organizada, por favor sigue est
 2. **Crear una nueva rama para tu tarea o bugfix**:
    ```bash
    git checkout -b feature/nombre-del-feature
-
-o para bugs:
+    ```
+    o para bugs:
     ```bash
     git checkout -b fix/nombre-del-feature
-
-3. **Realizar cambios, probar y hacer commit:**:
+3. **Realizar cambios, probar y hacer commit**:
    ```bash
     git add .
     git commit -m "Descripción breve del cambio"
-4. **Subir tu rama:**
+4. **Subir tu rama**:
     git push origin feature/nombre-del-feature
 5. **Crear Merge Request desde `feature/` hacia `devBranch`.**
 

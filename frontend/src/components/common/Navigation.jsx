@@ -2,63 +2,97 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Logo from '../icons/Logo';
 import navigationLinks from '../utils/content';
+import DropDownMenu from '../common/DropDownMenu';
+
 
 function Navigation() {
-  // Estados locales
-  const [menuOpen, setMenuOpen] = useState(false); // Menú hamburguesa
-  const [scrolled, setScrolled] = useState(false); // Estado de scroll
-  const [activeLink, setActiveLink] = useState(1); // Link activo
-  const navigate = useNavigate(); // Hook para navegar
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [activeLink, setActiveLink] = useState(1);
+  const [currentUser, setCurrentUser] = useState(null);
 
-  // Función para manejar el scroll y cambiar el estilo del navbar
+  const navigate = useNavigate();
+
   const handleScroll = () => {
-    if (window.scrollY > window.innerHeight) {
-      setScrolled(true);
-    } else {
-      setScrolled(false);
-    }
+    setScrolled(window.scrollY > window.innerHeight);
   };
 
-  // Función para abrir/cerrar el menú hamburguesa
   const toggleMenu = () => setMenuOpen(!menuOpen);
 
-  // Función para manejar el click en un link de navegación
   const handleLinkClick = (link) => {
-    setActiveLink(link); // Cambiar el link activo
-    setMenuOpen(false); // Cerrar el menú en móvil
+    setActiveLink(link);
+    setMenuOpen(false);
   };
 
-  // Función para redirigir al Sign In
   const handleSignInClick = () => {
-    navigate('/iniciarsesion');
+    navigate('/iniciar-sesion');
   };
 
-  // Hook para escuchar el evento de scroll
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setCurrentUser(null);
+    navigate('/');
+  };
+
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
-
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+  useEffect(() => {
+    const updateUser = () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const decoded = JSON.parse(atob(token.split('.')[1]));
+          const now = Date.now();
+  
+          if (
+            decoded &&
+            decoded.userType &&
+            decoded.firstName &&
+            decoded.email &&
+            decoded.exp &&
+            now < decoded.exp * 1000
+          ) {
+            setCurrentUser(decoded);
+          } else {
+            localStorage.removeItem('token');
+            setCurrentUser(null);
+          }
+        } catch (error) {
+          console.error('Error decoding token:', error);
+          localStorage.removeItem('token');
+          setCurrentUser(null);
+        }
+      } else {
+        setCurrentUser(null);
+      }
+    };
+  
+    updateUser();
+    window.addEventListener('userUpdated', updateUser);
+  
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('userUpdated', updateUser);
     };
   }, []);
+  
 
-  // JSX del componente
   return (
     <nav className={`nav ${scrolled ? 'scrolled' : ''}`}>
-      {/* Logo */}
       <a data-aos="fade-down" data-aos-duration="1500" className="logo" href="#">
         <Logo className="logo-img" />
       </a>
 
-      {/* Menú de navegación */}
       <div className={menuOpen ? 'nav-links open' : 'nav-links'}>
         <ul>
           {navigationLinks.map(link => (
             <li key={link.id}>
               <a 
-                data-aos="fade-down" 
-                data-aos-delay="350" 
-                data-aos-duration="3500" 
+                data-aos="fade-down"
+                data-aos-delay="350"
+                data-aos-duration="3500"
                 className={`navIndex ${activeLink === link.id ? 'active' : ''}`}
                 href={link.href}
                 onClick={() => handleLinkClick(link.id)}
@@ -70,9 +104,19 @@ function Navigation() {
         </ul>
       </div>
 
-      {/* Botón de Iniciar Sesión */}
+      {/* Botón o menú de cliente */}
       <div>
-        <button className="signInBtn" onClick={handleSignInClick}>Iniciar Sesión</button>
+        {currentUser && currentUser.userType === 'cliente' ? (
+          <div>
+          <DropDownMenu 
+            name={currentUser.firstName} 
+            email={currentUser.email} 
+            onLogout={handleLogout}
+          />
+        </div>
+        ) : (
+          <button className="signInBtn" onClick={handleSignInClick}>Iniciar Sesión</button>
+        )}
       </div>
 
       {/* Menú hamburguesa */}
