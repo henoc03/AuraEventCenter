@@ -2,14 +2,14 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     background-color: rgba(0, 0, 0, 0.6);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 4000;
-    overflow-y: scroll;
+
 }
   
 .modal-content {
@@ -17,9 +17,11 @@
     padding: 1.7rem 1rem;
     border-radius: 10px;
     max-width: 520px;
+    max-height: 90vh;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     position: relative;
     margin: 0 30px;
+    overflow-y: auto;
 }
 
 .title-close-container {
@@ -66,7 +68,31 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    gap:20px;
+    width:100%;
 }
+.title-close-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+.close-x {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    color: #000;
+    transition: color 0.2s ease;
+  }
+  
+  .close-x:hover {
+    color: #2563eb;
+  }
+
+  
+  
 
 .save-button,  .cancel-button{
     background-color: #0074D9;
