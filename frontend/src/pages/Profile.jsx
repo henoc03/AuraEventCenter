@@ -6,13 +6,13 @@ import DefaultProfilePhoto from '../assets/images/default-profile-photo.png'
 import '../style/auth.css';
 import '../style/profile.css';
 
-const DEFAULT_ROUTE = 'http://localhost:3000'
+const DEFAULT_ROUTE = 'http://localhost:1522'
 
 function Profile() {
   const [currentUser, setCurrentUser] = useState([]);
 
   useEffect(() => {
-    fetch(`${DEFAULT_ROUTE}/api/current_user`)
+    fetch(`${DEFAULT_ROUTE}/current_user`)
       .then(res => res.json())
       .then(data => setCurrentUser(data))
       .catch(error => console.error('Error fetching user data:', error));

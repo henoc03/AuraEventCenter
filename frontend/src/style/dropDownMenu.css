@@ -16,6 +16,20 @@
     border-radius: 0px 0px 15px 15px;
 }
 
+.drop-down-menu {
+    position: relative;
+    display: inline-block;
+}
+
+
+.submenu {
+    left: 50%;
+    transform: translateX(-50%);
+}
+.user-email{
+    left: 10%;
+    transform: translateX(-10%);
+}
 .dropdown-user-info {
     display: flex;
     flex-direction: column;

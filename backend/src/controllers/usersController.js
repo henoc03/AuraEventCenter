@@ -193,7 +193,8 @@ exports.login = async (req, res) => {
         email: user.EMAIL,
         userType: user.USER_TYPE,
         firstName: user.FIRST_NAME,
-        lastName1: user.LAST_NAME_1
+        lastName1: user.LAST_NAME_1,
+        lastName2: user.LAST_NAME_2
       },
       secretKey, 
       { expiresIn: '2h' }
@@ -248,7 +249,12 @@ exports.registerUser = async (req, res) => {
     const user_id = result.outBinds.user_id[0];
 
     const token = jwt.sign(
-      { id: user_id, email: email },
+      { id: user.USER_ID,
+        email: user.EMAIL,
+        userType: user.USER_TYPE,
+        firstName: user.FIRST_NAME,
+        lastName1: user.LAST_NAME_1,
+        lastName2: user.LAST_NAME_2 },
       secretKey,
       { expiresIn: '2h' }
     );
