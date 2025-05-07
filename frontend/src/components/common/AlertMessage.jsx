@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import '../../index.css';
 
-const AlertMessage = ({ message, type = 'info', onClose, duration = 3000 }) => {
+const AlertMessage = ({ message, type = 'info', onClose,  className = '', duration = 3000 }) => {
   useEffect(() => {
     if (message && onClose) {
       const timer = setTimeout(onClose, duration);
@@ -12,8 +12,9 @@ const AlertMessage = ({ message, type = 'info', onClose, duration = 3000 }) => {
   if (!message) return null;
 
   return (
-    <div className={`alert-message ${type}`}>
-      {message}
+    <div className={`alert-message ${type} ${className}`}>
+      <span>{message}</span>
+      <button onClick={onClose}>&times;</button>
     </div>
   );
 };

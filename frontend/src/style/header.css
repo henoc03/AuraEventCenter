@@ -49,7 +49,7 @@
     margin: 0px;
 }
 
-#collapse-button, #hamburger-button {
+#hamburger-button {
     color: white;
     background: none;
     border: none;
@@ -68,17 +68,14 @@
     box-shadow: none !important;
 }
 
-.submenu {
-    top: 95%;
-}
-
 .card {
     padding: 0;
     margin: 0;
     border: none;
+    border-radius: 0px 0px 15px 15px;
 }
 
-.dropdown-user-info, .dropdown-hamburger-menu {
+.dropdown-hamburger-menu {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -90,30 +87,8 @@
     font-size: 0.8rem;
     background-color: rgb(255, 255, 255);
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    background-color: rgb(255, 255, 255);
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     padding: 15px 0px;
     border-radius: 0px 0px 15px 15px;
-}
-
-.dropdown-hamburger-menu {
-    margin-top: 0px;
-    padding: 0;
-    width: 35vw;
-    max-width: 360px;
-    min-width: fit-content;
-    max-height: fit-content;
-    min-height: 100%;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-
-.dropdown-user-info p{
-    display: flex;
-    justify-content: center;
-    font-family: var(--font-family);
-    text-align: center;
-    margin: 10px 0px;
 }
 
 .options{
@@ -135,6 +110,22 @@
     font-weight: bold;
 }
 
+.dropdown-hamburger-menu{
+    height: 100%;
+    width: 100%;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.dropdown-hamburger-menu ul li span{
+    margin-left: 10px;
+    height: 25px;
+    font-size: 1rem;
+    text-decoration: none;
+    font-family: 'Merriweather Sans', sans-serif;
+}
+
 @media(max-width: 768px) {
     .header-container {
         justify-content: center;
@@ -144,21 +135,48 @@
     }
 
     .drop-down-menus-container {
-        width: 100%;
+        width: 98%;
     }
 
     .user-info-container {
-        margin: 20px;
+        margin: 0px;
         left: 50%;
     }
 
     .submenu {
-        top: 113%;
+        top: 90%;
     }
 
-    .card {
-        width: 20px;
+    .sidenav {
+        border-radius: 10px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 0;
+        border: none;
+        height: fit-content;
     }
+
+    aside.sidenav {
+        height: fit-content;
+        padding: 0;
+        border: none;
+    }
+
+    .sidenav li{
+        height: 60px;
+    }
+
+    .sidenav ul{
+        height: fit-content;
+        margin-bottom: 20px;
+    }
+
+    /* Asegurar que el menú hamburguesa quede siempre debajo del header */
+    #hamburger-menu {
+        top: 0%;
+        margin-top: 135px;
+        border-radius: 10px;
+    }
+
     .user-info-container h2 {
         font-size: 1rem;
     }
@@ -167,15 +185,16 @@
         font-size: 0.8rem;
     }
 
-    #hamburger-menu {
-        top: 5%;
-        margin-top: 113px;
+    .dropdown-hamburger-menu ul li{
+        margin: 10px 15px;
+        padding: 5px 8px;
     }
 }
 
-@media(max-width: 421px) {
+@media(max-width: 481px) {
+    /* Asegurar que el menú hamburguesa quede siempre debajo del header */
     #hamburger-menu {
-        top: 8%;
-        margin-top: 113px;
+        top: 0%;
+        margin-top: 158px;
     }
 }

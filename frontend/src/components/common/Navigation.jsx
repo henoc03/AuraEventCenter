@@ -4,45 +4,69 @@ import Logo from '../icons/Logo';
 import navigationLinks from '../utils/content';
 
 function Navigation() {
-  // Estados locales
-  const [menuOpen, setMenuOpen] = useState(false); // Menú hamburguesa
-  const [scrolled, setScrolled] = useState(false); // Estado de scroll
-  const [activeLink, setActiveLink] = useState(1); // Link activo
-  const navigate = useNavigate(); // Hook para navegar
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [activeLink, setActiveLink] = useState(1);
+  const [currentUser, setCurrentUser] = useState(null);
 
-  // Función para manejar el scroll y cambiar el estilo del navbar
+  const navigate = useNavigate();
+
   const handleScroll = () => {
-    if (window.scrollY > window.innerHeight) {
-      setScrolled(true);
-    } else {
-      setScrolled(false);
-    }
+    setScrolled(window.scrollY > window.innerHeight);
   };
 
-  // Función para abrir/cerrar el menú hamburguesa
   const toggleMenu = () => setMenuOpen(!menuOpen);
 
-  // Función para manejar el click en un link de navegación
   const handleLinkClick = (link) => {
-    setActiveLink(link); // Cambiar el link activo
-    setMenuOpen(false); // Cerrar el menú en móvil
+    setActiveLink(link);
+    setMenuOpen(false);
   };
 
-  // Función para redirigir al Sign In
   const handleSignInClick = () => {
     navigate('/iniciar-sesion');
   };
 
-  // Hook para escuchar el evento de scroll
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setCurrentUser(null);
+    navigate('/');
+  };
+
+
+   // Maneja la apertura y cierre del submenu
+   const [submenuOpen, setSubmenuOpen] = useState(false);
+   const toggleSubmenu = () => setSubmenuOpen(!submenuOpen);
+   
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
+  useEffect(() => {
+    const updateUser = () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const decoded = JSON.parse(atob(token.split('.')[1]));
+          setCurrentUser(decoded);
+        } catch (error) {
+          console.error('Error decoding token:', error);
+          setCurrentUser(null);
+        }
+      } else {
+        setCurrentUser(null);
+      }
+    };
+  
+    updateUser();
+    window.addEventListener('userUpdated', updateUser);
+  
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('userUpdated', updateUser);
     };
   }, []);
 
-  // JSX del componente
   return (
     <nav className={`nav ${scrolled ? 'scrolled' : ''}`}>
       {/* Logo */}
@@ -50,15 +74,14 @@ function Navigation() {
         <Logo className="logo-img" />
       </a>
 
-      {/* Menú de navegación */}
       <div className={menuOpen ? 'nav-links open' : 'nav-links'}>
         <ul>
           {navigationLinks.map(link => (
             <li key={link.id}>
               <a 
-                data-aos="fade-down" 
-                data-aos-delay="350" 
-                data-aos-duration="3500" 
+                data-aos="fade-down"
+                data-aos-delay="350"
+                data-aos-duration="3500"
                 className={`navIndex ${activeLink === link.id ? 'active' : ''}`}
                 href={link.href}
                 onClick={() => handleLinkClick(link.id)}
@@ -70,9 +93,37 @@ function Navigation() {
         </ul>
       </div>
 
-      {/* Botón de Iniciar Sesión */}
+      {/* Botón o menú de cliente */}
       <div>
-        <button className="signInBtn" onClick={handleSignInClick}>Iniciar Sesión</button>
+        {currentUser && currentUser.userType === 'cliente' ? (
+          <div>
+          {/* Botón "Hola" */}
+          <button className="helloBtn" onClick={toggleSubmenu}>
+            Hola, {currentUser.firstName}
+          </button>
+
+          {/* Collapse submenu */}
+          {submenuOpen && (
+            <div
+              className="collapse submenu"
+              id="collapseMenu"
+              style={{ position: 'absolute', zIndex: 1000, right: '-10%' }}
+            >
+              <div className="card card-body">
+                <div className="dropdown-user-info">
+                  <p className="user-email">{currentUser.email}</p>
+                  <div className="options">
+                    <a href={currentUser.userType === 'admin' ? '/admin/tablero' : '/'}>Inicio</a>
+                    <a href="/" onClick={handleLogout}>Cerrar sesión</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+        ) : (
+          <button className="signInBtn" onClick={handleSignInClick}>Iniciar Sesión</button>
+        )}
       </div>
 
       {/* Menú hamburguesa */}

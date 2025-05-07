@@ -4,15 +4,22 @@ import {jwtDecode} from 'jwt-decode';
 import Header from "../components/common/Header";
 import ProfilePhoto from "/default-image.jpg"
 import SideNav from "../components/common/SideNav.jsx"
+import AlertMessage from "../components/common/AlertMessage.jsx"
 import '../style/auth.css';
 import '../style/profile.css';
 import { useNavigate } from "react-router-dom";
+
 
 const DEFAULT_ROUTE = "http://localhost:1522";
 
 function Profile({sections}) {
   const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm({ mode: 'onChange' });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [lastname, setLastname] = useState("");
+  const [role, setRole] = useState("");
+  const [showSuccess, setShowSuccess] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,7 +56,15 @@ function Profile({sections}) {
         email: userData.EMAIL,
         phone: userData.PHONE
       });
-      setLoading(true);
+
+       // Guarda los datos traidos
+        setName(userData.FIRST_NAME)
+        setEmail(userData.EMAIL)
+        setLastname(userData.LAST_NAME_1)
+        setRole(userData.USER_TYPE)
+
+        // Cambia el estado de la página
+        setLoading(false);
     } catch {
       alert('Ocurrió un error al obtener la información de usuario.');
       navigate('/login');
@@ -91,17 +106,20 @@ function Profile({sections}) {
         alert(errorData.message || 'Error al actualizar la información del usuario');
         return;
       }
-
+      
+      getSetUserInfo();
+      setShowSuccess(true);
     } catch (error) {
+      setShowSuccess(false);
       console.error('Error:', error);
       alert('Ocurrió un error al actualizar la información de usuario.');
       navigate('/login');
     }
   };
 
-  if (loading) {return (
+  if (!loading) {return (
     <>   
-      <Header>
+      <Header name={name} lastname={lastname} role={role} email={email}>
         {/*Menu de hamburguesa*/}
         <SideNav id="side-nav-mobile" sections={sections} />
       </Header>
@@ -113,15 +131,33 @@ function Profile({sections}) {
 
 
         <div className="main">
+          {showSuccess && (
+            <AlertMessage
+              message={"Información actualizada con éxito"}
+              type={"alert-floating"}
+              onClose={() => setShowSuccess(false)}
+              duration={3000}
+              className={"success"}
+            />
+          )}
+
           <div className="profile-container">
             <h1>Información de perfil</h1>
             <div className="image-form-container">
               <div className="image-container">
-                <img src={ProfilePhoto} alt="Foto de perfil editable" className="editable-profile-photo" width='400' height='400'/>
-                <i className="bi bi-pencil edit-icon"></i>
+                <label htmlFor="image-upload" className="upload-label">
+                  <i className="bi bi-pencil edit-icon"></i>
+                  <img src={ProfilePhoto} alt="Foto de perfil editable" className="editable-profile-photo" width='400' height='400'/>
+                </label>
+                <input
+                  id="image-upload"
+                  type="file"
+                  accept="image/*"
+                />
+
               </div>
               <div className="user-info-form">
-                <form onSubmit={handleSubmit(onSubmit)} className="auth-form">
+                <form onSubmit={(handleSubmit(onSubmit))} className="auth-form">
                   <label htmlFor="name">Nombre *</label>
                   <input
                     type="text"
@@ -167,7 +203,7 @@ function Profile({sections}) {
                   />
                   {errors.phone && <span className="error">{errors.phone.message}</span>}
 
-                  <button type="submit" disabled={!isValid} className={`save-button ${isValid ? 'active' : ''}`} >
+                  <button onSubmit={onSubmit} type="submit" disabled={!isValid} className={`save-button ${isValid ? 'active' : ''}`} >
                     Guardar
                   </button>
                 </form>

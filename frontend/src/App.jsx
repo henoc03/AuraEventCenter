@@ -13,43 +13,44 @@ import NotFound from './pages/Notfound'; // Página de 404
 import SectionAdmin from '../src/components/utils/admin-nav'; // Lista de secciones que van en el nav para administradores
 import SectionRoot from '../src/components/utils/root-nav'; // Lista de secciones que van en el nav para root admins
 import SectionProfile from '../src/components/utils/profile-nav'; // Lista de secciones que van en el nav la pagina de perfil
+import Header from './components/common/Header.jsx'; // Página de 404
+
+import { AuthProvider } from './context/AuthContext';
+import PrivateRoute from './components/context/PrivateRoute'; // Una mausque herramineta que nos servira mas adelante
 
 function App() {
   return (
-    <>    
-      <Router>
-        <Routes>
-          {/* Ruta para la página de inicio */}
-          <Route path="/" element={<Home />} />
+    <Router>
+      <Routes>
+        {/* Ruta para la página de inicio */}
+        <Route path="/" element={<Home />} />
 
-          {/* Ruta para la página de inicio de sesión */}
-          <Route path="/iniciar-sesion" element={<SignIn />} />
+        {/* Ruta para la página de inicio de sesión */}
+        <Route path="/iniciar-sesion" element={<SignIn />} />
 
-          {/* Ruta para la página de registro */}
-          <Route path="/registro" element={<Register />} />
+        {/* Ruta para la página de registro */}
+        <Route path="/registro" element={<Register />} />
 
-          {/* Ruta para la página de recuperar contraseña */}
-          <Route path="/recuperar-contraseña" element={<RecoverEmail />} />
+        {/* Ruta para la página de recuperar contraseña */}
+        <Route path="/recuperar-contraseña" element={<RecoverEmail />} />
 
-          {/* Ruta para la página de validación de codigo */}
-          <Route path="/verificar-codigo" element={<VerifyCode />} />
+        {/* Ruta para la página de validación de codigo */}
+        <Route path="/verificar-codigo" element={<VerifyCode />} />
 
-          {/* Ruta para la página de contraseña nueva */}
-          <Route path="/cambiar-contraseña" element={<ResetPassword />} />
+        {/* Ruta para la página de contraseña nueva */}
+        <Route path="/cambiar-contraseña" element={<ResetPassword />} />
 
-          {/* Ruta para la página de inicio */}
-          <Route path="/inicio" element={<Home />} />
+        {/* Ruta para la página de inicio */}
+        <Route path="/inicio" element={<Home />} />
+        
+        {/* Ruta para la página de inicio */}
+        <Route path="/perfil" element={<Profile sections={SectionProfile}/>} />
 
-          {/* Ruta para la página de inicio */}
-          <Route path="/perfil" element={<Profile sections={SectionProfile}/>} />
+        {/* Ruta para 404 para paginas no definidas */}
+        <Route path="*" element={<NotFound />} />
           
-
-          {/* Ruta para 404 para paginas no definidas */}
-          <Route path="*" element={<NotFound />} />
-          
-        </Routes>
-      </Router>
-    </>
+      </Routes>
+    </Router>
   );
 }
 
