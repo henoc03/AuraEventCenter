@@ -9,6 +9,7 @@ router.get('/getNameEmail/:id', usersController.getNameEmail);
 router.get('/getNameLastNameRole/:id', usersController.getNameLastnameRole);
 router.post('/', usersController.createUser);
 router.put('/:id', usersController.updateUser);
+router.put('/updateProfile/:id', usersController.updateUserProfile);
 router.delete('/:id', usersController.deleteUser);
 router.post('/login', usersController.login);
 router.post('/register', usersController.registerUser);
