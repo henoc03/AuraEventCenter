@@ -9,7 +9,7 @@ import RecoverEmail from './pages/RecoverEmail'; // Página de recuperar contras
 import VerifyCode from './pages/VerifyCode'; // Página de validación de codigo
 import ResetPassword from './pages/ResetPassword'; // Página de contraseña nueva
 import NotFound from './pages/Notfound'; // Página de 404
-import Header from './components/common/Header.jsx'; // Página de 404
+import Profile from './pages/Profile'
 
 import { AuthProvider } from './context/AuthContext';
 import PrivateRoute from './components/context/PrivateRoute'; // Una mausque herramineta que nos servira mas adelante
@@ -17,7 +17,6 @@ import PrivateRoute from './components/context/PrivateRoute'; // Una mausque her
 function App() {
   return (
     <>
-    <Header></Header>
     <Router>
       <Routes>
         {/* Ruta para la página de inicio */}
@@ -37,6 +36,8 @@ function App() {
 
         {/* Ruta para la página de contraseña nueva */}
         <Route path="/cambiar-contraseña" element={<ResetPassword />} />
+
+        <Route path="/perfil" element={<Profile />} />
 
         {/* Ruta para la página de inicio */}
         <Route path="/inicio" element={<Home />} />
