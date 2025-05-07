@@ -15,6 +15,7 @@ import AdminDashboard from "./pages/AdminDashBoard";
 import Clients from './pages/Clients';
 import Administrators from './pages/Administrator';
 import Profile from './pages/Profile';
+import RoomsAdmin from './pages/RoomsAdmin';
 
 // Contexto y utilidades
 import { AuthProvider } from './context/AuthContext';
@@ -39,12 +40,14 @@ function App() {
 
           {/* Rutas protegidas para administradores comunes */}
           <Route element={<PrivateRoute allowedRoles={['admin']} />}>
+            <Route path="/admin/rooms" element={<RoomsAdmin sections={SectionAdmin}/>} />
             <Route path="/admin/tablero" element={<AdminDashboard sections={SectionAdmin} />} />
             <Route path="/admin/clientes" element={<Clients sections={SectionAdmin} />} />
           </Route>
 
           {/* Rutas protegidas para root-admin */}
           <Route element={<PrivateRoute allowedRoles={['root admin']} />}>
+            <Route path="/root-admin/salas" element={<RoomsAdmin sections={SectionRoot}/>} />
             <Route path="/root-admin/tablero" element={<AdminDashboard sections={SectionRoot} />} />
             <Route path="/root-admin/clientes" element={<Clients sections={SectionRoot} />} />
             <Route path="/root-admin/administradores" element={<Administrators sections={SectionRoot} />} />
