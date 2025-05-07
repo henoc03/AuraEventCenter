@@ -191,7 +191,6 @@
 .about-us {
   display: flex;
   flex-wrap: wrap;
-  flex-wrap: wrap;
   flex: 1;
   align-items: center;
   justify-content: space-between;
@@ -209,22 +208,22 @@
 }
 
 .about-text h2 {
-  font-size: clamp(1.8rem, 2.5vw, 2.3rem);
+  font-size: clamp(2rem, 3vw, 2.5rem);
   color: #ffff;
   margin-bottom: 1rem;
 }
 
 .about-text p {
-  font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+  font-size: clamp(1rem, 2vw, 1.2rem);
   color: var(--background-color);
   line-height: 1.4;
   text-align: justify;
   max-width: 100%;
-  margin-bottom: 1.8rem;
+  margin-bottom: 2rem;
 }
 
 .about-text button {
-  font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+  font-size: clamp(1rem, 2vw, 1.2rem);
   padding: 0.75rem 1.5rem;
   color: black;
   background-color: var(--blue-logo);
@@ -299,6 +298,7 @@ box-shadow: 0 0 50px var(--blue-logo);
   height: 100%;
   max-height: 600px;
   object-fit: fill;
+  border-radius: 0.5rem;
 }
 
 /*--------------------------------------------------------------------------FOOTER--------------------------------------------------------------*/
@@ -412,7 +412,7 @@ box-shadow: 0 0 50px var(--blue-logo);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap:20px;
+  gap:20px
 }
 
 .alert-message.success {

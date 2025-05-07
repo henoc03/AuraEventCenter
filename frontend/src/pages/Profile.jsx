@@ -23,7 +23,10 @@ function Profile({sections}) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    getSetUserInfo();
+    fetch(`${DEFAULT_ROUTE}/current_user`)
+      .then(res => res.json())
+      .then(data => setCurrentUser(data))
+      .catch(error => console.error('Error fetching user data:', error));
   }, []);
 
   // Función para obtener información del usuario

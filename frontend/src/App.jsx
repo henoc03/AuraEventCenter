@@ -40,6 +40,8 @@ function App() {
         {/* Ruta para la página de contraseña nueva */}
         <Route path="/cambiar-contraseña" element={<ResetPassword />} />
 
+        <Route path="/perfil" element={<Profile />} />
+
         {/* Ruta para la página de inicio */}
         <Route path="/inicio" element={<Home />} />
         
