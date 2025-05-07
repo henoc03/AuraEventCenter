@@ -4,32 +4,83 @@ import { useNavigate } from 'react-router-dom';
 import Auth from '../components/common/Auth';
 import '../style/auth.css';
 
+const PORT = "http://localhost:1522";
+
 const Register = () => {
   const { register, handleSubmit, formState: { errors, isValid } } = useForm({ mode: 'onChange' });
   const [termsAccepted, setTermsAccepted] = useState(false);
   const navigate = useNavigate();
 
-  const onSubmit = (data) => {
-    console.log('Registro:', data);
-    navigate('/');
+  const onSubmit = async (data) => {
+    const body = {
+      email: data.email,
+      first_name: data.first_name,
+      last_name_1: data.last_name_1,
+      last_name_2: data.last_name_2,
+      phone: data.phone,
+      password: data.password,
+      user_type: 'cliente'
+    };
+  
+    try {
+      const response = await fetch(`${PORT}/users/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        alert(errorData.error || 'Error al registrar');
+        return;
+      }
+  
+      const result = await response.json();
+  
+      if (result.token) {
+        localStorage.setItem('token', result.token);
+        console.log('Usuario creado con ID:', result.user_id);
+      }
+
+      window.dispatchEvent(new Event('userUpdated'));
+
+      sessionStorage.setItem('authSuccessMessage', 'Usuario registrado exitosamente');
+      sessionStorage.setItem('authMessageType', 'success');
+    
+      navigate('/');
+    } catch (error) {
+      console.error('Error al registrar:', error);
+      alert('Ocurrió un error al conectar con el servidor.');
+    }
   };
 
   return (
     <Auth title="Registrarse">
       <form onSubmit={handleSubmit(onSubmit)} className="auth-form">
-        
-        <label htmlFor="name">Nombre completo *</label>
+        <label>Nombre *</label>
         <input
           type="text"
-          placeholder=""
-          {...register('name', { required: 'Nombre requerido' })}
+          {...register('first_name', { required: 'Nombre requerido' })}
         />
-        {errors.name && <span className="error">{errors.name.message}</span>}
-        
-        <label htmlFor="email">Correo electrónico *</label>
+        {errors.first_name && <span className="error">{errors.first_name.message}</span>}
+
+        <label>Primer apellido *</label>
+        <input
+          type="text"
+          {...register('last_name_1', { required: 'Primer apellido requerido' })}
+        />
+        {errors.last_name_1 && <span className="error">{errors.last_name_1.message}</span>}
+
+        <label>Segundo apellido *</label>
+        <input
+          type="text"
+          {...register('last_name_2', { required: 'Segundo apellido requerido' })}
+        />
+        {errors.last_name_2 && <span className="error">{errors.last_name_2.message}</span>}
+
+        <label>Correo electrónico *</label>
         <input
           type="email"
-          placeholder=""
           {...register('email', {
             required: 'Email requerido',
             pattern: {
@@ -40,30 +91,27 @@ const Register = () => {
         />
         {errors.email && <span className="error">{errors.email.message}</span>}
 
-
-        <label htmlFor="phone">Número telefónico *</label>
+        <label>Número telefónico *</label>
         <input
           type="tel"
-          placeholder=""
           {...register('phone', {
             required: 'Teléfono requerido',
             pattern: {
               value: /^[0-9]{8}$/,
-              message: 'Solo números (8 dígitos)'
+              message: 'Debe tener 8 dígitos'
             }
           })}
         />
         {errors.phone && <span className="error">{errors.phone.message}</span>}
 
-        <label htmlFor="password">Contraseña *</label>
+        <label>Contraseña *</label>
         <input
           type="password"
-          placeholder=""
           {...register('password', {
             required: 'Contraseña requerida',
             pattern: {
-              value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[\W_]).{8,}$/,
-              message: 'Mínimo 8 caracteres, 1 mayúscula, 1 minúscula, 1 numero, 1 símbolo'
+              value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
+              message: 'Mínimo 8 caracteres, mayúscula, minúscula, número y símbolo'
             }
           })}
         />
@@ -78,7 +126,11 @@ const Register = () => {
           <label htmlFor="terms">He leído y acepto los términos y condiciones</label>
         </div>
 
-        <button type="submit" disabled={!isValid || !termsAccepted} className={`submit-button ${isValid && termsAccepted ? 'active' : ''}`} >
+        <button
+          type="submit"
+          disabled={!isValid || !termsAccepted}
+          className={`submit-button ${isValid && termsAccepted ? 'active' : ''}`}
+        >
           Registrarse
         </button>
 

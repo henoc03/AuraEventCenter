@@ -1,11 +1,6 @@
-*{
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Merriweather", serif;
+html {
   scroll-behavior: smooth;
 }
-
 :root {
   --blue-logo: #0074d9;
 }

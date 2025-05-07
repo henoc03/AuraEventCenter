@@ -6,7 +6,9 @@ import '../../style/room-card.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSquare } from '@fortawesome/free-solid-svg-icons';
 
-function RoomCard ({name, image, state, type, capacity, price, description, onClose}) {
+const DEFAULT_ROUTE = "http://localhost:1522";
+
+function RoomCard ({id, name, image, state, type, capacity, price, description, onClose}) {
   const [isDeleted, setIsDeleted] = useState(false);
   const [isEditClicked, setIsEditClicked] = useState(false);
   const [isViewClicked, setIsViewClicked] = useState(false);
@@ -18,6 +20,30 @@ function RoomCard ({name, image, state, type, capacity, price, description, onCl
     }
   };
 
+  if (isDeleted) {
+    const handleDelete  = async () => {
+      try {
+        const res = await fetch(`${DEFAULT_ROUTE}/zones/${id}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          alert(errorData.message || 'Error al eliminar la zona');
+          return;
+        }
+        
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Ocurrió un error al eliminar la zona.');
+      }
+      setIsDeleted(true);
+    }
+    handleDelete();
+  }
+
+
   return (
     <>
       <div className={`room-card ${isDeleted ? "deleted":""}`}>
@@ -25,10 +51,10 @@ function RoomCard ({name, image, state, type, capacity, price, description, onCl
         <div className="card-body">
           <h3 className="card-title">{name}</h3>
           <h2>
-            <FontAwesomeIcon icon={faSquare} className={state ? "status-indicator active" : "status-indicator inactive"} /> {state ?  "Publicada" : " No publicada"}
+            <FontAwesomeIcon icon={faSquare} className={state == 1 ? "status-indicator active" : "status-indicator inactive"} /> {state ?  "Publicada" : " No publicada"}
           </h2>
           <div className="buttons">
-            <a href="#" className="btn btn-primary button" onClick={() => setIsDeleted(!isDeleted)}>Borrar</a>
+            <a href="#" className="btn btn-primary button" onClick={() => setIsDeleted(true)}>Borrar</a>
             <a href="#" className="btn btn-primary button" onClick={() => setIsEditClicked(!isEditClicked)}>Editar</a>
             <a href="#" className="btn btn-primary button" onClick={() => setIsViewClicked(!isViewClicked)}>Visualizar</a>
           </div>
@@ -38,7 +64,13 @@ function RoomCard ({name, image, state, type, capacity, price, description, onCl
       {isEditClicked && (
         <AddEditRoomModal 
         isModalOpen={true} 
-        onClose={() => setIsEditClicked(false)} 
+        onClose={() => setIsEditClicked(false)}
+        id={id}
+        name={name}
+        type={type}
+        price={price}
+        capacity={capacity}
+        description={description}
       />
       )}
 
