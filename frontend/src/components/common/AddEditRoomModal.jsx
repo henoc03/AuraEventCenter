@@ -50,6 +50,7 @@ function AddEditRoomModal({
           return;
         }
 
+        onClose();
         setShowCreateSuccess(true);
       } catch (error) {
         console.error('Error:', error);

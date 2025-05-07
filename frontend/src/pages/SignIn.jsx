@@ -36,7 +36,7 @@ const SignIn = () => {
       localStorage.setItem('user', JSON.stringify(decoded));
       localStorage.setItem('token', access.token);
       
-      setCurrentUser(decoded); // Actualiza el estado del contexto de autenticación
+      setCurrentUser(decoded);
       
       window.dispatchEvent(new Event('userUpdated'));
       
