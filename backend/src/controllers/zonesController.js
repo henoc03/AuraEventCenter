@@ -1,8 +1,8 @@
 const { getConnection, oracledb } = require('../config/db');
+const { encrypt, decrypt } = require('../utils/encryption');
 
 // ===================== ZONES =====================
 
-// Obtener todas las zonas
 exports.getAllZones = async (req, res) => {
   let conn;
   try {
@@ -22,7 +22,6 @@ exports.getAllZones = async (req, res) => {
   }
 };
 
-// Obtener zona por ID
 exports.getZoneById = async (req, res) => {
   let conn;
   try {
@@ -42,7 +41,6 @@ exports.getZoneById = async (req, res) => {
   }
 };
 
-// Crear zona
 exports.createZone = async (req, res) => {
   const { name, description, capacity, type, event_center_id, price } = req.body;
   let conn;
@@ -72,7 +70,6 @@ exports.createZone = async (req, res) => {
   }
 };
 
-// Actualizar zona
 exports.updateZone = async (req, res) => {
   const { name, description, capacity, type, event_center_id, price } = req.body;
   let conn;
@@ -107,7 +104,6 @@ exports.updateZone = async (req, res) => {
   }
 };
 
-// Eliminar zona
 exports.deleteZone = async (req, res) => {
   let conn;
   try {
@@ -128,7 +124,6 @@ exports.deleteZone = async (req, res) => {
 
 // ===================== IMAGES =====================
 
-// Obtener todas las imágenes
 exports.getAllImages = async (req, res) => {
   let conn;
   try {
@@ -138,7 +133,13 @@ exports.getAllImages = async (req, res) => {
       [],
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
-    res.json(result.rows);
+
+    const images = result.rows.map(img => ({
+      ...img,
+      IMAGE_NAME: decrypt(img.IMAGE_NAME)
+    }));
+
+    res.json(images);
   } catch (err) {
     console.error('❌ Error al obtener imágenes:', err);
     res.status(500).json({ error: err.message });
@@ -147,7 +148,6 @@ exports.getAllImages = async (req, res) => {
   }
 };
 
-// Obtener imágenes por ZONE_ID
 exports.getImagesByZoneId = async (req, res) => {
   let conn;
   try {
@@ -158,7 +158,13 @@ exports.getImagesByZoneId = async (req, res) => {
       [req.params.zone_id],
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
-    res.json(result.rows);
+
+    const images = result.rows.map(img => ({
+      ...img,
+      IMAGE_NAME: decrypt(img.IMAGE_NAME)
+    }));
+
+    res.json(images);
   } catch (err) {
     console.error('❌ Error al obtener imágenes por zona:', err);
     res.status(500).json({ error: err.message });
@@ -167,12 +173,13 @@ exports.getImagesByZoneId = async (req, res) => {
   }
 };
 
-// Crear imagen asociada a zona
 exports.createImage = async (req, res) => {
   const { image_address, image_name } = req.body;
   const zone_id = req.params.zone_id;
   let conn;
   try {
+    const encryptedName = encrypt(image_name);
+
     conn = await getConnection();
     const result = await conn.execute(
       `INSERT INTO ADMIN_SCHEMA.IMAGES (ZONE_ID, IMAGE_ADDRESS, IMAGE_NAME)
@@ -181,7 +188,7 @@ exports.createImage = async (req, res) => {
       {
         zone_id,
         image_address,
-        image_name,
+        image_name: encryptedName,
         image_id: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER }
       },
       { autoCommit: true }
@@ -195,11 +202,12 @@ exports.createImage = async (req, res) => {
   }
 };
 
-// Actualizar imagen
 exports.updateImage = async (req, res) => {
   const { image_address, image_name } = req.body;
   let conn;
   try {
+    const encryptedName = encrypt(image_name);
+
     conn = await getConnection();
     await conn.execute(
       `UPDATE ADMIN_SCHEMA.IMAGES SET 
@@ -208,7 +216,7 @@ exports.updateImage = async (req, res) => {
        WHERE IMAGE_ID = :image_id`,
       {
         image_address,
-        image_name,
+        image_name: encryptedName,
         image_id: req.params.image_id
       },
       { autoCommit: true }
@@ -222,7 +230,6 @@ exports.updateImage = async (req, res) => {
   }
 };
 
-// Eliminar imagen
 exports.deleteImage = async (req, res) => {
   let conn;
   try {
