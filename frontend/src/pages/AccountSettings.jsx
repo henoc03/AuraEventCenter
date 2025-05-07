@@ -4,7 +4,8 @@ import SideNav from "../components/common/SideNav.jsx"
 import "../style/account-settings.css";
 
 const AccountSettings = ({ sections }) => {
-  const [showModal, setShowModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
@@ -12,6 +13,11 @@ const AccountSettings = ({ sections }) => {
 
   const handleEditClick = () => {
     navigate('/cuenta/verificar-codigo');
+  };
+
+  const handleConfirm = () => {
+    setShowConfirmModal(false);
+    setShowPasswordModal(true);
   };
 
   const handleDelete = async () => {
@@ -55,7 +61,6 @@ const AccountSettings = ({ sections }) => {
       setError('Error de conexión con el servidor.');
     }
   };
-  
 
   return (
     <>
@@ -92,34 +97,46 @@ const AccountSettings = ({ sections }) => {
               </div>
 
               <button className="delete-account-button"
-              onClick={() => setShowModal(true)}
+              onClick={() => setShowConfirmModal(true)}
               >
                 Eliminar cuenta
               </button>
+
+              {showConfirmModal && (
+              <div className="modal">
+                <div className="modal-content">
+                  <button className="modal-close" onClick={() => setShowConfirmModal(false)}>×</button>
+                  <h2>¿Estás seguro?</h2>
+                  <p>Esta acción es irreversible</p>
+                  <button onClick={() => setShowConfirmModal(false)}>Cancelar</button>
+                  <button onClick={handleConfirm}>Continuar</button>
+                </div>
+              </div>
+              )}
+
+              {showPasswordModal && (
+                <div className="modal">
+                  <div className="modal-content">
+                    <button className="modal-close" onClick={() => setShowPasswordModal(false)}>×</button>
+                    <h2>Confirmar eliminación</h2>
+                    <p>Escribe tu contraseña para confirmar</p>
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Contraseña"
+                    />
+                    {error && <p className="error">{error}</p>}
+                    <button onClick={() => setShowPasswordModal(false)}>Cancelar</button>
+                    <button onClick={handleDelete}>Eliminar cuenta</button>
+                  </div>
+                </div>
+              )}
+
             </div>
           </div>
         </div>
       </div>
-
-      {showModal && (
-      <div className="modal-overlay">
-        <div className="modal">
-          <h3>¿Estás seguro de que quieres eliminar tu cuenta?</h3>
-          <p>Ingresa tu contraseña para confirmar.</p>
-          <input
-            type="password"
-            placeholder="Contraseña"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          {error && <p className="error-message">{error}</p>}
-          <div className="modal-actions">
-            <button onClick={handleDelete} className="confirm-button">Confirmar</button>
-            <button onClick={() => setShowModal(false)} className="cancel-button">Cancelar</button>
-          </div>
-        </div>
-      </div>
-    )}
     </>
   );
 };
