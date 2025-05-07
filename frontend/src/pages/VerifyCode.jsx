@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import OTPInput from '../components/sections/OTPInput';
 import Auth from '../components/common/Auth';
-import AlertMessage from '../components/common/AlertMessage'; 
+import AlertMessage from '../components/common/AlertMessage';
 import '../style/auth.css';
 
 const VerifyCode = ({ onVerify }) => {
@@ -10,31 +10,79 @@ const VerifyCode = ({ onVerify }) => {
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
 
+
   const navigate = useNavigate();
   const location = useLocation();
+  const email = location.state?.email || '';
+  const [token, setToken] = useState(location.state?.token || '');
+  
   const isCodeValid = code.length === 6;
 
-  const handleVerify = (e) => {
+  const handleVerify = async (e) => {
     e.preventDefault();
 
-    if (isCodeValid) {
-      if (onVerify) onVerify(code);
-      const email = location.state?.email || '';
-      navigate('/cambiar-contraseña', { state: { email } });
-    } else {
+    if (!isCodeValid) {
       setMessage('Código inválido o incompleto');
+      setMessageType('error');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:1522/email/recuperar/verificar-codigo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ code, token }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        if (onVerify) onVerify(code);
+        navigate('/cambiar-contraseña', {
+          state: { email, token }
+        });
+      } else {
+        setMessage(result.message || 'Código incorrecto o expirado');
+        setMessageType('error');
+      }
+    } catch (error) {
+      console.error(error);
+      setMessage('Error al verificar el código');
       setMessageType('error');
     }
   };
 
-  const handleResend = () => {
-    setMessage('Reenviando código...');
-    setMessageType('info');
+  const handleResend = async () => {
+    try {
+      setMessage('Reenviando código...');
+      setMessageType('info');
 
-    setTimeout(() => {
-      setMessage('Código reenviado exitosamente.');
-      setMessageType('success');
-    }, 1000);
+      const response = await fetch('http://localhost:1522/email/recuperar/enviar-codigo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setMessage('Código reenviado exitosamente.');
+        setMessageType('success');
+
+        setToken(result.token);
+
+        setCode('');
+      } else {
+        setMessage(result.message || 'Error al reenviar el código');
+        setMessageType('error');
+      }
+    } catch (error) {
+      console.error(error);
+      setMessage('Error al conectar con el servidor');
+      setMessageType('error');
+    }
   };
 
   return (

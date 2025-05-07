@@ -13,11 +13,13 @@ import AdminDashboard from "./pages/AdminDashBoard"; // Página de tablero
 import Clients from './pages/Clients'; // Página de clientes
 import Administrators from './pages/Administrator'; // Página de administradores
 import NotFound from './pages/Notfound'; // Página de 404
+import Profile from './pages/Profile'
+
+import { AuthProvider } from './context/AuthContext';
+import PrivateRoute from './components/context/PrivateRoute'; // Una mausque herramineta que nos servira mas adelante
 
 import SectionAdmin from '../src/components/utils/admin-nav'; // Lista de secciones que van en el nav para administradores
 import SectionRoot from '../src/components/utils/root-nav'; // Lista de secciones que van en el nav para root admins
-
-
 function App() {
   return (
     
@@ -40,6 +42,8 @@ function App() {
 
         {/* Ruta para la página de contraseña nueva */}
         <Route path="/cambiar-contraseña" element={<ResetPassword />} />
+
+        <Route path="/perfil" element={<Profile />} />
 
         {/* Ruta para la página de inicio */}
         <Route path="/inicio" element={<Home />} />
