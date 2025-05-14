@@ -3,15 +3,6 @@ require('dotenv').config();
 const path = require('path');
 const fs = require('fs');
 
-// Detección del entorno
-function isWSL() {
-  try {
-    return fs.readFileSync('/proc/version', 'utf-8').toLowerCase().includes('microsoft');
-  } catch (err) {
-    return false;
-  }
-}
-
 function isWindows() {
   return process.platform === 'win32';
 }
@@ -20,19 +11,36 @@ function isLinux() {
   return process.platform === 'linux';
 }
 
-// Si no estamos en WSL y hay ORACLE_LIB_DIR definido, usar modo thick 
-// @note: En WSL, el instant client no se puede usar directamente, por lo que se usa el modo thin, pero la db no está sirviendo con thin
-if (!isWSL() && process.env.ORACLE_LIB_DIR) {
+function isMacOS() {
+  return process.platform === 'darwin';
+}
+
+walletPath = 0;
+
+// Detección de sistema operativo, actualmente solo funciona, se hace set de 
+if (isWindows() && process.env.ORACLE_LIB_DIR) {
   const libDirPath = path.resolve(__dirname, '../../', process.env.ORACLE_LIB_DIR);
   console.log('🔧 Iniciando Oracle Instant Client desde:', libDirPath);
   oracledb.initOracleClient({ libDir: libDirPath });
+  // Configuracion de wallet
+  walletPath = path.resolve(__dirname, '../../', process.env.TNS_ADMIN);
+  process.env.TNS_ADMIN = walletPath;
 } else {
-  console.log('🟡 Usando modo THIN de Oracle (sin Instant Client)');
-}
+  if (isMacOS() && process.env.ORACLE_CLI_MACOS) {
+    const libDirPath = path.resolve(__dirname, '../../', process.env.ORACLE_CLI_MACOS);
+    console.log('🔧 Iniciando Oracle Instant Client desde:', libDirPath);
+    oracledb.initOracleClient({ libDir: libDirPath });
+    // Configuracion de wallet
+    walletPath = path.resolve(__dirname, '../../', process.env.TNS_ADMIN_MACOS);
+    console.log('🔧 WALLET EN:', walletPath);
+    process.env.TNS_ADMIN = walletPath;
 
-// Configuración del TNS_ADMIN como ruta absoluta
-const walletPath = path.resolve(__dirname, '../../', process.env.TNS_ADMIN);
-process.env.TNS_ADMIN = walletPath;
+  } else {
+    console.log('❌ Sistema operativo no soportado');
+    process.exit(1);
+  }
+
+}
 
 // Verificar si el wallet existe
 if (!fs.existsSync(walletPath)) {
