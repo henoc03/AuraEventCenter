@@ -1,6 +1,16 @@
+/**
+ * @abstract Controlador encargado de gestionar las operaciones CRUD para las zonas
+ * dentro del esquema ADMIN_SCHEMA. Permite obtener todas las zonas, obtener una zona
+ * por ID, crear, actualizar y eliminar zonas.
+ * 
+ * @copyright BugBusters team 2025, Universidad de Costa Rica
+ */
+
 const { getConnection, oracledb } = require('../config/db');
 
-// Obtener todas las zonas
+/**
+ * Obtiene todas las zonas disponibles.
+ */
 exports.getAllZones = async (req, res) => {
   let conn;
   try {
@@ -20,7 +30,9 @@ exports.getAllZones = async (req, res) => {
   }
 };
 
-// Obtener zona por ID
+/**
+ * Obtiene una zona específica por su ID.
+ */
 exports.getZoneById = async (req, res) => {
   let conn;
   try {
@@ -40,7 +52,9 @@ exports.getZoneById = async (req, res) => {
   }
 };
 
-// Crear zona
+/**
+ * Crea una nueva zona con los datos proporcionados en el body.
+ */
 exports.createZone = async (req, res) => {
   const { name, description, capacity, type, event_center_id, price } = req.body;
   let conn;
@@ -70,7 +84,9 @@ exports.createZone = async (req, res) => {
   }
 };
 
-// Actualizar zona
+/**
+ * Actualiza una zona existente identificada por su ID con los datos proporcionados.
+ */
 exports.updateZone = async (req, res) => {
   const { name, description, capacity, type, event_center_id, price } = req.body;
   let conn;
@@ -105,7 +121,9 @@ exports.updateZone = async (req, res) => {
   }
 };
 
-// Eliminar zona
+/**
+ * Elimina una zona identificada por su ID.
+ */
 exports.deleteZone = async (req, res) => {
   let conn;
   try {

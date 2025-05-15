@@ -1,9 +1,23 @@
+/**
+ * @abstract Controlador responsable de gestionar las operaciones CRUD sobre usuarios,
+ * así como la autenticación (login) y registro (register) de nuevos usuarios en el sistema.
+ * Incluye funcionalidades para:
+ * - Obtener usuarios (todos o por ID)
+ * - Crear, actualizar y eliminar usuarios
+ * - Validar credenciales y generar tokens JWT para autenticación
+ * - Enviar correo de bienvenida al registrar un nuevo usuario
+ * 
+ * @copyright BugBusters team 2025, Universidad de Costa Rica
+ */
+
 const { getConnection, oracledb } = require('../config/db');
 const { sendWelcomeEmail } = require('./emailController');
-const secretKey = process.env.JWT_SECRET || 'defaultSecret';
 const jwt = require('jsonwebtoken');
+const secretKey = process.env.JWT_SECRET || 'defaultSecret';
 
-// Query para todos los usuarios
+/**
+ * Obtiene todos los usuarios.
+ */
 exports.getAllUsers = async (req, res) => {
   let conn;
   try {
@@ -23,7 +37,9 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
-// Query para usuario por ID
+/**
+ * Obtiene un usuario por su ID.
+ */
 exports.getUserById = async (req, res) => {
   let conn;
   try {
@@ -43,7 +59,9 @@ exports.getUserById = async (req, res) => {
   }
 };
 
-// Query para obtener correo y rol por ID
+/**
+ * Obtiene correo electrónico y nombre por ID de usuario.
+ */
 exports.getNameEmail = async (req, res) => {
   let conn;
   try {
@@ -62,7 +80,9 @@ exports.getNameEmail = async (req, res) => {
   }
 };
 
-// Query para obtener nombre y rol por ID
+/**
+ * Obtiene nombre, primer apellido y rol por ID de usuario.
+ */
 exports.getNameLastnameRole = async (req, res) => {
   let conn;
   try {
@@ -81,7 +101,9 @@ exports.getNameLastnameRole = async (req, res) => {
   }
 };
 
-// Query para crear usuario
+/**
+ * Crea un nuevo usuario en la base de datos.
+ */
 exports.createUser = async (req, res) => {
   const { email, first_name, last_name_1, last_name_2, phone, password, user_type } = req.body;
   let conn;
@@ -112,7 +134,9 @@ exports.createUser = async (req, res) => {
   }
 };
 
-// Query para actualizar usuario
+/**
+ * Actualiza los datos de un usuario existente.
+ */
 exports.updateUser = async (req, res) => {
   const { email, first_name, last_name_1, last_name_2, phone, password, user_type } = req.body;
   let conn;
@@ -147,7 +171,9 @@ exports.updateUser = async (req, res) => {
   }
 };
 
-// Query para eliminar usuario
+/**
+ * Elimina un usuario por su ID.
+ */
 exports.deleteUser = async (req, res) => {
   let conn;
   try {
@@ -166,7 +192,9 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
-// Query para validar datos de inicio de sesion
+/**
+ * Valida credenciales y genera token JWT para iniciar sesión.
+ */
 exports.login = async (req, res) => {
   const { email, password } = req.body;
   let conn;
@@ -207,7 +235,10 @@ exports.login = async (req, res) => {
   }
 };
 
-// Query para registrar un nuevo usuario
+/**
+ * Registra un nuevo usuario, valida si el correo ya existe,
+ * crea el usuario, genera token JWT y envía correo de bienvenida.
+ */
 exports.registerUser = async (req, res) => {
   const { email, first_name, last_name_1, last_name_2, phone, password, user_type } = req.body;
   let conn;
@@ -246,6 +277,7 @@ exports.registerUser = async (req, res) => {
 
     const user_id = result.outBinds.user_id[0];
 
+    // Generar token JWT para el usuario recién creado
     const token = jwt.sign(
       {
         id: user_id,
@@ -259,7 +291,7 @@ exports.registerUser = async (req, res) => {
       { expiresIn: '2h' }
     );
     
-
+    // Enviar correo de bienvenida
     await sendWelcomeEmail(email, `${first_name} ${last_name_1} ${last_name_2}`);
 
     res.status(201).json({ user_id, token });
@@ -270,4 +302,3 @@ exports.registerUser = async (req, res) => {
     if (conn) await conn.close();
   }
 };
-
