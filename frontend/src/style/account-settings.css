@@ -1,0 +1,435 @@
+body {
+  background-color: white;
+  color: #333;
+  min-height: 100vh;
+  font-family: 'Merriweather Sans', sans-serif;
+}
+
+.main-container {
+  position: relative;
+  z-index: 1;
+}
+
+.settings-container {
+  display: flex;
+  gap: 2rem;
+  padding: 2rem 3rem;
+  margin-top: 0;
+  box-sizing: border-box;
+}
+
+.main {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.main h1 {
+  width: 100%;
+  text-align: left;
+  font-family: 'Merriweather Sans', sans-serif;
+  margin: 20px 0px 40px 0px;
+  font-size: 1.6rem;
+  font-weight: bold;
+}
+
+.settings-content {
+  flex: 1;
+  max-width: 800px;
+}
+
+.settings-title {
+  font-size: 30px;
+  font-weight: bolder;
+  margin-bottom: 24px;
+  color: #333;
+}
+
+.settings-box {
+  background-color: white;
+  border-radius: 15px;
+  border: 1px solid #CFCFCF;
+  padding: 50px;
+  border: 1px solid #e5e7eb;
+  max-height: 600px;
+  max-width: 800px;
+  margin: 0 10px;
+}
+
+.settings-box p {
+  font-family: 'Merriweather Sans', sans-serif;
+}
+
+.password-section {
+  margin-bottom: 32px;
+}
+
+.settings-subtitle {
+  font-family: 'Merriweather Sans', sans-serif;
+  display: block;
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.password-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.password-input-wrapper input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 16px;
+  outline: none;
+}
+
+.password-input-wrapper input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.icon-button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+}
+
+.icon-button:hover {
+  background-color: #f3f4f6;
+}
+
+.two-factor-section {
+  margin-bottom: 32px;
+  
+}
+
+.two-factor-section a {
+  font-family: 'Merriweather Sans', sans-serif;
+}
+
+.two-step-ver-message {
+  font-family: 'Merriweather Sans', sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.blue-link {
+  color: #3b82f6;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+.blue-link:hover {
+  text-decoration: underline;
+}
+
+.delete-account-button {
+  font-family: 'Merriweather Sans', sans-serif;
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: regular;
+  cursor: pointer;
+  display: block;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 250px;
+  text-align: center;
+}
+
+.delete-account-button:hover {
+  background-color: #b91c1c;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.otp-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 30px 0;
+  gap: 12px;
+}
+
+.otp-input {
+  width: 60px;
+  height: 60px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 24px;
+  text-align: center;
+  outline: none;
+}
+
+.otp-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.resend-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  justify-content: center;
+}
+
+.continue-button {
+  width: 60%;
+  height: 40px;
+  padding: 6px;
+  margin: 30px 0;
+  border-radius: 10px;
+  background-color: gray;
+  border: none;
+  color: white;
+  font-family: 'Merriweather Sans', sans-serif;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.continue-button.active {
+  background-color: #0074D9;
+  cursor: pointer;
+  opacity: 1;
+}
+
+.continue-button.active:hover {
+  background-color: #339CFF;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+
+.resend-button {
+  width: 60%;
+  height: 40px;
+  padding: 6px;
+  margin: 30px 0;
+  border-radius: 10px;
+  background-color: white;
+  border-color: #0074D9;
+  font-family: 'Merriweather Sans', sans-serif;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.resend-button:hover {
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  text-align: left;
+  margin-bottom: 1rem;
+}
+
+.settings-form label {
+  font-family: 'Merriweather Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  margin-top: 1rem;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.settings-form input {
+  margin-bottom: 0.2rem;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 16px;
+  width: 100%;
+  outline: none;
+}
+
+.settings-form input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.change-password-error {
+  font-family: 'Merriweather Sans', sans-serif;
+  margin-top: 0.11rem;      
+  padding: 0.5rem 1rem;
+  background-color: #fdecea;
+  color: #d32f2f;
+  font-size: 0.85rem;
+  border-radius: 0.4rem;
+  line-height: 1.4;
+}
+
+.change-button {
+  width: 60%;
+  height: 40px;
+  padding: 6px;
+  margin: 30px 0;
+  border-radius: 10px;
+  background-color: gray;
+  border: none;
+  color: white;
+  font-family: 'Merriweather Sans', sans-serif;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.change-button.active {
+  background-color: #0074D9;
+  cursor: pointer;
+  opacity: 1;
+}
+
+.change-button.active:hover {
+  background-color: #339CFF;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal-content {
+  position: relative; /* Necesario para posicionar la X */
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 16px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  font-family: 'Merriweather Sans', sans-serif;
+}
+
+.modal-content h2, p{
+  font-family: 'Merriweather Sans', sans-serif;
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #666;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.modal-close:hover {
+  color: #000;
+}
+
+.delete-button {
+  font-family: 'Merriweather Sans', sans-serif;
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.delete-button:hover {
+  background-color: #b91c1c;
+}
+
+.modal-content input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 16px;
+  outline: none;
+  width: 100%;
+  padding: 0.6rem;
+  margin: 1rem 0;
+}
+
+.modal-content button {
+  font-family: 'Merriweather Sans', sans-serif;
+  margin: 0.3rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.modal-content button:last-child {
+  background-color: #dc2626;
+  color: white;
+}
+
+.error {
+  font-size: 0.9rem;
+}
+
+.side-nav-desktop {
+  width: 250px;
+  flex-shrink: 0;
+}
+
+.side-nav-mobile {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  /* Solo mostrar en móvil */
+  .side-nav-desktop {
+    display: none;
+  }
+
+  .side-nav-mobile {
+    display: block;
+  }
+
+  .main {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 1rem;
+  }
+
+  .settings-box {
+    width: 100%;
+    max-width: 100%;
+    margin: 1rem 0;
+    padding: 1.5rem;
+  }
+
+  .account-container {
+    padding: 0 1rem;
+  }
+
+  .delete-account-button {
+    width: 100%;
+  }
+}

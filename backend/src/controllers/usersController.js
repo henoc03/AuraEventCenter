@@ -14,10 +14,51 @@ const { getConnection, oracledb } = require('../config/db');
 const { sendWelcomeEmail } = require('./emailController');
 const jwt = require('jsonwebtoken');
 const secretKey = process.env.JWT_SECRET || 'defaultSecret';
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
-/**
- * Obtiene todos los usuarios.
- */
+exports.deactivateUser = async (req, res) => {
+  const { password } = req.body;
+  const userId = req.user.id;
+
+  let conn;
+
+  try {
+    conn = await getConnection();
+
+    const result = await conn.execute(
+      `SELECT PASSWORD FROM CLIENT_SCHEMA.USERS WHERE USER_ID = :id`,
+      [userId],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    const user = result.rows[0];
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado.' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.PASSWORD);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Contraseña incorrecta.' });
+    }
+
+    // Soft delete: marcar usuario como inactivo
+    await conn.execute(
+      `UPDATE CLIENT_SCHEMA.USERS SET ACTIVE = 0 WHERE USER_ID = :id`,
+      [userId],
+      { autoCommit: true }
+    );
+
+    res.status(200).json({ message: 'Cuenta desactivada exitosamente.' });
+  } catch (err) {
+    console.error('❌ Error al desactivar cuenta:', err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
+// Query para todos los usuarios
 exports.getAllUsers = async (req, res) => {
   let conn;
   try {
@@ -46,7 +87,7 @@ exports.getUserById = async (req, res) => {
     conn = await getConnection();
     const result = await conn.execute(
       `SELECT USER_ID, EMAIL, FIRST_NAME, LAST_NAME_1, LAST_NAME_2, PHONE, USER_TYPE 
-       FROM CLIENT_SCHEMA.USERS WHERE USER_ID = :id`,
+       FROM CLIENT_SCHEMA.USERS WHERE USER_ID = :id AND ACTIVE = 1`,
       [req.params.id],
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
@@ -195,6 +236,7 @@ exports.deleteUser = async (req, res) => {
 /**
  * Valida credenciales y genera token JWT para iniciar sesión.
  */
+// Query para validar datos de inicio de sesión
 exports.login = async (req, res) => {
   const { email, password } = req.body;
   let conn;
@@ -209,7 +251,13 @@ exports.login = async (req, res) => {
     );
     const user = result.rows[0];
 
-    if (!user || user.PASSWORD !== password) {
+    if (!user) {
+      return res.status(401).json({ message: 'Credenciales inválidas' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.PASSWORD);
+
+    if (!isMatch) {
       return res.status(401).json({ message: 'Credenciales inválidas' });
     }
 
@@ -235,6 +283,7 @@ exports.login = async (req, res) => {
   }
 };
 
+
 /**
  * Registra un nuevo usuario, valida si el correo ya existe,
  * crea el usuario, genera token JWT y envía correo de bienvenida.
@@ -257,10 +306,13 @@ exports.registerUser = async (req, res) => {
       return res.status(400).json({ error: 'El correo electrónico ya está registrado.' });
     }
 
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
     // Crear el usuario en la base de datos
     const result = await conn.execute(
       `INSERT INTO CLIENT_SCHEMA.USERS (USER_ID, EMAIL, FIRST_NAME, LAST_NAME_1, LAST_NAME_2, PHONE, PASSWORD, USER_TYPE)
-       VALUES (CLIENT_SCHEMA.USER_ID_SEQ.NEXTVAL, :email, :first_name, :last_name_1, :last_name_2, :phone, :password, :user_type)
+       VALUES (CLIENT_SCHEMA.USER_ID_SEQ.NEXTVAL, :email, :first_name, :last_name_1, :last_name_2, :phone, :hashedPassword, :user_type)
        RETURNING USER_ID INTO :user_id`,
       {
         email,
@@ -268,7 +320,7 @@ exports.registerUser = async (req, res) => {
         last_name_1,
         last_name_2,
         phone,
-        password,
+        hashedPassword,
         user_type,
         user_id: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER }
       },
