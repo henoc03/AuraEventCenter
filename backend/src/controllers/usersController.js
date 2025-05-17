@@ -14,7 +14,6 @@ const { getConnection, oracledb } = require('../config/db');
 const { sendWelcomeEmail } = require('./emailController');
 const jwt = require('jsonwebtoken');
 const secretKey = process.env.JWT_SECRET || 'defaultSecret';
-const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
 exports.deactivateUser = async (req, res) => {
