@@ -86,7 +86,13 @@ function Header({name, lastname, role, email, children}) {
         <div className='right-content-container'>
           <div className='user-info-container'>
             <h2>{`${name} ${lastname}`}</h2>
-            <p>{role == "admin"? "Administrador" : "Cliente"}</p>
+            <p>
+            {role === "root admin"
+              ? "Administrador Principal"
+              : role === "admin"
+              ? "Administrador"
+              : "Cliente"}
+          </p>
           </div>
 
           <DropDownMenu name={name} email={email}/>

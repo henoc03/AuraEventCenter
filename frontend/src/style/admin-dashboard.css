@@ -1,0 +1,160 @@
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Merriweather", serif;
+  scroll-behavior: smooth;
+}
+
+.admin-dashboard {
+    display: flex;
+    height: 100%;
+  }
+
+  .dashboard-content {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      "cards reservas"
+      "chart reservas";
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  .main-content {
+    grid-area: cards;
+    border: 1px solid #cec2c2 ;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    padding: 20px;
+    width: 110vh;
+  }
+
+  .main-content h2 { 
+    font-weight: bold;
+  }
+  
+  .dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  
+  .dashboard-sections {
+    grid-area: chart;
+  }
+  
+  .rooms-title {
+    display: flex;
+    gap: 20px;
+  }
+  .chart-section {
+    background: #fff;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: 1px solid #cec2c2 ;
+    width: 110vh;
+    min-height: 200px;
+  }
+  
+  .chart-section h3 {
+    font-size: large;
+    font-weight: 800;
+  }
+
+  .reservations-section {
+    grid-area: reservas;
+    background: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #cec2c2 ;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: center;
+    width: 55vh;
+    min-height: 390px;
+    height: auto;
+    max-height: max-content;
+  }
+  
+  .reservations-section table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .reservations-section table th,
+  .reservations-section table td {
+    text-align: center;
+    vertical-align: middle;
+    padding: 1px 14px;
+    border: 1px solid #ddd;
+  }
+  
+  .reservations-section table th {
+    font-weight: bold;
+  }
+  
+  .reservations-section table tr:hover {
+    background-color: #f1f1f1;
+  }
+  .reservations-section h3 {
+    font-size: large;
+    font-weight: 800;
+  }
+  .reservations-section table {
+    flex-grow: 1;
+    margin-bottom: 16px;
+  }
+  
+  .view-stats {
+    margin-top: auto;
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  .view-stats:hover {
+    text-decoration: underline;
+  }
+  
+  @media (max-width: 1024px) {
+    .dashboard-content {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        "cards"
+        "chart"
+        "reservas";
+    }
+  
+    .main-content,
+    .chart-section,
+    .reservations-section {
+      width: auto;
+    }
+    
+    .reservations-section {
+      min-height: 300px;
+      height: auto !important;
+    }
+    
+  }
+  
+  @media (max-width: 768px) {
+    
+    .rooms-title {
+      flex-direction: column;
+      gap: 10px;
+    }
+  
+    .dashboard-cards {
+      grid-template-columns: 1fr;
+    }
+  
+    .reservations-section table {
+      font-size: 0.85rem;
+    }
+  }
+  

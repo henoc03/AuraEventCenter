@@ -1,6 +1,6 @@
 import React from "react";
 import {useForm} from 'react-hook-form';
-import {useState} from 'react';
+import {useState,useEffect} from 'react';
 import { Dropdown } from 'react-bootstrap';
 import AlertMessage from "./AlertMessage.jsx"
 
@@ -21,10 +21,14 @@ function AddEditRoomModal({
   {
 
   const [isAddEditOpen, setIsAddEditOpen] = useState(isModalOpen);
-  const [image, setImage] = useState(null);
+  const [ setImage] = useState(null);
   const {register, handleSubmit, formState: { errors, isValid } } = useForm({ mode: 'onChange' });
   const [showCreateSuccess, setShowCreateSuccess] = useState(false);
   const [showUpdateSuccess, setShowUpdateSuccess] = useState(false);
+  
+  useEffect(() => {
+    setIsAddEditOpen(isModalOpen);
+  }, [isModalOpen]);
 
   const onSubmit = async (data) => {
     if (isAdd) {
@@ -50,6 +54,7 @@ function AddEditRoomModal({
           return;
         }
 
+        onClose();
         setShowCreateSuccess(true);
       } catch (error) {
         console.error('Error:', error);
@@ -124,10 +129,10 @@ function AddEditRoomModal({
       {isAddEditOpen && (
         <div className="add-edit-modal" onClick={handleClose}>
         <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-          <div className="title-close-container">
-            <h2>Agregar sala</h2>
-            <button className="close-x" type="button" onClick={handleClose}><i class="bi bi-x-lg"></i></button>
-          </div>
+        <div className="title-close-container">
+          <h2>{isAdd ? 'Agregar sala' : 'Editar sala'}</h2>
+          <button className="close-x" onClick={handleClose}>×</button>
+        </div>
 
           <form onSubmit={(handleSubmit(onSubmit))} className="auth-form">
             <h3>Los campos marcados con * son obligatorios</h3>

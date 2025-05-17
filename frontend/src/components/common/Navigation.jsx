@@ -85,7 +85,7 @@ function Navigation() {
         <Logo className="logo-img" />
       </a>
 
-      <div className={menuOpen ? 'nav-links open' : 'nav-links'}>
+      <div data-aos="fade-down" data-aos-duration="1500" className={menuOpen ? 'nav-links open' : 'nav-links'}>
         <ul>
           {navigationLinks.map(link => (
             <li key={link.id}>
@@ -115,7 +115,7 @@ function Navigation() {
           />
         </div>
         ) : (
-          <button className="signInBtn" onClick={handleSignInClick}>Iniciar Sesión</button>
+          <button data-aos="fade-down" data-aos-duration="1500" className="signInBtn" onClick={handleSignInClick}>Iniciar Sesión</button>
         )}
       </div>
 
