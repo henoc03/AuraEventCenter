@@ -5,6 +5,7 @@ import Header from "../components/common/Header";
 import UserModal from "../components/common/UserModal";
 import AlertMessage from '../components/common/AlertMessage';
 import LoadingPage from "../components/common/LoadingPage";
+import { jwtDecode } from "jwt-decode";
 import "../style/admin-users.css";
 
 const PORT = "http://localhost:1522";
@@ -19,35 +20,34 @@ const Administrators = ({ sections }) => {
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
 
-useEffect(() => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    try {
-      const decoded = JSON.parse(atob(token.split('.')[1]));
-      const now = Date.now();
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
 
-      if (
-        decoded &&
-        decoded.firstName &&
-        decoded.lastName1 &&
-        decoded.email &&
-        decoded.userType &&
-        decoded.exp &&
-        now < decoded.exp * 1000
-      )
-       {
-        setCurrentUser(decoded);
-      } else {
+      try {
+        const decoded = jwtDecode(token);
+        const now = Date.now();
+
+        if (decoded.exp && now < decoded.exp * 1000) {
+          const res = await fetch(`${PORT}/users/${decoded.id}`);
+          if (!res.ok) throw new Error("No se pudo obtener el usuario");
+
+          const user = await res.json();
+          setCurrentUser(user);
+        } else {
+          localStorage.removeItem("token");
+          setCurrentUser(null);
+        }
+      } catch (err) {
+        console.error("Error al obtener el usuario:", err);
         localStorage.removeItem("token");
         setCurrentUser(null);
       }
-    } catch (err) {
-      console.error(" Error decoding token:", err);
-      localStorage.removeItem("token");
-      setCurrentUser(null);
-    }
-  }
-}, []);
+    };
+
+    fetchUserInfo();
+  }, []);
 
   const fetchUsers = async () => {
     try {
@@ -66,11 +66,10 @@ useEffect(() => {
 
       setUsers(formatted);
     } catch (err) {
-      console.error("❌ Error al obtener administradores:", err);
+      console.error("Error al obtener administradores:", err);
     } finally {
-    setLoading(false); // Finaliza carga
+      setLoading(false);
     }
-
   };
 
   useEffect(() => {
@@ -96,8 +95,8 @@ useEffect(() => {
       setMessage("Administrador eliminado correctamente");
       setMessageType("success");
     } catch (err) {
-      console.error("❌ Error al eliminar administrador:", err);
-      setMessage("❌ Error al eliminar administrador");
+      console.error("Error al eliminar administrador:", err);
+      setMessage("Error al eliminar administrador");
       setMessageType("error");
     }
   };
@@ -117,17 +116,16 @@ useEffect(() => {
     if (data.password) {
       body.password = data.password;
     }
+
     try {
       if (modalMode === "add") {
         await fetch(`${PORT}/users`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body)
-          
         });
         setMessage("Administrador añadido correctamente");
         setMessageType("success");
-
       } else if (modalMode === "edit") {
         await fetch(`${PORT}/users/${selectedUser.id}`, {
           method: "PUT",
@@ -140,24 +138,26 @@ useEffect(() => {
 
       fetchUsers();
     } catch (err) {
-      console.error("❌ Error al guardar administrador:", err);
+      console.error("Error al guardar administrador:", err);
     }
   };
+
   if (loading) return <LoadingPage />;
+
   return (
     <div className="clients-page">
-    <AlertMessage
+      <AlertMessage
         message={message}
         type={messageType}
         onClose={() => setMessage('')}
         className="alert-floating"
-    />
-    <Header
-      name={currentUser?.firstName}
-      lastname={`${currentUser?.lastName1} ${currentUser?.lastName2 || ''}`}
-      role={currentUser?.userType}
-      email={currentUser?.email}
-    />
+      />
+      <Header
+        name={currentUser?.FIRST_NAME}
+        lastname={currentUser?.LAST_NAME_1}
+        role={currentUser?.USER_TYPE}
+        email={currentUser?.EMAIL}
+      />
       <div className="clients-dashboard">
         <SideNav sections={sections} />
         <main className="clients-dashboard-content">
@@ -173,7 +173,6 @@ useEffect(() => {
           </div>
         </main>
       </div>
-
       <UserModal
         isOpen={isModalOpen}
         user={selectedUser}

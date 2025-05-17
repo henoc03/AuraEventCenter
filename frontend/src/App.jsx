@@ -5,16 +5,19 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from './pages/Home';
 import SignIn from './pages/SignIn';
 import Register from './pages/Register';
+import Profile from './pages/Profile';
 import RecoverEmail from './pages/RecoverEmail';
 import VerifyCode from './pages/VerifyCode';
 import ResetPassword from './pages/ResetPassword';
 import NotFound from './pages/Notfound';
+import ChangePassword from './pages/ChangePassword';
+import AccountSettings from './pages/AccountSettings';
+import VerifyAccountCode from './pages/VerifyAccountCode';
 
 // Páginas protegidas
 import AdminDashboard from "./pages/AdminDashBoard";
 import Clients from './pages/Clients';
 import Administrators from './pages/Administrator';
-import Profile from './pages/Profile';
 import RoomsAdmin from './pages/RoomsAdmin';
 
 // Contexto y utilidades
@@ -38,6 +41,9 @@ function App() {
           <Route path="/verificar-codigo" element={<VerifyCode />} />
           <Route path="/cambiar-contraseña" element={<ResetPassword />} />
           <Route path="/perfil" element={<Profile sections={SectionProfile}/>} />
+          <Route path="/cuenta" element={<AccountSettings sections={SectionProfile}/>} />
+          <Route path="/cuenta/cambiar-contraseña" element={<ChangePassword sections={SectionProfile}/>} />
+          <Route path="/cuenta/verificar-codigo" element={<VerifyAccountCode sections={SectionProfile}/>} />
 
           {/* Rutas protegidas para administradores comunes */}
           <Route element={<PrivateRoute allowedRoles={['admin']} />}>
