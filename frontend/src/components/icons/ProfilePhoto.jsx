@@ -26,8 +26,8 @@ function ProfilePhoto({width = 70, height = 70}) {
           height: 'auto', 
           maxHeight: `${height}px`, 
           objectFit: 'cover',
-          borderRadius: `${50}px`
-        }} 
+          borderRadius: `${50}px`,
+        }}
       />
     </div>
   );
