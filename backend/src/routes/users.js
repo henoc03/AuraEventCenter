@@ -6,11 +6,14 @@ const verifyToken = require('../middleware/verifyToken');
 // Rutas de la API
 router.get('/', usersController.getAllUsers);
 router.get('/:id', usersController.getUserById);
+router.get('/getNameEmail/:id', usersController.getNameEmail);
+router.get('/getNameLastNameRole/:id', usersController.getNameLastnameRole);
 router.post('/', usersController.createUser);
 router.put('/deactivate', verifyToken, usersController.deactivateUser);
 router.put('/:id', usersController.updateUser);
 router.delete('/:id', usersController.deleteUser);
 router.post('/login', usersController.login);
 router.post('/register', usersController.registerUser);
+
 
 module.exports = router;

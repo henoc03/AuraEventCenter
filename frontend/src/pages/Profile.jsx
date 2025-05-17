@@ -1,58 +1,163 @@
 import React, {useEffect, useState } from "react";
 import { useForm} from 'react-hook-form';
+import {jwtDecode} from 'jwt-decode';
 import Header from "../components/common/Header";
-import DefaultProfilePhoto from '../assets/images/default-profile-photo.png'
+import ProfilePhoto from "/default-image.jpg"
 import SideNav from "../components/common/SideNav.jsx"
+import AlertMessage from "../components/common/AlertMessage.jsx"
 import '../style/auth.css';
 import '../style/profile.css';
+import { useNavigate } from "react-router-dom";
 
-const DEFAULT_ROUTE = 'http://localhost:3000'
+
+const DEFAULT_ROUTE = "http://localhost:1522";
 
 function Profile({sections}) {
-  const [currentUser, setCurrentUser] = useState([]);
+  const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm({ mode: 'onChange' });
+  const [loading, setLoading] = useState(true);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [lastname, setLastname] = useState("");
+  const [role, setRole] = useState("");
+  const [showSuccess, setShowSuccess] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`${DEFAULT_ROUTE}/api/current_user`)
-      .then(res => res.json())
-      .then(data => setCurrentUser(data))
-      .catch(error => console.error('Error fetching user data:', error));
+    getSetUserInfo();
   }, []);
 
-  const editableProfilePhoto = currentUser?.profile_photo || DefaultProfilePhoto;
+  // Función para obtener información del usuario
+  const getSetUserInfo = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      return;
+    }
 
-  const {register, handleSubmit, formState: { errors, isValid } } = useForm({ mode: 'onChange' });
+    const sessionUserData = jwtDecode(token);
 
-  const onSubmit = (data) => {
-    console.log('Profile:', data);
+    try {
+      const res = await fetch(`${DEFAULT_ROUTE}/users/${sessionUserData.id}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        alert(errorData.message || 'Error traer la información de usuario');
+        return;
+      }
+
+      const userData = await res.json();
+
+      // Setea los campos del formulario con los datos traídos
+      reset({
+        name: userData.FIRST_NAME,
+        lastname: `${userData.LAST_NAME_1} ${userData.LAST_NAME_2}`,
+        email: userData.EMAIL,
+        phone: userData.PHONE
+      });
+
+       // Guarda los datos traidos
+        setName(userData.FIRST_NAME)
+        setEmail(userData.EMAIL)
+        setLastname(userData.LAST_NAME_1)
+        setRole(userData.USER_TYPE)
+
+        // Cambia el estado de la página
+        setLoading(false);
+    } catch {
+      alert('Ocurrió un error al obtener la información de usuario.');
+      navigate('/login');
+    } finally {
+      () => setLoading(true)
+    }
   };
 
-  return (
+  // Función para actualizar los datos del usuario
+  const onSubmit = async (data) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      return;
+    }
+    const sessionUserData = jwtDecode(token);
+
+    const apellidos = data.lastname.trim().split(' ');
+
+    const apellido1 = apellidos[0] || '';
+    const apellido2 = apellidos[1] || '';
+
+    const userToSend = {
+      firstName: data.name,
+      lastName1: apellido1,
+      lastName2: apellido2,
+      email: data.email,
+      phone: data.phone
+    };
+    
+    try {
+      const res = await fetch(`${DEFAULT_ROUTE}/users/updateProfile/${sessionUserData.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userToSend)
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        alert(errorData.message || 'Error al actualizar la información del usuario');
+        return;
+      }
+      
+      getSetUserInfo();
+      setShowSuccess(true);
+    } catch (error) {
+      setShowSuccess(false);
+      console.error('Error:', error);
+      alert('Ocurrió un error al actualizar la información de usuario.');
+      navigate('/login');
+    }
+  };
+
+  if (!loading) {return (
     <>   
-      <Header>
+      <Header name={name} lastname={lastname} role={role} email={email}>
         {/*Menu de hamburguesa*/}
         <SideNav id="side-nav-mobile" sections={sections} />
       </Header>
 
-      <div className="main-container">
+      <div className="main-container-profile">
         <div id="side-nav-desktop">
-          <SideNav sections={sections} />
+          <SideNav className="profile-nav" sections={sections} />
         </div>
 
 
         <div className="main">
+          {showSuccess && (
+            <AlertMessage
+              message={"Información actualizada con éxito"}
+              type={"alert-floating"}
+              onClose={() => setShowSuccess(false)}
+              duration={3000}
+              className={"success"}
+            />
+          )}
+
           <div className="profile-container">
             <h1>Información de perfil</h1>
             <div className="image-form-container">
-              <div className="image-container">
-                <img src={editableProfilePhoto} alt="Foto de perfil editable" className="editable-profile-photo" width='400' height='400'/>
-                <i className="bi bi-pencil edit-icon"></i>
+              <div className="image-container-profile">
+                <label htmlFor="image-upload-profile" className="upload-label">
+                  <i className="bi bi-pencil edit-icon"></i>
+                  <img src={ProfilePhoto} alt="Foto de perfil editable" className="editable-profile-photo" width='400' height='400'/>
+                </label>
+
+
               </div>
               <div className="user-info-form">
-                <form onSubmit={handleSubmit(onSubmit)} className="auth-form">
+                <form onSubmit={(handleSubmit(onSubmit))} className="auth-form">
                   <label htmlFor="name">Nombre *</label>
                   <input
                     type="text"
-                    placeholder=""
+                    placeholder={name}
                     {...register('name', { required: 'Nombre requerido' })}
                   />
                   {errors.name && <span className="error">{errors.name.message}</span>}
@@ -94,7 +199,7 @@ function Profile({sections}) {
                   />
                   {errors.phone && <span className="error">{errors.phone.message}</span>}
 
-                  <button type="submit" disabled={!isValid} className={`save-button ${isValid ? 'active' : ''}`} >
+                  <button onSubmit={onSubmit} type="submit" disabled={!isValid} className={`save-button ${isValid ? 'active' : ''}`} >
                     Guardar
                   </button>
                 </form>
@@ -104,7 +209,7 @@ function Profile({sections}) {
         </div>
       </div>
     </>
-  )
+  )}
 }
 
 export default Profile;

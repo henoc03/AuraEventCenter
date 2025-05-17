@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Logo from '../icons/Logo';
 import navigationLinks from '../utils/content';
+import DropDownMenu from '../common/DropDownMenu';
+
 
 function Navigation() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -33,25 +35,34 @@ function Navigation() {
     navigate('/');
   };
 
-
-   // Maneja la apertura y cierre del submenu
-   const [submenuOpen, setSubmenuOpen] = useState(false);
-   const toggleSubmenu = () => setSubmenuOpen(!submenuOpen);
-   
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
   useEffect(() => {
     const updateUser = () => {
       const token = localStorage.getItem('token');
       if (token) {
         try {
           const decoded = JSON.parse(atob(token.split('.')[1]));
-          setCurrentUser(decoded);
+          const now = Date.now();
+  
+          if (
+            decoded &&
+            decoded.userType &&
+            decoded.firstName &&
+            decoded.email &&
+            decoded.exp &&
+            now < decoded.exp * 1000
+          ) {
+            setCurrentUser(decoded);
+          } else {
+            localStorage.removeItem('token');
+            setCurrentUser(null);
+          }
         } catch (error) {
           console.error('Error decoding token:', error);
+          localStorage.removeItem('token');
           setCurrentUser(null);
         }
       } else {
@@ -66,15 +77,15 @@ function Navigation() {
       window.removeEventListener('userUpdated', updateUser);
     };
   }, []);
+  
 
   return (
     <nav className={`nav ${scrolled ? 'scrolled' : ''}`}>
-      {/* Logo */}
       <a data-aos="fade-down" data-aos-duration="1500" className="logo" href="#">
         <Logo className="logo-img" />
       </a>
 
-      <div className={menuOpen ? 'nav-links open' : 'nav-links'}>
+      <div data-aos="fade-down" data-aos-duration="1500" className={menuOpen ? 'nav-links open' : 'nav-links'}>
         <ul>
           {navigationLinks.map(link => (
             <li key={link.id}>
@@ -97,32 +108,14 @@ function Navigation() {
       <div>
         {currentUser && currentUser.userType === 'cliente' ? (
           <div>
-          {/* Botón "Hola" */}
-          <button className="helloBtn" onClick={toggleSubmenu}>
-            Hola, {currentUser.firstName}
-          </button>
-
-          {/* Collapse submenu */}
-          {submenuOpen && (
-            <div
-              className="collapse submenu"
-              id="collapseMenu"
-              style={{ position: 'absolute', zIndex: 1000, right: '-10%' }}
-            >
-              <div className="card card-body">
-                <div className="dropdown-user-info">
-                  <p className="user-email">{currentUser.email}</p>
-                  <div className="options">
-                    <a href={currentUser.userType === 'admin' ? '/admin/tablero' : '/'}>Inicio</a>
-                    <a href="/" onClick={handleLogout}>Cerrar sesión</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
+          <DropDownMenu 
+            name={currentUser.firstName} 
+            email={currentUser.email} 
+            onLogout={handleLogout}
+          />
         </div>
         ) : (
-          <button className="signInBtn" onClick={handleSignInClick}>Iniciar Sesión</button>
+          <button data-aos="fade-down" data-aos-duration="1500" className="signInBtn" onClick={handleSignInClick}>Iniciar Sesión</button>
         )}
       </div>
 

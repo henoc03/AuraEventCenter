@@ -51,8 +51,8 @@ exports.getAllUsers = async (req, res) => {
   try {
     conn = await getConnection();
     const result = await conn.execute(
-      `SELECT USER_ID, EMAIL, FIRST_NAME, LAST_NAME_1, LAST_NAME_2, PHONE, USER_TYPE 
-       FROM CLIENT_SCHEMA.USERS WHERE ACTIVE = 1`,
+      `SELECT USER_ID, EMAIL, FIRST_NAME, LAST_NAME_1, LAST_NAME_2, PHONE, USER_TYPE , ACTIVE
+       FROM CLIENT_SCHEMA.USERS`,
       [],
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
@@ -79,6 +79,44 @@ exports.getUserById = async (req, res) => {
     res.json(result.rows[0] || {});
   } catch (err) {
     console.error('❌ Error al obtener usuario:', err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
+// Query para obtener correo y rol por ID
+exports.getNameEmail = async (req, res) => {
+  let conn;
+  try {
+    conn = await getConnection();
+    const result = await conn.execute(
+      `SELECT EMAIL, FIRST_NAME FROM CLIENT_SCHEMA.USERS WHERE USER_ID = :id`,
+      [req.params.id],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+    res.json(result.rows[0] || {});
+  } catch (err) {
+    console.error('❌ Error al obtener nombre y correo:', err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
+// Query para obtener nombre y rol por ID
+exports.getNameLastnameRole = async (req, res) => {
+  let conn;
+  try {
+    conn = await getConnection();
+    const result = await conn.execute(
+      `SELECT FIRST_NAME, LAST_NAME_1, USER_TYPE FROM CLIENT_SCHEMA.USERS WHERE USER_ID = :id`,
+      [req.params.id],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+    res.json(result.rows[0] || {});
+  } catch (err) {
+    console.error('❌ Error al obtener nombre y rol:', err);
     res.status(500).json({ error: err.message });
   } finally {
     if (conn) await conn.close();
@@ -129,7 +167,6 @@ exports.updateUser = async (req, res) => {
         LAST_NAME_1 = :last_name_1,
         LAST_NAME_2 = :last_name_2,
         PHONE = :phone,
-        PASSWORD = :password,
         USER_TYPE = :user_type
        WHERE USER_ID = :user_id`,
       [
@@ -138,7 +175,6 @@ exports.updateUser = async (req, res) => {
         last_name_1,
         last_name_2,
         phone,
-        password,
         user_type,
         req.params.id
       ],
@@ -203,7 +239,8 @@ exports.login = async (req, res) => {
         email: user.EMAIL,
         userType: user.USER_TYPE,
         firstName: user.FIRST_NAME,
-        lastName1: user.LAST_NAME_1
+        lastName1: user.LAST_NAME_1,
+        lastName2: user.LAST_NAME_2
       },
       secretKey, 
       { expiresIn: '2h' }
@@ -262,10 +299,18 @@ exports.registerUser = async (req, res) => {
     const user_id = result.outBinds.user_id[0];
 
     const token = jwt.sign(
-      { id: user_id, email: email },
+      {
+        id: user_id,
+        email,
+        userType: user_type,
+        firstName: first_name,
+        lastName1: last_name_1,
+        lastName2: last_name_2
+      },
       secretKey,
       { expiresIn: '2h' }
     );
+    
 
     await sendWelcomeEmail(email, `${first_name} ${last_name_1} ${last_name_2}`);
 
@@ -277,3 +322,4 @@ exports.registerUser = async (req, res) => {
     if (conn) await conn.close();
   }
 };
+

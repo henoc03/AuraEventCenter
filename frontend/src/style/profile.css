@@ -1,10 +1,53 @@
-.main-container {
+.main-container-profile {
     display: flex;
     flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
     height: 85vh;
     width: 100%;
+}
+
+.profile-nav {
+    box-shadow: 2px 0px 0px 0px rgba(0, 0, 0, 0.1);
+    width: 30vw;
+    min-width: 200px;
+    max-width: 260px;
+    height: 100%;
+    padding: 30px 0px;
+}
+
+.profile-nav ul{
+    height: 100%;
+    list-style: none;
+    padding: 0;
+}
+
+.profile-nav ul li{
+    display: flex;
+    flex-wrap: nowrap;
+    margin: 20px 15px;
+    padding: 8px 8px;
+    font-size: 1.1rem;
+}
+
+.profile-nav ul li:hover{
+    font-weight: bold;
+}
+
+.side-bar ul li:first-child{
+    background-color: #C3D6EA;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+.side-bar ul a{
+    text-decoration: none;
+    color: #666666;
+}
+
+.side-bar ul li span{
+    margin-left:10px;
+    font-size: 1.1rem;
+    text-decoration: none;
+    font-family: 'Merriweather Sans', sans-serif;
 }
 
 .main {
@@ -25,15 +68,6 @@
     font-weight: bold;
 }
 
-.side-bar {
-    box-shadow: 2px 0px 0px 0px rgba(0, 0, 0, 0.1);
-    width: 30vw;
-    min-width: 200px;
-    max-width: 260px;
-    height: 100%;
-    padding: 30px 0px;
-}
-
 .profile-container {
     padding: 0px 50px;
     display: flex;
@@ -49,7 +83,7 @@
     justify-content: space-between;
 }
 
-.image-container {
+.image-container-profile {
     display: flex;
     border: 1px solid #CFCFCF;
     height: fit-content;
@@ -73,7 +107,7 @@
     transition: opacity 0.3s ease;
 }
 
-.image-container:hover .editable-profile-photo {
+.image-container-profile:hover .editable-profile-photo {
     opacity: 0.4;
 }
 
@@ -81,18 +115,19 @@
     width: 22%;
     height: 20%;
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: 35%;
+    left: 40%;
     font-size: 2rem;
     color: black;
     border-radius: 50%;
     padding: 0.5rem;
     display: none;
+    cursor: pointer;
 }
 
-.image-container:hover .edit-icon {
+.image-container-profile:hover .edit-icon {
     display: block;
+    cursor: pointer;
 }
 
 .user-info-form {
@@ -175,7 +210,13 @@
         margin: 5vh 0;
     }
 
-    #side-nav-desktop {
+    .side-bar {
         display: none;
-    } 
+    }
+}
+
+@media(min-width: 1440px) {
+    .profile-container {
+        max-width: 80%;
+    }
 }
