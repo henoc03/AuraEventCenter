@@ -7,6 +7,8 @@ import SideNav from "../components/common/SideNav.jsx";
 import RoomCard from "../components/common/RoomCard.jsx";
 import AddEditRoomModal from "../components/common/AddEditRoomModal.jsx";
 import AlertMessage from "../components/common/AlertMessage.jsx";
+import LoadingPage from "../components/common/LoadingPage.jsx";
+
 
 import RoomPhoto from "../assets/images/salas/sala2.png";
 import "../style/rooms-admin.css";
@@ -28,6 +30,7 @@ function RoomsAdmin({ sections }) {
 
   useEffect(() => {
     getSetUserInfo();
+    getZones();
   }, []);
 
   const getSetUserInfo = async () => {
@@ -53,7 +56,6 @@ function RoomsAdmin({ sections }) {
       setLastname(userData.LAST_NAME_1);
       setRole(userData.USER_TYPE);
 
-      getZones();
     } catch {
       alert("Ocurrió un error al obtener la información de usuario.");
       navigate("/login");
@@ -83,7 +85,7 @@ function RoomsAdmin({ sections }) {
     }
   };
 
-  if (loading) return null;
+   if (loading) return <LoadingPage />;
 
   return (
     <div className="rooms-admin-page">

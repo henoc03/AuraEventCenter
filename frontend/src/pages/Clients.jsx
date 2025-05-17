@@ -4,6 +4,7 @@ import SideNav from "../components/common/SideNav";
 import Header from "../components/common/Header";
 import UserModal from "../components/common/UserModal";
 import AlertMessage from '../components/common/AlertMessage';
+import LoadingPage from "../components/common/LoadingPage";
 
 import "../style/admin-users.css";
 
@@ -14,6 +15,7 @@ const [selectedUser, setSelectedUser] = useState(null);
 const [isModalOpen, setIsModalOpen] = useState(false);
 const [modalMode, setModalMode] = useState("");
 const [users, setUsers] = useState([]);
+const [loading, setLoading] = useState(true);
 const [currentUser, setCurrentUser] = useState(null);
 const [message, setMessage] = useState('');
 const [messageType, setMessageType] = useState('');
@@ -50,6 +52,7 @@ useEffect(() => {
 
   const fetchUsers = async () => {
     try {
+      setLoading(true);
       const res = await fetch(`${PORT}/dashboard/clients`);
       const data = await res.json();
 
@@ -65,6 +68,8 @@ useEffect(() => {
       setUsers(formatted);
     } catch (err) {
       console.error("❌ Error al obtener usuarios:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -138,6 +143,7 @@ useEffect(() => {
     }
   };
 
+  if (loading) return <LoadingPage />;
   return (
     <div className="clients-page">
       <AlertMessage

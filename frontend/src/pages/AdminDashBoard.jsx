@@ -4,6 +4,8 @@ import {faChartSimple } from '@fortawesome/free-solid-svg-icons';
 
 import SideNav from '../components/common/SideNav';
 import Header from '../components/common/Header';
+import LoadingPage from '../components/common/LoadingPage';
+
 import '../style/admin-dashboard.css';
 
 import { Bar } from 'react-chartjs-2';
@@ -19,63 +21,62 @@ import {
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 const PORT = "http://localhost:1522";
+
 const AdminDashboard = ({ sections }) => {
+  const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState(null);
   const [topRooms, setTopRooms] = useState([]);
   const [weeklyReservations, setWeeklyReservations] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const statsRes = await fetch(`${PORT}/dashboard/stats`);
-        const statsData = await statsRes.json();
+        const [statsRes, weeklyRes, topRes] = await Promise.all([
+          fetch(`${PORT}/dashboard/stats`),
+          fetch(`${PORT}/dashboard/weekly-reservations`),
+          fetch(`${PORT}/dashboard/top-rooms`)
+        ]);
+
+        const [statsData, weeklyData, topData] = await Promise.all([
+          statsRes.json(),
+          weeklyRes.json(),
+          topRes.json()
+        ]);
+
         setStats(statsData);
-  
-        const weeklyRes = await fetch(`${PORT}/dashboard/weekly-reservations`);
-        const weeklyData = await weeklyRes.json();
         setWeeklyReservations(weeklyData);
-  
-        const topRes = await fetch(`${PORT}/dashboard/top-rooms`);
-        const topData = await topRes.json();
         setTopRooms(topData);
       } catch (error) {
         console.error('❌ Error al cargar dashboard:', error);
+      } finally {
+        setLoading(false);
       }
     };
-  
+
     fetchDashboardData();
   }, []);
-  
-  const [currentUser, setCurrentUser] = useState(null);
-  
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       try {
         const decoded = JSON.parse(atob(token.split('.')[1]));
         const now = Date.now();
-  
-        if (
-          decoded &&
-          decoded.firstName &&
-          decoded.lastName1 &&
-          decoded.email &&
-          decoded.userType &&
-          decoded.exp &&
-          now < decoded.exp * 1000
-        ) {
+
+        if (decoded && decoded.exp && now < decoded.exp * 1000) {
           setCurrentUser(decoded);
         } else {
           localStorage.removeItem("token");
-          setCurrentUser(null);
         }
       } catch (err) {
         console.error("❌ Error decoding token:", err);
         localStorage.removeItem("token");
-        setCurrentUser(null);
       }
     }
   }, []);
+
+  if (loading) return <LoadingPage />;
 
   return (
     <div className="admin-dash-page">
