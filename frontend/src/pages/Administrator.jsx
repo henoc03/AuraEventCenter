@@ -4,6 +4,7 @@ import SideNav from "../components/common/SideNav";
 import Header from "../components/common/Header";
 import UserModal from "../components/common/UserModal";
 import AlertMessage from '../components/common/AlertMessage';
+import LoadingPage from "../components/common/LoadingPage";
 import "../style/admin-users.css";
 
 const PORT = "http://localhost:1522";
@@ -13,6 +14,7 @@ const Administrators = ({ sections }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState("");
   const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState(null);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
@@ -40,7 +42,7 @@ useEffect(() => {
         setCurrentUser(null);
       }
     } catch (err) {
-      console.error("❌ Error decoding token:", err);
+      console.error(" Error decoding token:", err);
       localStorage.removeItem("token");
       setCurrentUser(null);
     }
@@ -49,6 +51,7 @@ useEffect(() => {
 
   const fetchUsers = async () => {
     try {
+      setLoading(true);
       const res = await fetch(`${PORT}/dashboard/admins`);
       const data = await res.json();
 
@@ -64,7 +67,10 @@ useEffect(() => {
       setUsers(formatted);
     } catch (err) {
       console.error("❌ Error al obtener administradores:", err);
+    } finally {
+    setLoading(false); // Finaliza carga
     }
+
   };
 
   useEffect(() => {
@@ -137,7 +143,7 @@ useEffect(() => {
       console.error("❌ Error al guardar administrador:", err);
     }
   };
-
+  if (loading) return <LoadingPage />;
   return (
     <div className="clients-page">
     <AlertMessage

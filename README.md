@@ -37,47 +37,84 @@ El sistema también permitirá a los administradores gestionar:
 
 ## 3. Estructura del Proyecto
 
-```
 bugbusters/
-├── frontend/     # Aplicación cliente hecha en React + Vite
-│   ├── public/   # Archivos públicos
-│   ├── src/      # Código fuente principal
+├── backend/                      # Backend en Node.js + Express
+│   ├── .env                     # Variables de entorno (conexiones, secretos)
+│   ├── package-lock.json        # Archivo de dependencias bloqueadas
+│   ├── package.json             # Configuración del backend y dependencias
+│   ├── readme.md                # Documentación del backend
+│   └── src/                     # Código fuente principal del backend
+│       ├── app.js               # Punto de entrada del backend (monta middlewares y rutas)
+│       ├── config/
+│       │   └── db.js            # Configuración de conexión a OracleDB
+│       ├── controllers/         # Lógica para cada entidad
+│       │   ├── dashboardController.js
+│       │   ├── emailController.js
+│       │   ├── usersController.js
+│       │   └── zonesController.js
+│       ├── middleware/
+│       │   └── verifyToken.js   # Middleware para autenticación con JWT
+│       ├── routes/              # Definición de rutas Express
+│       │   ├── dashboard.js
+│       │   ├── emails.js
+│       │   ├── users.js
+│       │   └── zones.js
+│       ├── server.js            # Arranque del servidor (escucha en el puerto)
+│       └── utils/
+│           └── encryption.js    # Funciones utilitarias para cifrado
+│
+├── CONTRIBUTING.md              # Guía de contribución para desarrolladores
+│
+├── frontend/                    # Aplicación cliente hecha en React + Vite
+│   ├── eslint.config.js         # Configuración de linting
+│   ├── index.html               # Archivo HTML principal
+│   ├── package-lock.json        # Dependencias bloqueadas del frontend
+│   ├── package.json             # Configuración y scripts del frontend
+│   ├── public/
+│   │   └── default-image.jpg    # Imagen por defecto (avatar)
+│   ├── src/                     # Código fuente del frontend
+│   │   ├── App.jsx              # Componente raíz de React
 │   │   ├── assets/
-│   │   │   └── images/
-│   │   │       ├── salas/                     # Imágenes específicas de salas
-│   │   │       ├── background.png              # Imagen de fondo general
-│   │   │       ├── logo-no-background.png      # Logo sin fondo
-│   │   │       └── logo.png                    # Logo principal
-│   │   ├── components/
-│   │   │   ├── common/                         # Componentes reutilizables (nav, inputs, etc)
-│   │   │   ├── icons/                          # Iconos utilizados en la aplicación
-│   │   │   ├── sections/                       # Apartados reutilizables (por ejemplo, secciones de una página)
-│   │   │   └── utils/                          # Componentes utilitarios (funciones, helpers, hooks, etc)
-│   │   ├── pages/                              # Páginas individuales
-│   │   │   ├── Home.jsx                        # Página principal (Home)
-│   │   │   ├── NotFound.jsx                    # Página de error 404
-│   │   │   └── SignIn.jsx                      # Página de inicio de sesión
-│   │   ├── services/                           # Llamadas a APIs (reservas, salas, servicios, etc)
-│   │   ├── App.jsx                             # Componente principal de React
-│   │   ├── index.css                           # Estilos globales
-│   │   └── main.jsx                            # Punto de entrada de la aplicación
-│   ├── package.json                            # Dependencias del frontend
-│   ├── vite.config.js                          # Configuración de Vite
-│   ├── eslint.config.js                        # Configuración de ESLint
-│   └── index.html                              # Archivo HTML principal
+│   │   │   └── images/          # Imágenes utilizadas
+│   │   │       ├── salas/       # Imágenes específicas de salas
+│   │   │       ├── background.png
+│   │   │       ├── default-profile-photo.png
+│   │   │       ├── logo-no-background.png
+│   │   │       └── logo.png
+│   │   ├── components/          # Componentes reutilizables
+│   │   │   ├── common/          # Elementos comunes como Header, Footer, etc.
+│   │   │   ├── context/         # Componentes relacionados al enrutamiento privado
+│   │   │   ├── icons/           # Iconos personalizados en React
+│   │   │   ├── sections/        # Secciones completas como Hero o About
+│   │   │   └── utils/           # Utilidades como navegación o carrusel
+│   │   ├── context/             # Contexto global (ej. autenticación)
+│   │   │   └── AuthContext.jsx
+│   │   ├── index.css            # Estilos globales del sitio
+│   │   ├── main.jsx             # Entrada del proyecto React
+│   │   ├── pages/               # Vistas completas del sitio
+│   │   │   ├── AccountSettings.jsx
+│   │   │   ├── AdminDashBoard.jsx
+│   │   │   ├── Administrator.jsx
+│   │   │   ├── ChangePassword.jsx
+│   │   │   ├── Clients.jsx
+│   │   │   ├── Home.jsx
+│   │   │   ├── NotFound.jsx
+│   │   │   ├── Profile.jsx
+│   │   │   ├── RecoverEmail.jsx
+│   │   │   ├── Register.jsx
+│   │   │   ├── ResetPassword.jsx
+│   │   │   ├── RoomsAdmin.jsx
+│   │   │   ├── SignIn.jsx
+│   │   │   ├── VerifyAccountCode.jsx
+│   │   │   └── VerifyCode.jsx
+│   │   └── style/               # Archivos CSS puros para cada componente/página
+│   │       ├── *.css            # Estilos específicos
+│   └── vite.config.js           # Configuración de Vite (servidor de desarrollo)
 │
-├── backend/     # Servidor backend hecho en Node.js + Express
-│   ├── controllers/   # Lógica de negocio (funciones para reservas, salas, servicios, etc)
-│   ├── middleware/    # Middlewares de Express (autenticación, validaciones, manejo de errores)
-│   ├── models/        # Modelos para interactuar con Oracle DB (consultas, estructuras)
-│   ├── routes/        # Definición de rutas API (por ejemplo /salas, /servicios, /reservas)
-│   ├── server.js      # Archivo principal que levanta el servidor Express
-│   ├── package.json   # Dependencias del backend
-│   └── package-lock.json
-│
-├── .gitignore          # Archivos y carpetas que Git debe ignorar
-├── README.md           # Documentación del proyecto
-```
+├── package-lock.json            # Archivo raíz de dependencias del proyecto (si usas monorepo)
+├── package.json                 # Configuración del monorepo o proyecto raíz
+└── README.md                    # Documentación general del proyecto
+
 ---
 ## 4. Flujo de Trabajo en Git
 
@@ -87,16 +124,16 @@ bugbusters/
   - No se puede hacer `push` directo.
   - Solo se actualiza mediante **Merge Requests** (MRs) aprobados.
   
-- **`devBranch`**: Rama de desarrollo.
+- **`dev`**: Rama de desarrollo.
   - Todos trabajamos aquí.
   - Los cambios se integran haciendo `push` o `merge` a esta rama.
 
 ### ¿Cómo trabajamos?
 
-1. **Siempre trabajar en `devBranch`**:
+1. **Siempre trabajar en `dev`**:
    ```bash
-   git checkout devBranch
-   git pull origin devBranch
+   git checkout dev
+   git pull origin dev
 2. **Antes de hacer cambios, crear una nueva rama**:
    ```bash
    git checkout -b feature/nombre-del-feature
@@ -105,8 +142,8 @@ bugbusters/
     git add .
     git commit -m "Descripción breve del cambio"
     git push origin feature/nombre-del-feature
-4. **Crear Merge Request desde `feature/` hacia `devBranch`.**
-5. **Pasar de devBranch a main solo con autorización de Maintainers mediante Merge Request aprobado.
+4. **Crear Merge Request desde `feature/` hacia `dev`.**
+5. **Pasar de dev a main solo con autorización de Maintainers mediante Merge Request aprobado.
 
 ---
 ## 5. Tecnologías Utilizadas
@@ -171,7 +208,7 @@ Esto lanzará el frontend, y podrás acceder a la aplicación web abriendo tu na
     npm install
 3. **Ejecutar el proyecto**:
     ```bash
-    node server.js
+    node src/server.js
 Esto lanzará el backend, y podrás acceder a la aplicación web abriendo tu navegador y dirigiéndote a http://localhost:3000.
 
 ---

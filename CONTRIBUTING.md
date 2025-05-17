@@ -7,7 +7,7 @@ Para mantener una estructura de trabajo limpia y organizada, por favor sigue est
 ##  Reglas Generales
 
 - **No** hacer `push` directo a la rama `main`.
-- Todo cambio debe realizarse a través de un **Merge Request** (MR) hacia `devBranch`.
+- Todo cambio debe realizarse a través de un **Merge Request** (MR) hacia `dev`.
 - Sigue el estilo de codificación y estructura definida en el proyecto.
 - Toda nueva funcionalidad debe estar probada antes de solicitar un Merge Request.
 
@@ -37,10 +37,10 @@ Para mantener una estructura de trabajo limpia y organizada, por favor sigue est
 
 ##  Flujo de Trabajo de Git
 
-1. **Actualizar `devBranch` antes de comenzar**:
+1. **Actualizar `dev` antes de comenzar**:
    ```bash
-   git checkout devBranch
-   git pull origin devBranch
+   git checkout dev
+   git pull origin dev
 2. **Crear una nueva rama para tu tarea o bugfix**:
    ```bash
    git checkout -b feature/nombre-del-feature
@@ -54,7 +54,7 @@ Para mantener una estructura de trabajo limpia y organizada, por favor sigue est
     git commit -m "Descripción breve del cambio"
 4. **Subir tu rama**:
     git push origin feature/nombre-del-feature
-5. **Crear Merge Request desde `feature/` hacia `devBranch`.**
+5. **Crear Merge Request desde `feature/` hacia `dev`.**
 
 ## Convención de nombres de ramas
 Usamos el siguiente formato:
