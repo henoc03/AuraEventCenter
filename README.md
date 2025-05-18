@@ -37,6 +37,7 @@ El sistema también permitirá a los administradores gestionar:
 
 ## 3. Estructura del Proyecto
 
+```
 bugbusters/
 ├── backend/                      # Backend en Node.js + Express
 │   ├── .env                     # Variables de entorno (conexiones, secretos)
@@ -114,7 +115,7 @@ bugbusters/
 ├── package-lock.json            # Archivo raíz de dependencias del proyecto (si usas monorepo)
 ├── package.json                 # Configuración del monorepo o proyecto raíz
 └── README.md                    # Documentación general del proyecto
-
+```
 ---
 ## 4. Flujo de Trabajo en Git
 
