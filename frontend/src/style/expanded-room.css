@@ -1,0 +1,82 @@
+.expanded-room {
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  background-color: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  padding-bottom: 1rem;
+  animation: fadeIn 1.7s ease;
+  width: 100%;
+  height: 100%;
+  min-height: 250px;
+}
+
+.expanded-room > .expanded-room-image {
+  width: 40%;
+  height: 106%;
+  object-fit: cover;
+  border-radius: 0px;
+}
+
+.expanded-room-details {
+  width: 60%;
+  padding: 2rem 1.5rem;
+  text-align: left;
+}
+
+.expanded-room >.expanded-room-details h2 {
+  text-align: left;
+  margin: 0 0 0.7rem 0;
+  font-size: 1.8rem;
+  color: #000000;
+}
+
+.expanded-room-details p {
+  margin: 0.25rem 0;
+  color: #222;
+}
+
+.close-expanded-room {
+  position: absolute;
+  top: 10px;
+  right: 28px;
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  color: #888;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  z-index: 10;
+}
+
+.close-expanded-room:hover {
+  color: #dc3545;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 768px) {
+  .expanded-room {
+    flex-direction: column;
+  }
+
+  .expanded-room-image {
+    width: 100%;
+    height: 200px;
+  }
+
+  .expanded-room-details {
+    width: 100%;
+    padding: 1rem;
+  }
+
+  .close-expanded-room {
+    top: 10px;
+    right: 10px;
+  }
+}
