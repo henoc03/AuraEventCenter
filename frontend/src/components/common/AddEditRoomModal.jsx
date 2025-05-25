@@ -25,77 +25,83 @@ function AddEditRoomModal({
   const {register, handleSubmit, formState: { errors, isValid } } = useForm({ mode: 'onChange' });
   const [showCreateSuccess, setShowCreateSuccess] = useState(false);
   const [showUpdateSuccess, setShowUpdateSuccess] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
+
   
   useEffect(() => {
     setIsAddEditOpen(isModalOpen);
   }, [isModalOpen]);
 
   const onSubmit = async (data) => {
-    if (isAdd) {
-      const zoneToSend = {
-        name: data.name,
-        type: data.type,
-        price: data.price,
-        capacity: data.capacity,
-        description: data.description,
-        event_center_id: 1
-      };
-  
-      try {
-        const res = await fetch(`${DEFAULT_ROUTE}/zones/`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(zoneToSend)
-        });
+  let encryptedImagePath = null;
 
-        if (!res.ok) {
-          const errorData = await res.json();
-          alert(errorData.message || 'Error al agregar la zona');
-          return;
-        }
+  if (imageFile) {
+    const formData = new FormData();
+    formData.append('image', imageFile);
 
-        onClose();
-        setShowCreateSuccess(true);
-      } catch (error) {
-        console.error('Error:', error);
-        alert('Ocurrió un error al agregar la zona de la sala.');
+    try {
+      const res = await fetch(`${DEFAULT_ROUTE}/zones/upload-image`, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!res.ok) {
+        throw new Error('Error al subir la imagen');
       }
-    } else {
-      const zoneToSend = {
-        name: data.name,
-        type: data.type,
-        price: data.price,
-        capacity: data.capacity,
-        description: data.description,
-        event_center_id: 1
-      };
-      try {
-        const res = await fetch(`${DEFAULT_ROUTE}/zones/${id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(zoneToSend)
-        });
 
-        if (!res.ok) {
-          const errorData = await res.json();
-          alert(errorData.message || 'Error al actualizar la información de la zona');
-          return;
-        }
-        setShowUpdateSuccess(true);
-      } catch (error) {
-        console.error('Error:', error);
-        alert('Ocurrió un error al actualizar la información de la sala.');
-      }
+      const imageData = await res.json();
+      console.log("📸 imageData recibido:", imageData);
+      encryptedImagePath = imageData.imagePath;
+    } catch (error) {
+      console.error('❌ Error subiendo imagen:', error);
+      alert('Error al subir imagen');
+      return;
     }
+  }
+
+  const zoneToSend = {
+    name: data.name,
+    type: data.type,
+    price: data.price,
+    capacity: data.capacity,
+    description: data.description,
+    event_center_id: 1,
+    imagePath: encryptedImagePath
   };
+
+  try {
+    const res = await fetch(`${DEFAULT_ROUTE}/zones/${isAdd ? '' : id}`, {
+      method: isAdd ? 'POST' : 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(zoneToSend)
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      alert(errorData.message || 'Error al guardar la zona');
+      return;
+    }
+
+    if (isAdd) setShowCreateSuccess(true);
+    else setShowUpdateSuccess(true);
+
+    onClose();
+  } catch (error) {
+    console.error('❌ Error:', error);
+    alert('Ocurrió un error al guardar la zona.');
+  }
+};
+
 
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
+    console.log(file);
     if (file) {
-      setImage(URL.createObjectURL(file)); // Mostrar imagen cargada
+      setImageFile(file); // Guardamos el archivo directamente
     }
   };
+
 
   const handleClose = () => {
     setIsAddEditOpen(false);
@@ -203,11 +209,13 @@ function AddEditRoomModal({
             <label htmlFor="room-image" className="upload-image-button">Subir imagen</label>
             <input
               id="room-image"
+              name="image"   // <-- agregar este atributo
               type="file"
               accept="image/*"
               onChange={handleImageChange}
               style={{ display: 'none' }}
             />
+
 
             <div className="save-cancel-container">
             <button onSubmit={onSubmit} type="submit" disabled={!isValid} className={`save-button ${isValid ? 'active' : ''}`} >

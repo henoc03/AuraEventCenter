@@ -77,10 +77,10 @@ function RoomCard ({id, name, image, state, type, capacity, price, description, 
       {isViewClicked && (
         <div className="room-info-modal" onClick={handleClose}>
           <div className="modal-room-info-content" onClick={(e) => e.stopPropagation()}>
-            <button className="close-button" type="button" onClick={handleClose}><i class="bi bi-x-lg"></i></button>
+            <button className="close-button" type="button" onClick={handleClose}><i className="bi bi-x-lg"></i></button>
 
             <div className='room-info-photo-container'>
-              <img src={RoomPhoto} alt={`Foto de la sala ${name}`}/>
+              <img src={image} alt={`Foto de la sala ${name}`}/>
               <div className='room-info-content'>
                 <h2>{name}</h2>
                 <p>{type}   |   Capacidad: {capacity} personas</p>

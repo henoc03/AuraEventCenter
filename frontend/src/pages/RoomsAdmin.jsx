@@ -8,9 +8,10 @@ import RoomCard from "../components/common/RoomCard.jsx";
 import AddEditRoomModal from "../components/common/AddEditRoomModal.jsx";
 import AlertMessage from "../components/common/AlertMessage.jsx";
 import LoadingPage from "../components/common/LoadingPage.jsx";
+import DefaultRoom from "../assets/images/salas/default_zone.jpg";
 
 
-import RoomPhoto from "../assets/images/salas/sala2.png";
+
 import "../style/rooms-admin.css";
 
 const DEFAULT_ROUTE = "http://localhost:1522";
@@ -125,7 +126,7 @@ function RoomsAdmin({ sections }) {
                 key={zone.ZONE_ID}
                 id={zone.ZONE_ID}
                 name={zone.NAME}
-                image={RoomPhoto}
+                image={zone.IMAGE_PATH && zone.IMAGE_PATH.trim() !== "" ? `${DEFAULT_ROUTE}/${zone.IMAGE_PATH}` : DefaultRoom}
                 state={zone.ACTIVE}
                 capacity={zone.CAPACITY}
                 price={zone.PRICE}

@@ -1,13 +1,14 @@
 import React from "react";
 import "../../style/expanded-room.css";
-import SalaDefault from "../../assets/images/salas/sala2.png";
+import DefaultRoom from "../../assets/images/salas/default_zone.jpg";
 
 const ExpandedRoom = ({ room, onClose }) => {
+    const DEFAULT_ROUTE = "http://localhost:1522";
   return (
 <div className="expanded-room">
   <button onClick={onClose} className="close-expanded-room">✕</button>
   <img
-    src={SalaDefault}
+    src={room.IMAGE_PATH && room.IMAGE_PATH.trim() !== "" ? `${DEFAULT_ROUTE}/${room.IMAGE_PATH}` : DefaultRoom}
     alt={`Imagen de ${room.NAME}`}
     className="expanded-room-image"
   />

@@ -112,7 +112,7 @@ bugbusters/
 │   │       ├── *.css            # Estilos específicos
 │   └── vite.config.js           # Configuración de Vite (servidor de desarrollo)
 │
-├── package-lock.json            # Archivo raíz de dependencias del proyecto (si usas monorepo)
+├── package-lock.json            # Archivo raíz de dependencias del proyecto
 ├── package.json                 # Configuración del monorepo o proyecto raíz
 └── README.md                    # Documentación general del proyecto
 ```
