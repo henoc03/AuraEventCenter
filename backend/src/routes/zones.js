@@ -5,13 +5,6 @@ const path = require('path');
 const fs = require('fs');
 const zonesController = require('../controllers/zonesController');
 
-router.get('/', zonesController.getAllZones);
-router.get('/:id', zonesController.getZoneById);
-router.post('/', zonesController.createZone);
-router.put('/:id', zonesController.updateZone);
-router.delete('/:id', zonesController.deleteZone);
-
-
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadDir = path.join(__dirname, '../uploads/zones');
@@ -28,6 +21,14 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-router.post('/upload-image', upload.single('image'), zonesController.uploadZoneImage);
+router.get('/', zonesController.getAllZones);
+router.get('/:id', zonesController.getZoneById);
+router.post('/', zonesController.createZone);
+router.put('/:id', zonesController.updateZone);
+router.delete('/:id', zonesController.deleteZone);
+
+router.post('/upload-primary-image', upload.single('image'), zonesController.uploadZonePrimaryImage);
+router.post('/upload-secondary-image', upload.single('image'), zonesController.uploadZoneSecondaryImage);
+router.get('/:zoneId/images', zonesController.getAllZoneImages);
 
 module.exports = router;

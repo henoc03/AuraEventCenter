@@ -7,9 +7,23 @@
  */
 
 const { getConnection, oracledb } = require('../config/db');
-
+const path = require('path');
+const fs = require('fs').promises;
 const { encrypt, decrypt } = require('../utils/encryption');
 
+const deletedFiles = new Set();
+
+async function deletePhysicalFile(filePath) {
+  const fullPath = path.join(__dirname, '..', filePath);
+  if (deletedFiles.has(fullPath)) return;
+
+  try {
+    await fs.unlink(fullPath);
+    deletedFiles.add(fullPath);
+  } catch (err) {
+    console.error(`❌ No se pudo borrar el archivo: ${fullPath}`, err.message);
+  }
+}
 
 /**
  * Obtiene todas las zonas disponibles.
@@ -97,7 +111,7 @@ exports.createZone = async (req, res) => {
     );
     res.status(201).json({ zone_id: result.outBinds.zone_id[0] });
   } catch (err) {
-    console.error('❌ Error al crear zona:', err);
+    console.error('Error al crear zona:', err);
     res.status(500).json({ error: err.message });
   } finally {
     if (conn) await conn.close();
@@ -106,9 +120,22 @@ exports.createZone = async (req, res) => {
 
 exports.updateZone = async (req, res) => {
   const { name, description, capacity, type, event_center_id, price, imagePath } = req.body;
+  const zoneId = req.params.id;
   let conn;
+
   try {
     conn = await getConnection();
+
+    let finalImagePath = imagePath;
+    if (imagePath === null || imagePath === undefined) {
+      const result = await conn.execute(
+        `SELECT IMAGE_PATH FROM ADMIN_SCHEMA.ZONES WHERE ZONE_ID = :id`,
+        [zoneId],
+        { outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
+      finalImagePath = result.rows[0]?.IMAGE_PATH || null;
+    }
+
     await conn.execute(
       `UPDATE ADMIN_SCHEMA.ZONES SET 
         NAME = :name,
@@ -126,19 +153,21 @@ exports.updateZone = async (req, res) => {
         type,
         event_center_id,
         price,
-        image_path: imagePath || null,
-        zone_id: req.params.id
+        image_path: finalImagePath,
+        zone_id: zoneId
       },
       { autoCommit: true }
     );
+
     res.sendStatus(204);
   } catch (err) {
-    console.error('❌ Error al actualizar zona:', err);
+    console.error('Error al actualizar zona:', err);
     res.status(500).json({ error: err.message });
   } finally {
     if (conn) await conn.close();
   }
 };
+
 
 
 
@@ -149,14 +178,48 @@ exports.deleteZone = async (req, res) => {
   let conn;
   try {
     conn = await getConnection();
-    await conn.execute(
-      `DELETE FROM ADMIN_SCHEMA.ZONES WHERE ZONE_ID = :id`,
-      [req.params.id],
-      { autoCommit: true }
+    const zoneId = req.params.id;
+
+    // Obtener imágenes secundarias
+    const secImages = await conn.execute(
+      `SELECT i.IMAGE_ADDRESS
+       FROM ADMIN_SCHEMA.IMAGES i
+       JOIN ADMIN_SCHEMA.ZONE_IMAGES zi ON zi.IMAGE_ID = i.IMAGE_ID
+       WHERE zi.ZONE_ID = :id`,
+      [zoneId],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
+
+    // Obtener imagen principal
+    const mainImageResult = await conn.execute(
+      `SELECT IMAGE_PATH FROM ADMIN_SCHEMA.ZONES WHERE ZONE_ID = :id`,
+      [zoneId],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    const mainImagePathEncrypted = mainImageResult.rows[0]?.IMAGE_PATH;
+    const mainImagePath = mainImagePathEncrypted ? decrypt(mainImagePathEncrypted) : null;
+
+    // Rutas únicas de imágenes
+    const imagePathsSet = new Set();
+
+    if (mainImagePath) imagePathsSet.add(mainImagePath);
+    secImages.rows.forEach(img => imagePathsSet.add(decrypt(img.IMAGE_ADDRESS)));
+
+    // Eliminar archivos físicos
+    await Promise.allSettled(
+      Array.from(imagePathsSet).map(deletePhysicalFile)
+    );
+
+    // Eliminar registros en tablas relacionadas
+    await conn.execute(`DELETE FROM ADMIN_SCHEMA.ZONE_EQUIPMENTS WHERE ZONE_ID = :id`, [zoneId], { autoCommit: true });
+    await conn.execute(`DELETE FROM RELATIONS_SCHEMA.BOOKINGS_ZONES WHERE ZONE_ID = :id`, [zoneId], { autoCommit: true });
+    await conn.execute(`DELETE FROM ADMIN_SCHEMA.ZONE_IMAGES WHERE ZONE_ID = :id`, [zoneId], { autoCommit: true });
+    await conn.execute(`DELETE FROM ADMIN_SCHEMA.ZONES WHERE ZONE_ID = :id`, [zoneId], { autoCommit: true });
+
     res.sendStatus(204);
   } catch (err) {
-    console.error('❌ Error al eliminar zona:', err);
+    console.error('Error al eliminar zona:', err);
     res.status(500).json({ error: err.message });
   } finally {
     if (conn) await conn.close();
@@ -164,7 +227,9 @@ exports.deleteZone = async (req, res) => {
 };
 
 
-exports.uploadZoneImage = (req, res) => {
+
+
+exports.uploadZonePrimaryImage = (req, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({ error: 'No se recibió ningún archivo' });
@@ -173,7 +238,104 @@ exports.uploadZoneImage = (req, res) => {
       const encryptedPath = encrypt(imagePath);
       res.status(200).json({ imagePath: encryptedPath });
     } catch (err) {
-      console.error("❌ Error al subir imagen:", err);
+      console.error("Error al subir imagen:", err);
       res.status(500).json({ error: err.message });
     }
   };
+
+
+exports.uploadZoneSecondaryImage = async (req, res) => {
+  let conn;
+  try {
+    const { zoneId } = req.body;
+    const image = req.file;
+
+    if (!image) {
+      return res.status(400).json({ error: "No se recibió ninguna imagen." });
+    }
+
+  const imagePath = `uploads/zones/${image.filename}`;
+  const encryptedPath = encrypt(imagePath);
+  const imageName = image.originalname;
+
+  conn = await getConnection();
+
+  const result = await conn.execute(
+    `INSERT INTO ADMIN_SCHEMA.IMAGES (IMAGE_ADDRESS, IMAGE_NAME)
+    VALUES (:imageAddress, :imageName)
+    RETURNING IMAGE_ID INTO :imageId`,
+    {
+      imageAddress: encryptedPath,
+      imageName,
+      imageId: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER }
+    },
+    { autoCommit: false }
+  );
+
+  const imageId = result.outBinds.imageId[0];
+
+  await conn.execute(
+    `INSERT INTO ADMIN_SCHEMA.ZONE_IMAGES (ZONE_ID, IMAGE_ID)
+    VALUES (:zoneId, :imageId)`,
+    { zoneId, imageId },
+    { autoCommit: true }
+  );
+
+  res.status(200).json({ message: "Imagen secundaria subida con éxito.", imageId, imagePath: encryptedPath });
+
+    } catch (error) {
+      console.error("Error al subir imagen secundaria:", error);
+      res.status(500).json({ message: "Error al subir imagen secundaria." });
+    } finally {
+      if (conn) await conn.close();
+    }
+};
+
+
+exports.getAllZoneImages = async (req, res) => {
+  let conn;
+  try {
+    const zoneId = req.params.zoneId;
+    conn = await getConnection();
+
+    const zoneResult = await conn.execute(
+      `SELECT IMAGE_PATH FROM ADMIN_SCHEMA.ZONES WHERE ZONE_ID = :zoneId`,
+      [zoneId],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    let mainImage = zoneResult.rows[0]?.IMAGE_PATH || null;
+    if (mainImage) {
+      mainImage = decrypt(mainImage);
+    }
+
+    const imagesResult = await conn.execute(
+      `SELECT i.IMAGE_ID, i.IMAGE_ADDRESS
+       FROM ADMIN_SCHEMA.IMAGES i
+       JOIN ADMIN_SCHEMA.ZONE_IMAGES zi ON zi.IMAGE_ID = i.IMAGE_ID
+       WHERE zi.ZONE_ID = :zoneId`,
+      [zoneId],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    const secondaryImages = imagesResult.rows.map(img => ({
+      id: img.IMAGE_ID,
+      path: decrypt(img.IMAGE_ADDRESS)
+    }));
+
+    const allImages = [];
+
+    if (mainImage) {
+      allImages.push({ id: 'main', path: mainImage });
+    }
+
+    allImages.push(...secondaryImages);
+
+    res.json(allImages);
+  } catch (err) {
+    console.error("Error al obtener todas las imágenes:", err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};

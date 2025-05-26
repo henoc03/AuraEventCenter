@@ -17,6 +17,7 @@ function AddEditRoomModal({
   price="Ingresse el precio aquí",
   capacity="Ingrese la capacidad aquí",
   description="Ingrese la descripción aquí",
+  existingImagePath=null,
   isAdd=false}) 
   {
 
@@ -26,6 +27,9 @@ function AddEditRoomModal({
   const [showCreateSuccess, setShowCreateSuccess] = useState(false);
   const [showUpdateSuccess, setShowUpdateSuccess] = useState(false);
   const [imageFile, setImageFile] = useState(null);
+  const [secondaryFiles, setSecondaryFiles] = useState([]);
+  const [showImageUploadSuccess, setShowImageUploadSuccess] = useState(false);
+
 
   
   useEffect(() => {
@@ -40,7 +44,7 @@ function AddEditRoomModal({
     formData.append('image', imageFile);
 
     try {
-      const res = await fetch(`${DEFAULT_ROUTE}/zones/upload-image`, {
+      const res = await fetch(`${DEFAULT_ROUTE}/zones/upload-primary-image`, {
         method: 'POST',
         body: formData
       });
@@ -50,13 +54,15 @@ function AddEditRoomModal({
       }
 
       const imageData = await res.json();
-      console.log("📸 imageData recibido:", imageData);
       encryptedImagePath = imageData.imagePath;
+      setShowImageUploadSuccess(true)
     } catch (error) {
-      console.error('❌ Error subiendo imagen:', error);
+      console.error('Error subiendo imagen:', error);
       alert('Error al subir imagen');
       return;
     }
+  } else {
+    encryptedImagePath = existingImagePath;
   }
 
   const zoneToSend = {
@@ -75,7 +81,25 @@ function AddEditRoomModal({
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(zoneToSend)
     });
+    
+    const data = await res.json();
 
+    if (secondaryFiles.length > 0 && data.zone_id) {
+      for (const file of secondaryFiles) {
+        const formData = new FormData();
+        formData.append('image', file);
+        formData.append('zoneId', data.zone_id);
+
+        try {
+          await fetch(`${DEFAULT_ROUTE}/zones/upload-secondary-image`, {
+            method: 'POST',
+            body: formData,
+          });
+        } catch (err) {
+          console.error('❌ Error subiendo imagen secundaria:', err);
+        }
+      }
+    }
     if (!res.ok) {
       const errorData = await res.json();
       alert(errorData.message || 'Error al guardar la zona');
@@ -98,7 +122,7 @@ function AddEditRoomModal({
     const file = e.target.files[0];
     console.log(file);
     if (file) {
-      setImageFile(file); // Guardamos el archivo directamente
+      setImageFile(file);
     }
   };
 
@@ -132,18 +156,25 @@ function AddEditRoomModal({
         />
       )}
 
+      {showImageUploadSuccess && (
+        <AlertMessage
+          message={"Imagen subida con éxito"}
+          type={"alert-floating"}
+          onClose={() => setShowImageUploadSuccess(false)}
+          duration={3000}
+          className={"success"}
+        />
+      )}
+
       {isAddEditOpen && (
         <div className="add-edit-modal" onClick={handleClose}>
-        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="title-close-container">
-          <h2>{isAdd ? 'Agregar sala' : 'Editar sala'}</h2>
-          <button className="close-x" onClick={handleClose}>×</button>
-        </div>
+        <div className="room-modal-content" onClick={(e) => e.stopPropagation()} >
+        <button className="room-modal-close" onClick={handleClose}>×</button>
 
-          <form onSubmit={(handleSubmit(onSubmit))} className="auth-form">
-            <h3>Los campos marcados con * son obligatorios</h3>
+          <p>Los campos marcados con <span style={{ color: "red" }}>*</span> son obligatorios</p>
+          <form onSubmit={(handleSubmit(onSubmit))} className="room-modal-form">
             {/* Nombre de la sala */}
-            <label htmlFor="name">Nombre de la sala *</label>
+            <label>Nombre de la sala <span style={{ color: "red" }}>*</span></label>
             <input
               type="text"
               placeholder={name}
@@ -153,7 +184,7 @@ function AddEditRoomModal({
     
             {errors.name && <span className="error">{errors.name.message}</span>}
 
-            <label htmlFor="type">Categoría *</label>
+            <label >Categoría <span style={{ color: "red" }}>*</span></label>
             <input
               type="text"
               placeholder={type}
@@ -165,10 +196,10 @@ function AddEditRoomModal({
       
             
             {/* Precio */}
-            <label htmlFor="price">Precio *</label>
+            <label >Precio <span style={{ color: "red" }}>*</span></label>
             <input
               type="text"
-              placeholder={`₡${price}`}
+              placeholder={`Ingrese el precio aquí`}
               className='input'
               {...register('price', {
                 required: 'Precio requerido',
@@ -181,7 +212,7 @@ function AddEditRoomModal({
             {errors.price && <span className="error">{errors.price.message}</span>}
 
             {/* Capacidad */}
-            <label htmlFor="capacity">Capacidad *</label>
+            <label >Capacidad <span style={{ color: "red" }}>*</span></label>
             <input
               type="text"
               placeholder={`${capacity} personas`}
@@ -197,7 +228,7 @@ function AddEditRoomModal({
             {errors.capacity && <span className="error">{errors.capacity.message}</span>}
 
             {/* Descripcion */}
-            <label htmlFor="description">Descripcion *</label>
+            <label >Descripcion <span style={{ color: "red" }}>*</span></label>
             <input
               type="text"
               placeholder={description}
@@ -209,13 +240,38 @@ function AddEditRoomModal({
             <label htmlFor="room-image" className="upload-image-button">Subir imagen</label>
             <input
               id="room-image"
-              name="image"   // <-- agregar este atributo
+              name="image"
               type="file"
               accept="image/*"
               onChange={handleImageChange}
               style={{ display: 'none' }}
             />
-
+            {imageFile && (
+            <div className="image-name">
+              Imagen principal seleccionada: {imageFile.name}
+            </div>
+          )}
+          <label htmlFor="secondary-images" className="upload-image-button">Subir imágenes adicionales</label>
+          <input
+            id="secondary-images"
+            name="secondaryImages"
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => setSecondaryFiles(Array.from(e.target.files))}
+            style={{ display: 'none' }}
+          />
+          {/* Mostrar nombres de las imágenes secundarias */}
+          {secondaryFiles.length > 0 && (
+            <div className="image-names">
+              Imágenes secundarias seleccionadas:
+              <ul>
+                {secondaryFiles.map((file, index) => (
+                  <li key={index}>{file.name}</li>
+                ))}
+              </ul>
+            </div>
+          )}
 
             <div className="save-cancel-container">
             <button onSubmit={onSubmit} type="submit" disabled={!isValid} className={`save-button ${isValid ? 'active' : ''}`} >
@@ -229,7 +285,9 @@ function AddEditRoomModal({
         </div>
       </div>
       )}
+      
     </>
+    
   )
 }
 
