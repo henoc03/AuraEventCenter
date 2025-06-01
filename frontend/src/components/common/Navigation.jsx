@@ -81,7 +81,7 @@ function Navigation() {
 
   return (
     <nav className={`nav ${scrolled ? 'scrolled' : ''}`}>
-      <a data-aos="fade-down" data-aos-duration="1500" className="logo" href="#">
+      <a data-aos="fade-down" data-aos-duration="1500" className="logo" href="/">
         <Logo className="logo-img" />
       </a>
 
