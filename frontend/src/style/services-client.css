@@ -1,4 +1,23 @@
 .services-client-page {
-    background-color: rgb(126, 126, 126);
+    display: flex;
+    flex-direction: column;
+    background-color: white;
     height: 100vh;
+}
+
+.services-client-main {
+    margin-top: 30px;
+}
+
+.services-client-main h2{
+    display: flex;
+    justify-content: center;
+    font-family: 'Merriweather sans', serif;
+    font-size: 1.5rem;
+}
+
+@media(max-width: 768px) {
+    .services-client-main h2{
+        font-size: 1.2rem;
+    }
 }
