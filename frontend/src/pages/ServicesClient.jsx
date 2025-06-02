@@ -6,6 +6,7 @@ import heroImage from "../assets/images/services-hero.jpg";
 import Hero from "../components/sections/RoomsServicesHero";
 import Footer from "../components/common/Footer";
 import LoadingPage from "../components/common/LoadingPage";
+import defaultImage from "../assets/images/default_no_image.jpg"
 
 const DEFAULT_ROUTE = "http://localhost:1522";
 
@@ -65,7 +66,9 @@ function ServicesClient() {
           <div 
             key={service.ADDITIONAL_SERVICE_ID}   className="service-container">
             <img 
-              src="https://brownbrotherscatering.com/wp-content/uploads/Exploring-the-Importance-of-Good-Service-in-Catering.jpg"
+              src={service.IMAGE_PATH && service.IMAGE_PATH.trim() !== ""
+                ? `${DEFAULT_ROUTE}/${service.IMAGE_PATH}` : defaultImage
+              }
               alt={service.NAME}
               data-aos={service.ADDITIONAL_SERVICE_ID %2 != 0 ? "fade-right" : "fade-left"}
               data-aos-duration="1500"
