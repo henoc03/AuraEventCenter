@@ -57,8 +57,8 @@ function ServicesClient() {
       <main className="services-client-main">
         <h2>Conoce nuestros servicios</h2>
         {services.map((service) => (
-          <div key={service.SERVICE_ID} className="service-container">
-            <img src={service.IMAGE_URL} alt={service.NAME} />
+          <div key={service.ADDITIONAL_SERVICE_ID} className="service-container">
+            <img src={service.IMAGE_PATH} alt={service.NAME} />
             <div className="service-info-container">
               <h3>{service.NAME}</h3>
               <p>{service.DESCRIPTION}</p>
