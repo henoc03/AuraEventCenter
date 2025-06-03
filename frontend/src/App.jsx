@@ -14,6 +14,7 @@ import ChangePassword from './pages/ChangePassword';
 import AccountSettings from './pages/AccountSettings';
 import VerifyAccountCode from './pages/VerifyAccountCode';
 import ServicesClient from './pages/ServicesClient';
+import MenusClient from './pages/MenusClient';
 
 // Páginas protegidas
 import AdminDashboard from "./pages/AdminDashBoard";
@@ -46,6 +47,7 @@ function App() {
           <Route path="/cuenta/cambiar-contraseña" element={<ChangePassword sections={SectionProfile}/>} />
           <Route path="/cuenta/verificar-codigo" element={<VerifyAccountCode sections={SectionProfile}/>} />
           <Route path="/servicios" element={<ServicesClient />} />
+          <Route path="/menus" element={<MenusClient />} />
 
           {/* Rutas protegidas para administradores comunes */}
           <Route element={<PrivateRoute allowedRoles={['admin']} />}>
