@@ -5,6 +5,7 @@ const emailRoutes = require('./routes/emails');
 const zonesRoutes = require('./routes/zones');
 const dashboardRoutes = require('./routes/dashboard');
 const servicesRoutes = require('./routes/services');
+const menusRoutes = require('./routes/menus');
 
 const app = express();
 app.use(cors());
@@ -14,6 +15,7 @@ app.use('/email', emailRoutes);
 app.use('/zones', zonesRoutes);
 app.use('/dashboard', dashboardRoutes);
 app.use('/services', servicesRoutes);
+app.use('/menus', menusRoutes);
 
 app.get('/', (req, res) => {
   res.send('API REST Oracle con tabla USERS ✅');

@@ -1,5 +1,5 @@
 import React from "react";
-// import "../../style/menu-cards.css";
+import "../../style/menu-cards.css";
 import MenuDefault from "../../assets/images/default_no_image.jpg";
 
 const ExpandedMenu = ({ menu, onClose }) => {
@@ -15,8 +15,8 @@ const ExpandedMenu = ({ menu, onClose }) => {
       <div className="expanded-menu-details">
         <h2>{menu.NAME}</h2>
         <p>{menu.DESCRIPTION}</p>
-        <p> Precio: {menu.PRICE} | {menu.ACTIVE === 1 ? "Disponible" : "No disponible"}</p>
-        <p><strong>Productos</strong></p>
+        <p> {`Precio: ₡${menu.PRICE.toLocaleString('es-CR')}`} | {menu.AVAILABLE === 1 ? "Disponible" : "No disponible"}</p>
+        <h3>Productos</h3>
         {/*TODO: Agregar los productos*/} 
       </div>
     </div>

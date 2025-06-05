@@ -12,7 +12,6 @@ function Navigation() {
 
   const navigate = useNavigate();
   const location = useLocation();
-  console.log(location);
 
   const handleScroll = () => {
     setScrolled(window.scrollY > window.innerHeight);

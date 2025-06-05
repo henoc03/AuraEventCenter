@@ -17,7 +17,7 @@ exports.getAllMenus = async (req, res) => {
   try {
     conn = await getConnection();
     const result = await conn.execute(
-      `SELECT MENU_ID, NAME, DESCRIPTION, PRICE, IMAGE_PATH, AVAILABLE
+      `SELECT MENU_ID, NAME, DESCRIPTION, PRICE, IMAGE_PATH, AVAILABLE, TYPE
        FROM ADMIN_SCHEMA.CATERING_MENUS`,
       [],
       { outFormat: oracledb.OUT_FORMAT_OBJECT }

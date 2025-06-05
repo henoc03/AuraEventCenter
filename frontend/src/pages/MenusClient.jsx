@@ -1,10 +1,12 @@
 import React, {useEffect, useState, useRef} from 'react';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-// import "../style/menus-client.css";
+import "../style/menus-client.css";
 import Footer from "../components/common/Footer";
 import Navigation from '../components/common/Navigation';
 import LoadingPage from "../components/common/LoadingPage";
+import CompactMenu from "../components/common/CompactMenu";
+import ExpandedMenu from "../components/common/ExpandedMenu";
 
 const DEFAULT_ROUTE = "http://localhost:1522";
 
@@ -39,7 +41,7 @@ function MenusClient() {
 
       if (!res.ok) {
         const errorData = await res.json();
-        alert(errorData.message || "Error al obtener los menus");
+        alert(errorData.message || "Error al obtener los menús");
         return;
       }
 
@@ -47,7 +49,7 @@ function MenusClient() {
       const menusData = await res.json();
       setMenus(menusData);
     } catch (error) {
-      console.error("Error al obtener menus:", error);
+      console.error("Error al obtener menús:", error);
       alert("Ocurrió un error al obtener los menus.");
     } finally {
       setLoading(false);
@@ -70,9 +72,9 @@ function MenusClient() {
 
   return (
     <div className="menus-client-page">
-      <head className="menus-navigation-container">
+      <div className="menus-navigation-container">
         <Navigation/>
-      </head>
+      </div>
 
       <main className="menus-client-main">
         <h2>Conoce nuestros menús</h2>
