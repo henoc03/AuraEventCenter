@@ -16,22 +16,52 @@ exports.getAllMenus = async (req, res) => {
   let conn;
   try {
     conn = await getConnection();
-    const result = await conn.execute(
+    // Obtener todos los menús
+    const menusResult = await conn.execute(
       `SELECT MENU_ID, NAME, DESCRIPTION, PRICE, IMAGE_PATH, AVAILABLE, TYPE
        FROM ADMIN_SCHEMA.CATERING_MENUS`,
       [],
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
 
-    // Desencriptar el path de las imagenes del menú
-    const menus = result.rows.map(menu => {
-      const decryptedPath = menu.IMAGE_PATH ? decrypt(menu.IMAGE_PATH) : null;
+    // Agregar path de la imagen y array de productos al menú
+    const menus = menusResult.rows.map(menu => ({
+      ...menu,
+      IMAGE_PATH: menu.IMAGE_PATH ? decrypt(menu.IMAGE_PATH) : null,
+      PRODUCTS: []
+    }));
 
-      // TODO: Traer los productos de cada menu
-      return {
-        ...menu,
-        IMAGE_PATH: decryptedPath
-      };
+    // Obtener todos los productos relacionados a los menús
+    let productsResult = { rows: [] };
+    productsResult = await conn.execute(
+      `SELECT mp.MENU_ID, mp.PRODUCT_ID, p.NAME, p.DESCRIPTION, p.UNITARY_PRICE
+        FROM ADMIN_SCHEMA.CATERING_MENUS m
+        JOIN ADMIN_SCHEMA.PRODUCTS_MENUS mp ON m.MENU_ID = mp.MENU_ID
+        JOIN ADMIN_SCHEMA.PRODUCTS p ON mp.PRODUCT_ID = p.PRODUCT_ID`,
+        [],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    // Agrupar productos por menú
+    const productsByMenu = {};
+    menusResult.rows.forEach(menu => {
+      productsByMenu[menu.MENU_ID] = productsResult.rows
+        .filter(product => product.MENU_ID === menu.MENU_ID)
+        .map(product => ({
+          PRODUCT_ID: product.PRODUCT_ID,
+          NAME: product.NAME,
+          DESCRIPTION: product.DESCRIPTION,
+          UNITARY_PRICE: product.UNITARY_PRICE
+        }));
+    });
+
+    // Asignar productos a cada menú
+    menus.forEach(menu => {
+      menu.PRODUCTS = productsByMenu[menu.MENU_ID] || [];
+    });
+
+    menus.forEach(menu => {
+      menu.PRICE = menu.PRODUCTS.reduce((sum, product) => sum + (product.UNITARY_PRICE || 0), 0);
     });
 
     res.json(menus);

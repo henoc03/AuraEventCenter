@@ -77,6 +77,7 @@ function MenusClient() {
       </div>
 
       <main className="menus-client-main">
+        <button type='button' onClick={() => window.history.back()}><i class="bi bi-arrow-left"></i> Regresar</button>
         <h2>Conoce nuestros menús</h2>
 
         {/* Filtros */}

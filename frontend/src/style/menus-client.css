@@ -20,7 +20,7 @@
     align-self: center;
     width: 90%;
     max-width: 1800px;
-    margin: 90px 0 0 0;
+    margin: 85px 0 0 0;
     padding: 2rem 1.5rem;
 }
 
@@ -29,6 +29,20 @@
     margin-bottom: 40px;
     font-family: 'Merriweather sans', sans-serif;
     font-size: 1.75rem;
+}
+
+.menus-client-main button{
+    text-align: left;
+    width: fit-content;
+    margin-bottom: 20px;
+    font-family: 'Merriweather sans', sans-serif;
+    font-size: 1.05rem;
+    transition: font-weight 0.2s;
+}
+
+.menus-client-main button:hover {
+    font-weight: bold;
+    cursor: pointer;
 }
 
 .filters {
@@ -79,5 +93,19 @@
 @media (max-width: 1440px) {
     .menu-grid {
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .menus-client-main h2{
+        font-size: 1.4rem;
+    }
+
+    .menus-client-main{
+        margin-top: 67px;
+    }
+
+    .menus-client-main button{
+        font-size: 0.95rem;
     }
 }

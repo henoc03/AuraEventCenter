@@ -5,9 +5,8 @@ import MenuDefault from "../../assets/images/default_no_image.jpg";
 const CompactMenu = ({ menu }) => {
   return (
     <div className="compact-menu">
-      {/*TODO: Agregar las imagenes desde el backend*/}
       <img
-        src={MenuDefault}
+        src={menu.IMAGE_PATH || MenuDefault}
         alt={`Imagen de ${menu.NAME}`}
         className="compact-menu-image"
       />
