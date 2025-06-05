@@ -4,10 +4,11 @@ import { jwtDecode } from "jwt-decode";
 
 import Header from "../components/common/Header.jsx";
 import SideNav from "../components/common/SideNav.jsx";
-// import ServiceCard from "../components/common/ServiceCard.jsx";
+import ServiceCard from "../components/common/ServiceCard.jsx";
 // import AddEditRoomModal from "../components/common/AddEditRoomModal.jsx";
 import AlertMessage from "../components/common/AlertMessage.jsx";
 import LoadingPage from "../components/common/LoadingPage.jsx";
+
 
 // import "../style/services-admin.css";
 
@@ -28,6 +29,7 @@ function ServicesAdmin({ sections }) {
 
   // Estados para los filtros y búsqueda
   const [searchTerm, setSearchTerm] = useState("");
+  const [filterActive, setFilterActive] = useState("todos");
   const [sortOrder, setSortOrder] = useState("asc");
 
 
@@ -96,6 +98,19 @@ function ServicesAdmin({ sections }) {
 
   if (loading) return <LoadingPage />;
 
+  const filteredAndSortedServices = services
+  .filter((service) => {
+    const matchesSearch = service.NAME.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesActive =
+      filterActive === "todos" ||
+      (filterActive === "activos" && service.ACTIVE === 1) ||
+      (filterActive === "inactivos" && service.ACTIVE === 0);
+    return matchesSearch && matchesActive;
+  })
+  .sort((a, b) => {
+    return sortOrder === "asc" ? a.PRICE - b.PRICE : b.PRICE - a.PRICE;
+  });
+
   return (
     <div className="services-admin-page">
       {showSuccess && (
@@ -115,7 +130,7 @@ function ServicesAdmin({ sections }) {
       />
 
       <div className={`service-admin-main ${isAddEditOpen ? "modal-open" : ""}`}>
-        <SideNav className= "services-admin-nav" sections={sections} />
+        
 
         <main className="services-admin-main">
           <div className="title-add-service-cont">
@@ -139,6 +154,17 @@ function ServicesAdmin({ sections }) {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="filter-input"
             />
+            <label htmlFor="active">Filtrar: </label>
+            <select
+              id="active"
+              value={filterActive}
+              onChange={(e) => setFilterActive(e.target.value)}
+              className="filter-select"
+            >
+              <option value="todos">Todos</option>
+              <option value="activos">Activos</option>
+              <option value="inactivos">Inactivos</option>
+            </select>
             <label htmlFor="sort">Ordenar: </label>
             <select
               id="sort"
@@ -152,9 +178,9 @@ function ServicesAdmin({ sections }) {
           </div>
 
           <div className="services-admin-grid">
-            {/* {filteredAndSortedServices.map((service) => (
+            {filteredAndSortedServices.map((service) => (
               <ServiceCard service={service} />
-            ))} */}
+            ))}
           </div>
         </main>
       </div>
