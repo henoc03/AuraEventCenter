@@ -9,8 +9,6 @@ import SideNav from "../components/common/SideNav.jsx";
 import AlertMessage from "../components/common/AlertMessage.jsx";
 import LoadingPage from "../components/common/LoadingPage.jsx";
 
-
-import defaultPhoto from "../assets/images/default_no_image.jpg";
 // import "../style/services-admin.css";
 
 const DEFAULT_ROUTE = "http://localhost:1522";
@@ -30,7 +28,6 @@ function ServicesAdmin({ sections }) {
 
   // Estados para los filtros y búsqueda
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterType, setFilterType] = useState("todos");
   const [sortOrder, setSortOrder] = useState("asc");
 
 
@@ -99,19 +96,6 @@ function ServicesAdmin({ sections }) {
 
   if (loading) return <LoadingPage />;
 
-  // Establece los filtros y ordenamiento para los servicios
-  const uniqueTypes = [...new Set(services.map((service) => service.TYPE))];
-
-  const filteredAndSortedServices = services
-  .filter((service) => {
-    const matchesSearch = service.NAME.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = filterType === "todos" || service.TYPE.toLowerCase() === filterType.toLowerCase();
-    return matchesSearch && matchesType;
-  })
-  .sort((a, b) => {
-    return sortOrder === "asc" ? a.PRICE - b.PRICE : b.PRICE - a.PRICE;
-  });
-
   return (
     <div className="services-admin-page">
       {showSuccess && (
@@ -155,20 +139,6 @@ function ServicesAdmin({ sections }) {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="filter-input"
             />
-            <label htmlFor="status">Filtrar: </label>
-            <select
-              id="status"
-              value={filterType}
-              onChange={(e) => setFilterType(e.target.value)}
-              className="filter-select"
-            >
-              <option value="todos">Todos los tipos</option>
-              {uniqueTypes.map((type) => (
-                <option key={type} value={type}>
-                  {type.charAt(0).toUpperCase() + type.slice(1)}
-                </option>
-              ))}
-            </select>
             <label htmlFor="sort">Ordenar: </label>
             <select
               id="sort"
@@ -182,9 +152,9 @@ function ServicesAdmin({ sections }) {
           </div>
 
           <div className="services-admin-grid">
-            {filteredAndSortedServices.map((service) => (
-              {/*<ServiceCard service={service} />*/}
-            ))}
+            {/* {filteredAndSortedServices.map((service) => (
+              <ServiceCard service={service} />
+            ))} */}
           </div>
         </main>
       </div>
