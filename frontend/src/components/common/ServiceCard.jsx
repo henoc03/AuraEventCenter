@@ -2,7 +2,7 @@ import React from 'react';
 import {useState} from 'react';
 // import AddEditserviceModal from './AddEditserviceModal';
 import defaultImage from '../../assets/images/default_no_image.jpg'
-// import '../../style/service-card.css';
+import '../../style/service-card.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSquare } from '@fortawesome/free-solid-svg-icons';
 
@@ -53,9 +53,9 @@ function ServiceCard ({service, onClose}) {
         <div className="service-card-body">
           <h3 className="servide-card-title">{service.NAME}</h3>
           <h2>
-            <FontAwesomeIcon icon={faSquare} className={service.ACTIVE == 1 ? "status-indicator active" : "status-indicator inactive"} /> {service.ACTIVE ?  "Publicada" : " No publicada"}
+            <FontAwesomeIcon icon={faSquare} className={service.ACTIVE == 1 ? "service-status-indicator active" : "service-status-indicator inactive"} /> {service.ACTIVE ?  "Publicada" : " No publicada"}
           </h2>
-          <div className="buttons">
+          <div className="service-card-buttons">
             <a href="#" className="btn btn-primary button" onClick={() => setIsDeleted(true)}>Borrar</a>
             <a href="#" className="btn btn-primary button" onClick={() => setIsEditClicked(!isEditClicked)}>Editar</a>
             <a href="#" className="btn btn-primary button" onClick={() => setIsViewClicked(!isViewClicked)}>Visualizar</a>
@@ -83,7 +83,7 @@ function ServiceCard ({service, onClose}) {
                 <p>Precio: {service.PRICE}  |  {service.ACTIVE ?  "Disponible" : " No disponible"}</p>
                 <p>{service.DESCRIPTION}</p>
 
-                {service.NAME.toLowerCase().includes("catering") && (
+                {/* {service.NAME.toLowerCase().includes("catering") && (
                   <div className='menus-products-buttons'>
                     <a href="/admin/menus" className="service-menu-button">
                       <button type='button'>Ver menús</button>
@@ -92,7 +92,7 @@ function ServiceCard ({service, onClose}) {
                       <button type='button'>Ver productos</button>
                     </a>
                   </div>
-                )}
+                )} */}
               </div>
             </div>
           </div>

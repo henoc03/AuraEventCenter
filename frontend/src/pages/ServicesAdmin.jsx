@@ -130,7 +130,7 @@ function ServicesAdmin({ sections }) {
       />
 
       <div className={`service-admin-main ${isAddEditOpen ? "modal-open" : ""}`}>
-        
+        {/* <SideNav className= "services-admin-nav" sections={sections} /> */}
 
         <main className="services-admin-main">
           <div className="title-add-service-cont">
