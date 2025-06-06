@@ -77,22 +77,22 @@ function ServiceCard ({service, onClose}) {
             <button className="service-close-button" type="button" onClick={handleClose}><i class="bi bi-x-lg"></i></button>
 
             <div className='service-info-photo-container'>
-              <img src={service.IMAGE_PATH} alt={`Foto del servicio ${service.NAME}`}/>
+              <img src={service.IMAGE_PATH || defaultImage} alt={`Foto del servicio ${service.NAME}`}/>
               <div className='service-info-content'>
                 <h2>{service.NAME}</h2>
                 <p>Precio: {service.PRICE}  |  {service.ACTIVE ?  "Disponible" : " No disponible"}</p>
                 <p>{service.DESCRIPTION}</p>
 
-                {/* {service.NAME.toLowerCase().includes("catering") && (
+                {service.NAME.toLowerCase().includes("catering") && (
                   <div className='menus-products-buttons'>
                     <a href="/admin/menus" className="service-menu-button">
                       <button type='button'>Ver menús</button>
                     </a>
-                    <a href="/admin/menus" className="service-products-button">
+                    <a href="/admin/productos" className="service-products-button">
                       <button type='button'>Ver productos</button>
                     </a>
                   </div>
-                )} */}
+                )}
               </div>
             </div>
           </div>

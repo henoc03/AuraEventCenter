@@ -103,7 +103,6 @@
     justify-content: center;
     z-index: 4000;
     overflow-y: scroll;
-
   }
   
   .modal-service-info-content {
@@ -124,7 +123,6 @@
     background: none;
     border: none;
     color: black;
-    margin-bottom: 30px;
     width: 30px;
   }
   
@@ -132,17 +130,16 @@
     display: flex;
     flex-direction: row;
     width: 400px;
-    height: 300px;
+    height: auto;
     border-radius: 0;
     object-fit: cover;
-    margin-bottom: 30px;
   }
   
   .service-info-photo-container{
     display: flex;
     flex-direction: row;
-    width: 360px;
-    height: 300px;
+    width: fit-content;
+    height: fit-content;
     border-radius: 0;
     object-fit: cover;
     margin-bottom: 30px;
@@ -150,7 +147,7 @@
     font-size: 0.8rem;
     
   }
-  
+
   .service-info-content{
     margin-left: 20px;
     width: 60%;
@@ -158,14 +155,42 @@
   
   .service-info-content h2 {
     font-family: "Merriweather Sans", sans-serif;
-    font-size: 1.8rem;
+    font-size: 1.4rem;
     font-weight: bold;
   }
   
   .service-info-content p{
     font-family: "Merriweather Sans", sans-serif;
-    font-size: 1rem;
+    font-size: 0.95rem;
     margin: 15px 0;
+  }
+
+  .menus-products-buttons {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .menus-products-buttons a{
+    width: 45%;
+    height: 40px;
+    margin-top: 10px;
+  }
+
+  .menus-products-buttons button{
+    width: 100%;
+    height: 100%;
+    font-size: 0.9rem;
+    font-family: 'Merriweather sans';
+    background-color: #0074D9;
+    color: white;
+    border-radius: 5px;
+  }
+
+  .service-products-button button{
+    background-color: #F0F4F8;
+    color: #007AFF;
   }
   
   @media(max-width: 768px) {
@@ -194,8 +219,19 @@
     }
   
     .service-info-content{
-      margin-left: 20px;
+      margin-left: 0;
       width: 100%;
     }
-    
-  }
+
+    .modal-service-info-content {
+        margin-top: 25vw;
+        margin-bottom: 5vw;
+    }
+
+    .modal-service-info-content button {
+        margin-bottom: 10px;
+    }
+    .service-info-photo-container img {
+        margin-bottom: 20px;
+    }
+}
