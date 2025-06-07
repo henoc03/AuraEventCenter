@@ -1,9 +1,9 @@
 .filters {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
 }
 
 .service-search-input {
@@ -17,18 +17,18 @@
 }
 
 .filter-input{
-  padding: 0.5rem;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
-  max-width: 400px;
+    padding: 0.5rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    max-width: 400px;
 }
 
 .filter-select {
-  padding: 0.5rem;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
+    padding: 0.5rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
 }
 
 #search {
@@ -124,18 +124,18 @@
     overflow: hidden;
 } */
 
-@media (max-width: 1180px) {
+/* @media (max-width: 1180px) {
     .services-admin-cards {
         justify-content: center;
         align-items: center;
         gap: 0;
     }
-}
+} */
 
 @media (max-width: 768px) {
     .services-admin-main {
         margin-left: 0;
-        padding: 30px 20px;
+        padding: 30px 0;
     }
 
     .services-admin-nav {
@@ -148,13 +148,22 @@
         gap: 20px;
     }
 
-    .service-card {
-        justify-self: center;
-        margin: 0;
-    }
-
     .filters {
         margin: 30px 10px;
+        padding: 0 20px;
+    }
+
+    .title-add-service-cont {
+        margin: 15px 10px;
+        padding: 0 20px;
+    }
+
+    .title-add-service-cont h1{
+        font-size: 1.3rem;
+    }
+
+    #search {
+        width: 80%;
     }
 }
   
