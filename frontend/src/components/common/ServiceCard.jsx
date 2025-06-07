@@ -1,5 +1,6 @@
 import React from 'react';
 import {useState, useEffect} from 'react';
+import { useNavigate } from 'react-router-dom';
 // import AddEditserviceModal from './AddEditserviceModal';
 import defaultImage from '../../assets/images/default_no_image.jpg'
 import '../../style/service-card.css';
@@ -14,6 +15,7 @@ function ServiceCard ({service, onClose}) {
   const [isEditClicked, setIsEditClicked] = useState(false);
   const [isViewClicked, setIsViewClicked] = useState(false);
   const [adminType, setAdminType] = useState("");
+  const navigation = useNavigate();
 
   useEffect(() => {
     const currentPath = window.location.pathname;
@@ -95,12 +97,20 @@ function ServiceCard ({service, onClose}) {
 
                 {service.NAME.toLowerCase().includes("catering") && (
                   <div className='menus-products-buttons'>
-                    <a href={`/${adminType}/menus`} className="service-menu-button">
-                      <button type='button'>Ver menús</button>
-                    </a>
-                    <a href={`/${adminType}/productos`} className="service-products-button">
-                      <button type='button'>Ver productos</button>
-                    </a>
+                    <button 
+                      type='button'
+                      onClick={() => navigation(`/${adminType}/menus`)}
+                      className="service-menus-button"
+                    >
+                      Ver menús
+                    </button>
+                    <button 
+                      type='button'
+                      onClick={() => navigation(`/${adminType}/menus`)}
+                      className="service-products-button"
+                    >
+                      Ver productos
+                    </button>
                   </div>
                 )}
               </div>
