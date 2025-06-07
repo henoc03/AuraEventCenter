@@ -4,7 +4,7 @@ import { jwtDecode } from "jwt-decode";
 
 import Header from "../components/common/Header.jsx";
 import SideNav from "../components/common/SideNav.jsx";
-// import MenuCard from "../components/common/menuCard.jsx";
+import MenuCard from "../components/common/MenuAdminCard.jsx";
 // import AddEditRoomModal from "../components/common/AddEditRoomModal.jsx";
 import AlertMessage from "../components/common/AlertMessage.jsx";
 import LoadingPage from "../components/common/LoadingPage.jsx";
@@ -34,7 +34,6 @@ function MenusAdmin({ sections }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log(window.location.pathname);
     getSetUserInfo();
     getMenus();
   }, []);
@@ -187,9 +186,9 @@ function MenusAdmin({ sections }) {
           </div>
 
           <div className="menus-admin-cards">
-            {/* {filteredAndSortedMenus.map((menu) => (
+            {filteredAndSortedMenus.map((menu) => (
               <MenuCard className="menu-admin-card" menu={menu} />
-            ))} */}
+            ))}
           </div>
         </main>
       </div>
