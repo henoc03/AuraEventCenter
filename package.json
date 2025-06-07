@@ -10,6 +10,14 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.56.1",
-    "recharts": "^2.15.3"
+    "react-multi-carousel": "^2.8.6",
+    "recharts": "^2.15.3",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "scripts": {
+    "dev": "concurrently \"npm run server --prefix backend\" \"npm run dev --prefix frontend\""
   }
 }
