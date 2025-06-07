@@ -1,10 +1,12 @@
 const express = require('express');
 const cors = require('cors');
+
 const path = require('path');
 const usersRoutes = require('./routes/users');
 const emailRoutes = require('./routes/emails');
 const zonesRoutes = require('./routes/zones');
 const dashboardRoutes = require('./routes/dashboard');
+const verifyToken = require('./middleware/verifyToken');
 
 const app = express();
 app.use(cors());
