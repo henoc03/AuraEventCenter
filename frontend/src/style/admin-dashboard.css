@@ -112,7 +112,9 @@
     flex-grow: 1;
     margin-bottom: 16px;
   }
-  
+  .placeholder{
+    background:transparent
+  }
   .view-stats {
     margin-top: auto;
     color: #007bff;
@@ -122,7 +124,7 @@
   .view-stats:hover {
     text-decoration: underline;
   }
-@media (max-width: 1440px) {
+@media (max-width: 1340px) {
   .dashboard-content {
     grid-template-columns: 1fr;
     grid-template-areas:

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Carousel from '../utils/CarouselFade';
-
+import imagePaths from '../utils/page-image-paths'
 
 function About() {
   const navigate = useNavigate(); // Hook para navegar
@@ -38,7 +38,7 @@ function About() {
       </div>
   
       <div data-aos="fade-left" data-aos-duration="3000" data-aos-delay="200" className="carousel-container">
-        <Carousel />
+        <Carousel imagePaths={imagePaths} />
       </div>
     </section>
   </div>

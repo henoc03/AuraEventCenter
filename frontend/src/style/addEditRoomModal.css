@@ -171,6 +171,20 @@
   color: #fff;
 }
 
+.delete-image-button {
+  background: none;
+  border: none;
+  color: red;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0;
+}
+
+.delete-image-button:hover {
+  font-weight: bold;
+  color: darkred;
+}
+
 
 @media (max-width: 400px) {
   .modal-content {

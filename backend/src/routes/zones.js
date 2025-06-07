@@ -21,6 +21,10 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
+router.use((req, res, next) => {
+  console.log(`[Router zones] ${req.method} ${req.originalUrl}`);
+  next();
+});
 router.get('/', zonesController.getAllZones);
 router.get('/:id', zonesController.getZoneById);
 router.post('/', zonesController.createZone);
@@ -30,5 +34,8 @@ router.delete('/:id', zonesController.deleteZone);
 router.post('/upload-primary-image', upload.single('image'), zonesController.uploadZonePrimaryImage);
 router.post('/upload-secondary-image', upload.single('image'), zonesController.uploadZoneSecondaryImage);
 router.get('/:zoneId/images', zonesController.getAllZoneImages);
+router.delete('/images/:imageId', zonesController.deleteZoneSecondaryImage);
 
+
+router.delete('/:id/delete-primary-image', zonesController.deleteZonePrimaryImage);
 module.exports = router;

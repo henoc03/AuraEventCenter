@@ -1,17 +1,18 @@
 import React from 'react';
 import {useState} from 'react';
 import AddEditRoomModal from './AddEditRoomModal';
-import RoomPhoto from '../../assets/images/salas/sala2.png'
 import '../../style/room-card.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSquare } from '@fortawesome/free-solid-svg-icons';
 
 const DEFAULT_ROUTE = "http://localhost:1522";
 
-function RoomCard ({id, name, image, state, type, capacity, price, description, onClose}) {
+function RoomCard ({id, name, image, state, type, capacity, price, description, onClose, onSuccess }) {
   const [isDeleted, setIsDeleted] = useState(false);
   const [isEditClicked, setIsEditClicked] = useState(false);
   const [isViewClicked, setIsViewClicked] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+
 
   const handleClose = () => {
     setIsViewClicked(false);
@@ -20,28 +21,29 @@ function RoomCard ({id, name, image, state, type, capacity, price, description, 
     }
   };
 
-  if (isDeleted) {
-    const handleDelete  = async () => {
-      try {
-        const res = await fetch(`${DEFAULT_ROUTE}/zones/${id}`, {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' }
-        });
+    const handleDelete = async () => {
+    try {
+      const res = await fetch(`${DEFAULT_ROUTE}/zones/${id}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+      });
 
-        if (!res.ok) {
-          const errorData = await res.json();
-          alert(errorData.message || 'Error al eliminar la zona');
-          return;
-        }
-        
-      } catch (error) {
-        console.error('Error:', error);
-        alert('Ocurrió un error al eliminar la zona.');
+      if (!res.ok) {
+        const errorData = await res.json();
+        if (onError) onError(errorData.message || 'Error al eliminar la zona');
+        return;
       }
+
+      if (onSuccess) onSuccess("Sala eliminada con éxito");
       setIsDeleted(true);
+
+    } catch (error) {
+      console.error('Error:', error);
+      alert("Ocurrió un error al eliminar la zona.");
     }
-    handleDelete();
-  }
+  };
+
+
 
 
   return (
@@ -54,7 +56,7 @@ function RoomCard ({id, name, image, state, type, capacity, price, description, 
             <FontAwesomeIcon icon={faSquare} className={state == 1 ? "status-indicator active" : "status-indicator inactive"} /> {state ?  "Publicada" : " No publicada"}
           </h2>
           <div className="buttons">
-            <a href="#" className="btn btn-primary button" onClick={() => setIsDeleted(true)}>Borrar</a>
+            <a href="#" className="btn btn-primary button" onClick={(e) => { e.preventDefault(); setShowDeleteConfirmation(true); }}>Borrar</a>
             <a href="#" className="btn btn-primary button" onClick={() => setIsEditClicked(!isEditClicked)}>Editar</a>
             <a href="#" className="btn btn-primary button" onClick={() => setIsViewClicked(!isViewClicked)}>Visualizar</a>
           </div>
@@ -65,12 +67,17 @@ function RoomCard ({id, name, image, state, type, capacity, price, description, 
         <AddEditRoomModal 
         isModalOpen={true} 
         onClose={() => setIsEditClicked(false)}
+        onSuccess={() => {
+        if (typeof onSuccess === "function") onSuccess("Sala actualizada con éxito");
+            setIsEditClicked(false);
+        }}
         id={id}
         name={name}
         type={type}
         price={price}
         capacity={capacity}
         description={description}
+        isAdd={false}
       />
       )}
 
@@ -91,6 +98,28 @@ function RoomCard ({id, name, image, state, type, capacity, price, description, 
           </div>
         </div>
       )}
+      {showDeleteConfirmation && (
+        <div className="user-modal-overlay">
+          <div className="user-modal-content">
+            <button className="user-modal-close" onClick={() => setShowDeleteConfirmation(false)}>×</button>
+            <h2 className="modal-title">¿Eliminar Sala?</h2>
+            <p><strong>{name}</strong> será eliminada permanentemente.</p>
+            <div className="user-modal-actions">
+              <button
+                className="btn"
+                onClick={async () => {
+                  await handleDelete();
+                  setShowDeleteConfirmation(false);
+                }}
+                style={{ color: "red" }}
+              >
+                Eliminar
+              </button>
+              <button className="btn" onClick={() => setShowDeleteConfirmation(false)}>Cancelar</button>
+            </div>
+          </div>
+        </div>
+)}
     </>
   );
 };

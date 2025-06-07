@@ -17,28 +17,25 @@
   width: 40%;
   height: 100%;
   overflow: hidden;
-  margin-bottom: 0;
+  margin: -1.5vh 20px 0px;
+  border-radius: 10px !important;
+}
+
+.carousel-container > .carousel{
+  height: 100%;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+    object-fit: cover;
 }
 
-.expanded-room-carousel img {
-  align-items: center;
+.expanded-room-carousel > .expanded-room-image {
+  height: 100%;
+  display: flex;
   justify-content: center;
-  height: 85% !important;
-  width: auto !important;
-  border-radius: 0px !important;
+  align-items: center;
   object-fit: cover;
-}
-.carousel-container {
-  height: 100%;
-}
-
-.carousel-item img {
-  height: 100%;
-  width: auto;
-  object-fit: cover;
+  margin-top: 50px;
 }
 .expanded-room-details {
   width: 60%;

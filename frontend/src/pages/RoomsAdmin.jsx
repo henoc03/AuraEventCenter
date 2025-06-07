@@ -10,22 +10,27 @@ import AlertMessage from "../components/common/AlertMessage.jsx";
 import LoadingPage from "../components/common/LoadingPage.jsx";
 import DefaultRoom from "../assets/images/salas/default_zone.jpg";
 
-
-
 import "../style/rooms-admin.css";
 
 const DEFAULT_ROUTE = "http://localhost:1522";
 
 function RoomsAdmin({ sections }) {
   const [isAddEditOpen, setIsAddEditOpen] = useState(false);
+  const [isAddMode, setIsAddMode] = useState(true);
+  const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [zones, setZones] = useState([]);
-  const [showSuccess, setShowSuccess] = useState(false);
 
+  // Estados para usuario
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [lastname, setLastname] = useState("");
   const [role, setRole] = useState("");
+
+  // Estados para mensajes
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [showError, setShowError] = useState(false);
 
   const navigate = useNavigate();
 
@@ -47,7 +52,7 @@ function RoomsAdmin({ sections }) {
 
       if (!res.ok) {
         const errorData = await res.json();
-        alert(errorData.message || "Error al obtener la información del usuario");
+        showErrorAlert(errorData.message || "Error al obtener la información del usuario");
         return;
       }
 
@@ -56,9 +61,8 @@ function RoomsAdmin({ sections }) {
       setEmail(userData.EMAIL);
       setLastname(userData.LAST_NAME_1);
       setRole(userData.USER_TYPE);
-
-    } catch {
-      alert("Ocurrió un error al obtener la información de usuario.");
+    } catch (err) {
+      showErrorAlert("Ocurrió un error al obtener la información de usuario.");
       navigate("/login");
     }
   };
@@ -72,50 +76,79 @@ function RoomsAdmin({ sections }) {
 
       if (!res.ok) {
         const errorData = await res.json();
-        alert(errorData.message || "Error al obtener las zonas");
+        showErrorAlert(errorData.message || "Error al obtener las zonas");
         return;
       }
 
       const zonesData = await res.json();
       setZones(zonesData);
-    } catch {
-      alert("Ocurrió un error al obtener las zonas.");
+    } catch (err) {
+      showErrorAlert("Ocurrió un error al obtener las zonas.");
       navigate("/login");
     } finally {
       setLoading(false);
     }
   };
 
-   if (loading) return <LoadingPage />;
+  const showErrorAlert = (message) => {
+    setErrorMessage(message);
+    setShowError(true);
+s
+    setTimeout(() => {
+      setShowError(false);
+      setErrorMessage("");
+    }, 4000);
+  };
+
+  const handleSuccess = (msg = "Operación exitosa") => {
+    setIsAddEditOpen(false);
+    getZones();
+    setSuccessMessage(msg);
+    setShowSuccess(true);
+    setTimeout(() => setShowSuccess(false), 2000);
+  };
+
+  const handleError = (msg = "Ocurrió un error") => {
+  setErrorMessage(msg);
+  setShowError(true);
+  setTimeout(() => {
+    setShowError(false);
+    setErrorMessage("");
+  }, 4000);
+};
+
+
+  if (loading) return <LoadingPage />;
 
   return (
     <div className="rooms-admin-page">
-      {showSuccess && (
+    {showSuccess && (
+      <AlertMessage
+        message={successMessage}
+        type="alert-floating"
+        onClose={() => setShowSuccess(false)}
+        className="success"
+      />
+    )}
+
+      {showError && (
         <AlertMessage
-          message="Información actualizada con éxito"
+          message={errorMessage}
           type="alert-floating"
-          onClose={() => setShowSuccess(false)}
-          className="success"
+          onClose={() => setShowError(false)}
+          className="error"
         />
       )}
 
-      <Header
-        name={name}
-        lastname={lastname}
-        role={role}
-        email={email}
-      />
+      <Header name={name} lastname={lastname} role={role} email={email} />
 
       <div className={`room-main-container ${isAddEditOpen ? "modal-open" : ""}`}>
-        <SideNav className= "zones-nav" sections={sections} />
+        <SideNav className="zones-nav" sections={sections} />
 
         <main className="rooms-content">
           <div className="title-button-container">
             <h1>Salas</h1>
-            <button
-              className="add-room-button"
-              onClick={() => setIsAddEditOpen(true)}
-            >
+            <button className="add-room-button" onClick={() => {setIsAddEditOpen(true); setIsAddMode(true)}}>
               Agregar Sala
             </button>
           </div>
@@ -126,12 +159,18 @@ function RoomsAdmin({ sections }) {
                 key={zone.ZONE_ID}
                 id={zone.ZONE_ID}
                 name={zone.NAME}
-                image={zone.IMAGE_PATH && zone.IMAGE_PATH.trim() !== "" ? `${DEFAULT_ROUTE}/${zone.IMAGE_PATH}` : DefaultRoom}
+                image={
+                  zone.IMAGE_PATH && zone.IMAGE_PATH.trim() !== ""
+                    ? `${DEFAULT_ROUTE}/${zone.IMAGE_PATH}`
+                    : DefaultRoom
+                }
                 state={zone.ACTIVE}
                 capacity={zone.CAPACITY}
                 price={zone.PRICE}
                 type={zone.TYPE}
                 description={zone.DESCRIPTION}
+                onSuccess={(msg) => handleSuccess(msg)}
+                onError={(msg) => handleError(msg)}
               />
             ))}
           </div>
@@ -141,10 +180,8 @@ function RoomsAdmin({ sections }) {
       {isAddEditOpen && (
         <AddEditRoomModal
           isModalOpen={true}
-          onClose={() => {
-            setIsAddEditOpen(false);
-            getZones();
-          }}
+          onClose={() => setIsAddEditOpen(false)}
+          onSuccess={() => handleSuccess()}
           isAdd={true}
         />
       )}
