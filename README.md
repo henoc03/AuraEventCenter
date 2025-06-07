@@ -384,3 +384,283 @@ bugbusters
 └─ README.md
 
 ```
+```
+bugbusters
+├─ backend
+│  ├─ .env
+│  ├─ package-lock.json
+│  ├─ package.json
+│  ├─ readme.md
+│  └─ src
+│     ├─ app.js
+│     ├─ config
+│     │  └─ db.js
+│     ├─ controllers
+│     │  ├─ dashboardController.js
+│     │  ├─ emailController.js
+│     │  ├─ usersController.js
+│     │  └─ zonesController.js
+│     ├─ middleware
+│     │  └─ verifyToken.js
+│     ├─ routes
+│     │  ├─ dashboard.js
+│     │  ├─ emails.js
+│     │  ├─ users.js
+│     │  └─ zones.js
+│     ├─ server.js
+│     ├─ tests
+│     │  └─ zones-test.js
+│     ├─ uploads
+│     │  └─ zones
+│     │     ├─ image-1749253791729-8319761.png
+│     │     ├─ image-1749253794343-17603510.png
+│     │     └─ image-1749253797165-431108285.png
+│     └─ utils
+│        ├─ dbMock.js
+│        └─ encryption.js
+├─ CONTRIBUTING.md
+├─ frontend
+│  ├─ eslint.config.js
+│  ├─ index.html
+│  ├─ package-lock.json
+│  ├─ package.json
+│  ├─ public
+│  │  └─ default-image.jpg
+│  ├─ src
+│  │  ├─ App.jsx
+│  │  ├─ assets
+│  │  │  └─ images
+│  │  │     ├─ background.png
+│  │  │     ├─ default-profile-photo.png
+│  │  │     ├─ logo-no-background.png
+│  │  │     ├─ logo.png
+│  │  │     └─ salas
+│  │  │        ├─ default_zone.jpg
+│  │  │        ├─ sala1.png
+│  │  │        ├─ Sala2.png
+│  │  │        └─ sala3.png
+│  │  ├─ components
+│  │  │  ├─ common
+│  │  │  │  ├─ AddEditRoomModal.jsx
+│  │  │  │  ├─ AlertMessage.jsx
+│  │  │  │  ├─ Auth.jsx
+│  │  │  │  ├─ CompactRoom.jsx
+│  │  │  │  ├─ DropDownMenu.jsx
+│  │  │  │  ├─ ExpandedRoom.jsx
+│  │  │  │  ├─ Footer.jsx
+│  │  │  │  ├─ Header.jsx
+│  │  │  │  ├─ LoadingPage.jsx
+│  │  │  │  ├─ Main.jsx
+│  │  │  │  ├─ Nav.jsx
+│  │  │  │  ├─ Navigation.jsx
+│  │  │  │  ├─ Page.jsx
+│  │  │  │  ├─ RoomCard.jsx
+│  │  │  │  ├─ SideBar.jsx
+│  │  │  │  ├─ SideNav.jsx
+│  │  │  │  ├─ UserCard.jsx
+│  │  │  │  └─ UserModal.jsx
+│  │  │  ├─ context
+│  │  │  │  └─ PrivateRoute.jsx
+│  │  │  ├─ icons
+│  │  │  │  ├─ Logo.jsx
+│  │  │  │  └─ ProfilePhoto.jsx
+│  │  │  ├─ sections
+│  │  │  │  ├─ About.jsx
+│  │  │  │  ├─ Hero.jsx
+│  │  │  │  ├─ OTPInput.jsx
+│  │  │  │  └─ Users.jsx
+│  │  │  └─ utils
+│  │  │     ├─ admin-nav.jsx
+│  │  │     ├─ CarouselFade.jsx
+│  │  │     ├─ content.js
+│  │  │     ├─ page-image-paths.js
+│  │  │     ├─ profile-nav.jsx
+│  │  │     └─ root-nav.jsx
+│  │  ├─ context
+│  │  │  └─ AuthContext.jsx
+│  │  ├─ index.css
+│  │  ├─ main.jsx
+│  │  ├─ pages
+│  │  │  ├─ AccountSettings.jsx
+│  │  │  ├─ AdminDashBoard.jsx
+│  │  │  ├─ Administrator.jsx
+│  │  │  ├─ ChangePassword.jsx
+│  │  │  ├─ Clients.jsx
+│  │  │  ├─ Home.jsx
+│  │  │  ├─ NotFound.jsx
+│  │  │  ├─ Profile.jsx
+│  │  │  ├─ RecoverEmail.jsx
+│  │  │  ├─ Register.jsx
+│  │  │  ├─ ResetPassword.jsx
+│  │  │  ├─ RoomsAdmin.jsx
+│  │  │  ├─ RoomsClient.jsx
+│  │  │  ├─ SignIn.jsx
+│  │  │  ├─ VerifyAccountCode.jsx
+│  │  │  └─ VerifyCode.jsx
+│  │  └─ style
+│  │     ├─ account-settings.css
+│  │     ├─ addEditRoomModal.css
+│  │     ├─ admin-dashboard.css
+│  │     ├─ admin-users.css
+│  │     ├─ auth.css
+│  │     ├─ compact-room.css
+│  │     ├─ dropDownMenu.css
+│  │     ├─ expanded-room.css
+│  │     ├─ header.css
+│  │     ├─ layout.css
+│  │     ├─ loading-page.css
+│  │     ├─ nav.css
+│  │     ├─ profile.css
+│  │     ├─ room-card.css
+│  │     ├─ rooms-admin.css
+│  │     ├─ rooms-client.css
+│  │     ├─ side-nav.css
+│  │     ├─ sideBar.css
+│  │     └─ user-modal.css
+│  └─ vite.config.js
+├─ jest.config.js
+├─ package-lock.json
+├─ package.json
+└─ README.md
+
+```
+```
+bugbusters
+├─ backend
+│  ├─ .env
+│  ├─ package-lock.json
+│  ├─ package.json
+│  ├─ readme.md
+│  └─ src
+│     ├─ app.js
+│     ├─ config
+│     │  └─ db.js
+│     ├─ controllers
+│     │  ├─ dashboardController.js
+│     │  ├─ emailController.js
+│     │  ├─ usersController.js
+│     │  └─ zonesController.js
+│     ├─ middleware
+│     │  └─ verifyToken.js
+│     ├─ routes
+│     │  ├─ dashboard.js
+│     │  ├─ emails.js
+│     │  ├─ users.js
+│     │  └─ zones.js
+│     ├─ server.js
+│     ├─ tests
+│     │  └─ zones-test.js
+│     ├─ uploads
+│     │  └─ zones
+│     │     ├─ image-1749253791729-8319761.png
+│     │     ├─ image-1749253794343-17603510.png
+│     │     └─ image-1749253797165-431108285.png
+│     └─ utils
+│        ├─ dbMock.js
+│        └─ encryption.js
+├─ CONTRIBUTING.md
+├─ frontend
+│  ├─ eslint.config.js
+│  ├─ index.html
+│  ├─ package-lock.json
+│  ├─ package.json
+│  ├─ public
+│  │  └─ default-image.jpg
+│  ├─ src
+│  │  ├─ App.jsx
+│  │  ├─ assets
+│  │  │  └─ images
+│  │  │     ├─ background.png
+│  │  │     ├─ default-profile-photo.png
+│  │  │     ├─ logo-no-background.png
+│  │  │     ├─ logo.png
+│  │  │     └─ salas
+│  │  │        ├─ default_zone.jpg
+│  │  │        ├─ sala1.png
+│  │  │        ├─ Sala2.png
+│  │  │        └─ sala3.png
+│  │  ├─ components
+│  │  │  ├─ common
+│  │  │  │  ├─ AddEditRoomModal.jsx
+│  │  │  │  ├─ AlertMessage.jsx
+│  │  │  │  ├─ Auth.jsx
+│  │  │  │  ├─ CompactRoom.jsx
+│  │  │  │  ├─ DropDownMenu.jsx
+│  │  │  │  ├─ ExpandedRoom.jsx
+│  │  │  │  ├─ Footer.jsx
+│  │  │  │  ├─ Header.jsx
+│  │  │  │  ├─ LoadingPage.jsx
+│  │  │  │  ├─ Main.jsx
+│  │  │  │  ├─ Nav.jsx
+│  │  │  │  ├─ Navigation.jsx
+│  │  │  │  ├─ Page.jsx
+│  │  │  │  ├─ RoomCard.jsx
+│  │  │  │  ├─ SideBar.jsx
+│  │  │  │  ├─ SideNav.jsx
+│  │  │  │  ├─ UserCard.jsx
+│  │  │  │  └─ UserModal.jsx
+│  │  │  ├─ context
+│  │  │  │  └─ PrivateRoute.jsx
+│  │  │  ├─ icons
+│  │  │  │  ├─ Logo.jsx
+│  │  │  │  └─ ProfilePhoto.jsx
+│  │  │  ├─ sections
+│  │  │  │  ├─ About.jsx
+│  │  │  │  ├─ Hero.jsx
+│  │  │  │  ├─ OTPInput.jsx
+│  │  │  │  └─ Users.jsx
+│  │  │  └─ utils
+│  │  │     ├─ admin-nav.jsx
+│  │  │     ├─ CarouselFade.jsx
+│  │  │     ├─ content.js
+│  │  │     ├─ page-image-paths.js
+│  │  │     ├─ profile-nav.jsx
+│  │  │     └─ root-nav.jsx
+│  │  ├─ context
+│  │  │  └─ AuthContext.jsx
+│  │  ├─ index.css
+│  │  ├─ main.jsx
+│  │  ├─ pages
+│  │  │  ├─ AccountSettings.jsx
+│  │  │  ├─ AdminDashBoard.jsx
+│  │  │  ├─ Administrator.jsx
+│  │  │  ├─ ChangePassword.jsx
+│  │  │  ├─ Clients.jsx
+│  │  │  ├─ Home.jsx
+│  │  │  ├─ NotFound.jsx
+│  │  │  ├─ Profile.jsx
+│  │  │  ├─ RecoverEmail.jsx
+│  │  │  ├─ Register.jsx
+│  │  │  ├─ ResetPassword.jsx
+│  │  │  ├─ RoomsAdmin.jsx
+│  │  │  ├─ RoomsClient.jsx
+│  │  │  ├─ SignIn.jsx
+│  │  │  ├─ VerifyAccountCode.jsx
+│  │  │  └─ VerifyCode.jsx
+│  │  └─ style
+│  │     ├─ account-settings.css
+│  │     ├─ addEditRoomModal.css
+│  │     ├─ admin-dashboard.css
+│  │     ├─ admin-users.css
+│  │     ├─ auth.css
+│  │     ├─ compact-room.css
+│  │     ├─ dropDownMenu.css
+│  │     ├─ expanded-room.css
+│  │     ├─ header.css
+│  │     ├─ layout.css
+│  │     ├─ loading-page.css
+│  │     ├─ nav.css
+│  │     ├─ profile.css
+│  │     ├─ room-card.css
+│  │     ├─ rooms-admin.css
+│  │     ├─ rooms-client.css
+│  │     ├─ side-nav.css
+│  │     ├─ sideBar.css
+│  │     └─ user-modal.css
+│  └─ vite.config.js
+├─ jest.config.js
+├─ package-lock.json
+├─ package.json
+└─ README.md
+
+```

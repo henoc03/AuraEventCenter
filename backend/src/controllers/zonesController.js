@@ -11,6 +11,7 @@ const path = require('path');
 const fs = require('fs').promises;
 const { encrypt, decrypt } = require('../utils/encryption');
 
+
 const deletedFiles = new Set();
 
 async function deletePhysicalFile(filePath) {
