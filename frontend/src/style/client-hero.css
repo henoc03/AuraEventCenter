@@ -1,0 +1,40 @@
+.client-hero {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    font-family: "Segoe UI", sans-serif;
+}
+
+.client-hero-text {
+    flex: 1;
+    background-color: #007bff;
+    color: white;
+    padding: 5rem 4rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.client-hero-subtitle {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.client-hero-title {
+    font-size: 2.8rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    line-height: 1.2;
+}
+
+.client-hero-description {
+    font-size: 1.2rem;
+    line-height: 1.6;
+}
+
+.client-hero-image {
+    flex: 1;
+    background-size: cover;
+    background-position: center;
+}
