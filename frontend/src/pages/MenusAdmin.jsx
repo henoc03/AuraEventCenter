@@ -9,7 +9,7 @@ import SideNav from "../components/common/SideNav.jsx";
 import AlertMessage from "../components/common/AlertMessage.jsx";
 import LoadingPage from "../components/common/LoadingPage.jsx";
 
-// import "../style/menus-admin.css";
+import "../style/menus-admin.css";
 
 const DEFAULT_ROUTE = "http://localhost:1522";
 
@@ -100,15 +100,14 @@ function MenusAdmin({ sections }) {
   const uniqueTypes = [...new Set(menus.map((menu) => menu.TYPE))];
 
   const filteredAndSortedMenus = menus
-    .filter((menu) => {
-      const matchesSearch = menu.NAME.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesType = filterType === "todos" || menu.TYPE.toLowerCase() === filterType.toLowerCase();
-      return matchesSearch && matchesType;
-    })
-    .sort((a, b) => {
-      return sortOrder === "asc" ? a.PRICE - b.PRICE : b.PRICE - a.PRICE;
-    });
-
+  .filter((menu) => {
+    const matchesSearch = menu.NAME.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType = filterType === "todos" || menu.TYPE.toLowerCase() === filterType.toLowerCase();
+    return matchesSearch && matchesType;
+  })
+  .sort((a, b) => {
+    return sortOrder === "asc" ? a.PRICE - b.PRICE : b.PRICE - a.PRICE;
+  });
 
   return (
     <div className="menus-admin-page">
