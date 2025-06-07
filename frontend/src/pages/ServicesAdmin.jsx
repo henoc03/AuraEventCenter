@@ -9,8 +9,7 @@ import ServiceCard from "../components/common/ServiceCard.jsx";
 import AlertMessage from "../components/common/AlertMessage.jsx";
 import LoadingPage from "../components/common/LoadingPage.jsx";
 
-
-// import "../style/services-admin.css";
+import "../style/services-admin.css";
 
 const DEFAULT_ROUTE = "http://localhost:1522";
 
@@ -129,57 +128,65 @@ function ServicesAdmin({ sections }) {
         email={email}
       />
 
-      <div className={`service-admin-main ${isAddEditOpen ? "modal-open" : ""}`}>
-        {/* <SideNav className= "services-admin-nav" sections={sections} /> */}
+      <div className={`services-admin-container ${isAddEditOpen ? "modal-open" : ""}`}>
+        <SideNav className= "services-admin-nav" sections={sections} />
 
         <main className="services-admin-main">
           <div className="title-add-service-cont">
-            <h1>Salas</h1>
+            <h1>Servicios adicionales</h1>
             <button
               className="add-service-button"
               onClick={() => setIsAddEditOpen(true)}
             >
-              Agregar Sala
+              Agregar
             </button>
           </div>
 
           {/* Filtros */}
           <div className="filters">
-            <label htmlFor="search">Buscar: </label>
-            <input
-              id="search"
-              type="text"
-              placeholder="Buscar por nombre..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="filter-input"
-            />
-            <label htmlFor="active">Filtrar: </label>
-            <select
-              id="active"
-              value={filterActive}
-              onChange={(e) => setFilterActive(e.target.value)}
-              className="filter-select"
-            >
-              <option value="todos">Todos</option>
-              <option value="activos">Activos</option>
-              <option value="inactivos">Inactivos</option>
-            </select>
-            <label htmlFor="sort">Ordenar: </label>
-            <select
-              id="sort"
-              value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value)}
-              className="filter-select"
-            >
-              <option value="asc">Precio: menor a mayor</option>
-              <option value="desc">Precio: mayor a menor</option>
-            </select>
+            <div className="service-search-input">
+              <label htmlFor="search">Buscar: </label>
+              <input
+                id="search"
+                type="text"
+                placeholder="Buscar por nombre..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="filter-input"
+              />
+            </div>
+
+            <div className="service-filter-input">
+              <label htmlFor="active">Filtrar: </label>
+              <select
+                id="active"
+                value={filterActive}
+                onChange={(e) => setFilterActive(e.target.value)}
+                className="filter-select"
+              >
+                <option value="todos">Todos</option>
+                <option value="activos">Activos</option>
+                <option value="inactivos">Inactivos</option>
+              </select>
+            </div>
+
+            <div className="service-sort-input">
+              <label htmlFor="sort">Ordenar: </label>
+              <select
+                id="sort"
+                value={sortOrder}
+                onChange={(e) => setSortOrder(e.target.value)}
+                className="filter-select"
+              >
+                <option value="asc">Precio: menor a mayor</option>
+                <option value="desc">Precio: mayor a menor</option>
+              </select>
+            </div>
           </div>
 
-          <div className="services-admin-grid">
+          <div className="services-admin-cards">
             {filteredAndSortedServices.map((service) => (
-              <ServiceCard service={service} />
+              <ServiceCard className="service-admin-card" service={service} />
             ))}
           </div>
         </main>

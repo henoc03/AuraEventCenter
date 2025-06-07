@@ -80,7 +80,7 @@ function ServiceCard ({service, onClose}) {
               <img src={service.IMAGE_PATH || defaultImage} alt={`Foto del servicio ${service.NAME}`}/>
               <div className='service-info-content'>
                 <h2>{service.NAME}</h2>
-                <p>Precio: {service.PRICE}  |  {service.ACTIVE ?  "Disponible" : " No disponible"}</p>
+                <p>{`Precio: ₡${service.PRICE.toLocaleString('es-CR')}`}  |  {service.ACTIVE ?  "Disponible" : " No disponible"}</p>
                 <p>{service.DESCRIPTION}</p>
 
                 {service.NAME.toLowerCase().includes("catering") && (
