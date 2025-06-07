@@ -20,6 +20,7 @@ import Clients from './pages/Clients';
 import Administrators from './pages/Administrator';
 import RoomsAdmin from './pages/RoomsAdmin';
 import ServicesAdmin from './pages/ServicesAdmin';
+import MenusAdmin from './pages/MenusAdmin';
 
 // Contexto y utilidades
 import { AuthProvider } from './context/AuthContext';
@@ -52,6 +53,7 @@ function App() {
             <Route path="/admin/tablero" element={<AdminDashboard sections={SectionAdmin} />} />
             <Route path="/admin/clientes" element={<Clients sections={SectionAdmin} />} />
             <Route path="/admin/servicios" element={<ServicesAdmin sections={SectionAdmin} />} />
+            <Route path="/admin/menus" element={<MenusAdmin sections={SectionAdmin} />} />
           </Route>
 
           {/* Rutas protegidas para root-admin */}
@@ -61,6 +63,7 @@ function App() {
             <Route path="/root-admin/clientes" element={<Clients sections={SectionRoot} />} />
             <Route path="/root-admin/administradores" element={<Administrators sections={SectionRoot} />} />
             <Route path="/root-admin/servicios" element={<ServicesAdmin sections={SectionRoot} />} />
+            <Route path="/root-admin/menus" element={<MenusAdmin sections={SectionRoot} />} />
           </Route>
 
           {/* Página 404 */}
