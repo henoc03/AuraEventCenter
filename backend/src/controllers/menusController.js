@@ -150,3 +150,65 @@ exports.getAllMenuImages = async (req, res) => {
     if (conn) await conn.close();
   }
 };
+
+/** 
+ * Crea un nuevo menú.
+*/
+console.log("✅ createMenu endpoint alcanzado");
+exports.createMenu = async (req, res) => {
+  let conn;
+  try {
+    const {
+      name,
+      description,
+      type,
+      price,
+      available,
+      imagePath,
+      products
+    } = req.body;
+
+    conn = await getConnection();
+
+    const isAvailable = available === true || true ? 1 : 0;
+    // Insertar menú
+    const result = await conn.execute(
+      `INSERT INTO ADMIN_SCHEMA.CATERING_MENUS
+        (NAME, DESCRIPTION, TYPE, PRICE, IMAGE_PATH, AVAILABLE, ADDITIONAL_SERVICE_ID)
+       VALUES (:name, :description, :type, :price, :imagePath, :available, :serviceId)
+       RETURNING MENU_ID INTO :menuId`,
+      {
+        name,
+        description,
+        type,
+        price,
+        imagePath: imagePath || null,
+        available: isAvailable,
+        serviceId: 1,
+        menuId: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER }
+      },
+      { autoCommit: false }
+    );
+
+    const menuId = result.outBinds.menuId[0];
+
+    // Insertar productos asociados
+    for (const productId of products) {
+      await conn.execute(
+        `INSERT INTO ADMIN_SCHEMA.PRODUCTS_MENUS (MENU_ID, PRODUCT_ID)
+         VALUES (:menuId, :productId)`,
+        { menuId, productId },
+        { autoCommit: false }
+      );
+    }
+
+    await conn.commit();
+    res.status(201).json({ message: "Menú creado", menu_id: menuId });
+  } catch (err) {
+    if (conn) await conn.rollback();
+    console.error("❌ Error al crear menú:", err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
