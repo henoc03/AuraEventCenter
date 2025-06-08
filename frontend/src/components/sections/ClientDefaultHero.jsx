@@ -1,11 +1,11 @@
 import Navigation from '../common/Navigation';
-import '../../style/rooms-services-hero.css';
+import '../../style/client-default-hero.css';
 
 // Componente para el hero de la pantalla de servicios y salas
 function RoomsServicesHero({subtitle, title, message, imgSrc}) {
   return (
-    <section className="rooms-services-hero">
-      <div className='services-navigation-container'>
+    <section className="client-default-hero">
+      <div className='navigation-container'>
         <Navigation />
       </div>
       <div className="info-img-hero-container">
