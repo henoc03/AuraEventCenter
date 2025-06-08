@@ -1,0 +1,21 @@
+import React from "react";
+import "../../style/menu-cards.css";
+import MenuDefault from "../../assets/images/default_no_image.jpg";
+
+const CompactMenu = ({ menu }) => {
+  return (
+    <div className="compact-menu">
+      <img
+        src={menu.IMAGE_PATH || MenuDefault}
+        alt={`Imagen de ${menu.NAME}`}
+        className="compact-menu-image"
+      />
+      <div className="compact-menu-info">
+        <h3>{menu.NAME}</h3>
+        <span className="compact-menu-link">Ver más &gt; </span>
+      </div>
+    </div>
+  );
+};
+
+export default CompactMenu;

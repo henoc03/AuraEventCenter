@@ -4,7 +4,7 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 
 // Componentes
-import Hero from '../components/sections/Hero';      // Hero específico para Home
+import Hero from '../components/sections/HomeHero';      // Hero específico para Home
 import About from '../components/sections/About'; // Sección About
 import Footer from '../components/common/Footer'; // Footer común
 import Main from '../components/common/Main';    // Main común

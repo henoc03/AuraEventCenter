@@ -1,0 +1,128 @@
+html {
+    overflow-x: hidden;
+}
+
+.rooms-services-hero {
+    height: fit-content;
+}
+
+.services-navigation-container {
+    height: fit-content;
+    width: 100vw;
+    background-color: #6E92B2;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    padding: 0;
+}
+
+.info-img-hero-container {
+    margin-top: 87px;
+    height: fit-content;
+    display: flex;
+    flex-direction: row;
+    background-color: #d0e3f3;
+    box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.18);
+}
+
+.hero-info-container {
+    height: 45vw;
+    max-height: 70vh;
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: left;
+    padding: 0 5vw;
+}
+
+.hero-info-container h1,
+.hero-info-container h2,
+.hero-info-container p {
+    font-family: 'Merriweather sans', serif;
+    color: black;
+    margin: 1.3vw 0;
+
+}
+
+.hero-info-container h2 {
+    font-size: 1.1rem;
+    font-weight: normal;
+    margin-top: 30px;
+}
+
+.hero-info-container h1 {
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+.hero-info-container p {
+    font-size: 0.9rem;
+    font-weight: normal;
+    margin-bottom: 30px;
+}
+
+.info-img-hero-container img {
+    width: 50%;
+    height: auto;
+}
+
+@media(max-width: 768px) {
+    .info-img-hero-container {
+        flex-direction: column;
+        margin-top: 69px;
+    }
+
+    .hero-info-container {
+        height: fit-content;
+        min-height: 35vw;
+        width: 100%;
+        padding: 0 50px;
+    }
+
+    .hero-info-container h1,
+    .hero-info-container h2,
+    .hero-info-container p {
+        font-family: 'Merriweather sans', serif;
+        color: white;
+        margin: 15px 0;
+
+    }
+
+    .hero-info-container h2 {
+        font-size: 1rem;
+        margin-top: 35px;
+    }
+
+    .hero-info-container h1 {
+        font-size: 1.2rem;
+    }
+
+    .hero-info-container p {
+        font-size: 0.8rem;
+        margin-bottom: 35px;
+    }
+
+    .info-img-hero-container img {
+        width: 100%;
+        height: auto;
+        max-height: 55vw;
+    }
+}
+
+@media(min-width: 1440px) {
+   .hero-info-container h2 {
+        font-size: 1.5rem;
+        margin-top: 30px;
+    }
+
+    .hero-info-container h1 {
+        font-size: 1.7rem;
+    }
+
+    .hero-info-container p {
+        font-size: 1.2rem;
+        margin-bottom: 30px;
+    }
+}

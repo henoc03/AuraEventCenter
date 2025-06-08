@@ -1,0 +1,130 @@
+.menus-client-page {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+}
+
+.menus-navigation-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 6;
+    background-color: #6E92B2;
+}
+
+.menus-client-main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-self: center;
+    width: 90%;
+    max-width: 1800px;
+    margin: 85px 0 0 0;
+    padding: 2rem 1.5rem;
+}
+
+.menus-client-main h2{
+    display: flex;
+    justify-content: center;
+    font-family: 'Merriweather sans', serif;
+    font-weight: bold;
+    font-size: 1.85rem;
+    margin-bottom: 60px;
+}
+
+.menus-client-main button{
+    text-align: left;
+    width: fit-content;
+    margin-bottom: 20px;
+    font-family: 'Merriweather sans', sans-serif;
+    font-size: 1.05rem;
+    transition: font-weight 0.2s;
+    background: none;
+    border: none;
+    margin-top: 30px;
+}
+
+.menus-client-main button:hover {
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.filter-input{
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  max-width: 400px;
+}
+
+.filter-select {
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+#search {
+    font-family: 'Merriweather', sans-serif;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.menu-card {
+  transition: all 0.3s ease;
+  max-height: fit-content;
+}
+
+.menu-card.expanded {
+  grid-column: 1 / -1;
+  z-index: 2;
+  width: 100%;
+  max-height: 100% !important;
+}
+
+.client-menus-container {
+    min-height: 370px;
+}
+
+.client-menus-container p:first-of-type{
+    height: 100%;
+    width: 100%;
+    text-align: center;
+    margin-top: 50px;
+    font-family: 'Merriweather sans', sans-serif;
+    font-size: 1.2rem;
+}
+
+@media (max-width: 1440px) {
+    .menu-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .menus-client-main h2{
+        font-size: 1.6rem;
+        text-align: center;
+    }
+
+    .menus-client-main{
+        margin-top: 67px;
+    }
+
+    .menus-client-main button{
+        font-size: 0.95rem;
+    }
+}
