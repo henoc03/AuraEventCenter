@@ -1,3 +1,48 @@
+.services-client-filters {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    padding: 0 6vw;
+}
+
+.service-search-input {
+    display: flex;
+    align-items: center;
+}
+
+.service-filter-input {
+    display: flex;
+    align-items: center;
+}
+
+.filter-input{
+    padding: 0.5rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    max-width: 400px;
+}
+
+.filter-select {
+    padding: 0.5rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+}
+
+#search {
+    font-family: 'Merriweather', sans-serif;
+    width: 270px;
+    margin-left: 15px;
+}
+
+#sort {
+    margin-left: 15px;
+}
+
+
 .services-client-page {
     display: flex;
     flex-direction: column;
@@ -7,6 +52,15 @@
 .services-client-main {
     width: 100%;
     margin-top: 50px;
+}
+
+.services-client-main h2{
+    display: flex;
+    justify-content: center;
+    font-family: 'Merriweather sans', serif;
+    font-weight: bold;
+    font-size: 1.85rem;
+    margin-bottom: 60px;
 }
 
 .service-container {
@@ -22,7 +76,7 @@
 
 .service-container:nth-child(odd) {
     flex-direction: row-reverse;
-    text-align: right;
+    text-align: left;
 }
 
 .service-container img{
@@ -38,10 +92,6 @@
     display: flex;
     flex-direction: column;
     align-items: left;
-}
-
-.service-info-container:nth-child(odd) {
-    text-align: right;
 }
 
 .service-info-container h3 {
@@ -72,14 +122,11 @@
     color: #fff;
 }
 
-.services-client-main h2{
-    display: flex;
-    justify-content: center;
-    font-family: 'Merriweather sans', serif;
-    font-size: 1.5rem;
-}
-
 @media(max-width: 1440px) {
+    .services-client-filters {
+        padding: 0 7vw;
+    }
+
     .service-info-container h3 {
         font-size: 1.5rem;
     }
@@ -97,6 +144,10 @@
 }
 
 @media(max-width: 1024px) {
+    .services-client-filters {
+        padding: 0 8vw;
+    }
+
     .service-info-container h3 {
         font-size: 1.3rem;
     }
@@ -112,8 +163,17 @@
 }
 
 @media(max-width: 768px) {
+    .services-client-filters {
+        padding: 0 7%;
+    }
+
+    #search {
+        width: 80%;
+    }
+
     .services-client-main h2{
-        font-size: 1rem;
+        font-size: 1.6rem;
+        text-align: center;
     }
 
     .service-container {
@@ -138,10 +198,6 @@
         width: 85%;
     }
 
-    .service-info-container:nth-child(odd) {
-        text-align: left;
-    }
-
     .service-info-container h3 {
         font-size: 1.3rem;
     }
@@ -157,13 +213,4 @@
         font-size: 0.9rem;
         padding: 10px 18px;
     }
-
-    .services-client-main h2{
-        display: flex;
-        justify-content: center;
-        font-family: 'Merriweather sans', serif;
-        font-size: 1.5rem;
-    }
-
-
 }

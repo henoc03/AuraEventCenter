@@ -116,28 +116,34 @@ function MenusClient() {
             <option value="desc">Precio: mayor a menor</option>
           </select>
         </div>
+        
+        <div className="client-menus-container">
+          {menus.length === 0 && (
+            <p>No hay menús disponibles</p>
+          )}
 
-        {/* Menu expandido */}
-        {selectedMenu && (
-          <div className="menu-card expanded" ref={expandedMenuRef}>
-            <ExpandedMenu
-              menu={menus.find((menu) => menu.MENU_ID === selectedMenu)}
-              onClose={() => setSelectedMenu(null)}
-            />
-          </div>
-        )}
-
-        {/* Menus compactados */}
-        <div className="menu-grid">
-          {filteredAndSortedMenus.map((menu) => (
-            <div
-              key={menu.MENU_ID}
-              className="menu-card"
-              onClick={() => setSelectedMenu(menu.MENU_ID)}
-            >
-              <CompactMenu menu={menu} />
+          {/* Menu expandido */}
+          {selectedMenu && (
+            <div className="menu-card expanded" ref={expandedMenuRef}>
+              <ExpandedMenu
+                menu={menus.find((menu) => menu.MENU_ID === selectedMenu)}
+                onClose={() => setSelectedMenu(null)}
+              />
             </div>
-          ))}
+          )}
+
+          {/* Menus compactados */}
+          <div className="menu-grid">
+            {filteredAndSortedMenus.map((menu) => (
+              <div
+                key={menu.MENU_ID}
+                className="menu-card"
+                onClick={() => setSelectedMenu(menu.MENU_ID)}
+              >
+                <CompactMenu menu={menu} />
+              </div>
+            ))}
+          </div>
         </div>
       </main>
       <Footer />

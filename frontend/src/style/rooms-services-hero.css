@@ -22,7 +22,8 @@ html {
     height: fit-content;
     display: flex;
     flex-direction: row;
-    background-color: #4a9ee7;
+    background-color: #d0e3f3;
+    box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.18);
 }
 
 .hero-info-container {
@@ -40,7 +41,7 @@ html {
 .hero-info-container h2,
 .hero-info-container p {
     font-family: 'Merriweather sans', serif;
-    color: white;
+    color: black;
     margin: 1.3vw 0;
 
 }

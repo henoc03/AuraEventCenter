@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 // Páginas públicas
 import Home from './pages/Home';
+import RoomsClient from './pages/RoomsClient';
 import SignIn from './pages/SignIn';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
@@ -37,6 +38,7 @@ function App() {
           {/* Páginas públicas */}
           <Route path="/" element={<Home />} />
           <Route path="/inicio" element={<Home />} />
+          <Route path="/salas" element={<RoomsClient />} />
           <Route path="/iniciar-sesion" element={<SignIn />} />
           <Route path="/registro" element={<Register />} />
           <Route path="/recuperar-contraseña" element={<RecoverEmail />} />

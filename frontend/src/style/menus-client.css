@@ -38,6 +38,9 @@
     font-family: 'Merriweather sans', sans-serif;
     font-size: 1.05rem;
     transition: font-weight 0.2s;
+    background: none;
+    border: none;
+    margin-top: 30px;
 }
 
 .menus-client-main button:hover {
@@ -88,6 +91,19 @@
   z-index: 2;
   width: 100%;
   max-height: 100% !important;
+}
+
+.client-menus-container {
+    min-height: 370px;
+}
+
+.client-menus-container p:first-of-type{
+    height: 100%;
+    width: 100%;
+    text-align: center;
+    margin-top: 50px;
+    font-family: 'Merriweather sans', sans-serif;
+    font-size: 1.2rem;
 }
 
 @media (max-width: 1440px) {
