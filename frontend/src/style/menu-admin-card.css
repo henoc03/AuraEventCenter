@@ -217,6 +217,12 @@
     color: #007AFF;
 }
 
+.menu-card-buttons {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 1 rem;
+}
+
 @media (max-width: 1440px) {
     .menu-card {
         margin-right: 0; 
