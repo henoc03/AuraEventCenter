@@ -22,6 +22,7 @@ function Profile({sections}) {
   const [role, setRole] = useState("");
   const [imageFile, setImageFile] = useState(null);
   const [imageName, setImageName] = useState("");
+  const [imagePath, setImagePath] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
   const navigate = useNavigate();
 
@@ -65,6 +66,7 @@ function Profile({sections}) {
       setEmail(userData.EMAIL)
       setLastname(userData.LAST_NAME_1)
       setRole(userData.USER_TYPE)
+      setImagePath(userData.PROFILE_IMAGE_PATH)
     } catch {
       alert('Ocurrió un error al obtener la información de usuario.');
       navigate('/login');
@@ -85,20 +87,18 @@ function Profile({sections}) {
     const apellido1 = apellidos[0] || '';
     const apellido2 = apellidos[1] || '';
 
-    const userToSend = {
-      firstName: data.name,
-      lastName1: apellido1,
-      lastName2: apellido2,
-      email: data.email,
-      phone: data.phone,
-      imageName: imageName
-    };
+    const formData = new FormData();
+    formData.append('firstName', data.name);
+    formData.append('lastName1', apellido1);
+    formData.append('lastName2', apellido2);
+    formData.append('email', data.email);
+    formData.append('phone', data.phone);
+    formData.append('image', imageFile);
     
     try {
       const res = await fetch(`${DEFAULT_ROUTE}/users/profile/${sessionUserData.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userToSend)
+        body: formData
       });
 
       if (!res.ok) {
@@ -157,8 +157,11 @@ function Profile({sections}) {
             <div className="image-form-container">
               <div className="profile-image-container">
                 <label htmlFor="profile-image-upload" className="upload-label">
-                  <div className="edit-icon-container"><i className="bi bi-pencil profile-edit-icon"></i></div>
-                  <img src={ProfilePhoto} alt="Foto de perfil editable"/>
+                  <div className="edit-delete-icons">
+                    <i className="bi bi-pencil profile-edit-icon"></i>
+                    <i className="bi bi-x profile-delete-icon" onClick={() => setImageFile(null)}></i>
+                  </div>
+                  <img src={imagePath ? `${DEFAULT_ROUTE}/${imagePath}` : ProfilePhoto} alt="Foto de perfil editable"/>
                 </label>
                 <input id="profile-image-upload" type="file" accept="image/*" onChange={handleImageChange} style={{ display: "none" }} />
               </div>
