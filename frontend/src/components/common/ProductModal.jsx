@@ -65,8 +65,11 @@ const ProductModal = ({ isOpen, mode, product, onClose, onDelete, onSubmit: onSu
         <p>Los campos marcados con <span style={{ color: "red" }}>*</span> son obligatorios</p>
           <form onSubmit={handleSubmit(onSubmit)} className="product-modal-form">
             <label>Nombre<span style={{ color: "red" }}>*</span></label>
-            <input {...register("name", { required: "Nombre requerido" })} />
-            {errors.name && <span>{errors.name.message}</span>}
+            <input 
+              type="text"
+              className="input"
+              {...register("name", { required: "Nombre requerido" })} />
+              {errors.name && <span>{errors.name.message}</span>}
 
             <label>Tipo<span style={{ color: "red" }}>*</span></label>
             <input
@@ -75,18 +78,24 @@ const ProductModal = ({ isOpen, mode, product, onClose, onDelete, onSubmit: onSu
             {errors.type && <span>{errors.type.message}</span>}
 
             <label>Descripción<span>*</span></label>
-            <textarea {...register("description", { required: "Descripción requerida" })} />
+            <textarea 
+            className="input"
+            {...register("description", { required: "Descripción requerida" })} />
             {errors.description && <span>{errors.description.message}</span>}
 
             <label>Precio<span>*</span></label>
-            <input type="number" step="0.01" {...register("price", { required: "Precio requerido" })} />
+            <input 
+            type="number" 
+            step="0.01" 
+            className="input"
+            {...register("price", { required: "Precio requerido" })} />
             {errors.price && <span>{errors.price.message}</span>}
 
             <div className="modal-btns">
-              <button type="submit" disabled={!isValid} className={`btn ${isValid ? "active" : ""}`}>
+              <button type="submit" className="btn" disabled={!isValid}>
                 {isAddMode ? "Registrar Producto" : "Guardar Cambios"}
               </button>
-              <button className="btn-text-close" onClick={onClose}>Cerrar</button>
+              <button type="button" className="btn-text-close" onClick={onClose}>Cerrar</button>
             </div>
           </form>
           </>

@@ -5,5 +5,8 @@ const servicesController = require('../controllers/servicesController');
 router.get('/', servicesController.getAllServices);
 router.get('/:id', servicesController.getServiceById);
 router.get('/:serviceId/images', servicesController.getAllServiceImages);
+router.post('/', servicesController.createService);
+router.put('/:id', servicesController.updateService);
+router.delete('/:id', servicesController.deleteService);
 
 module.exports = router;

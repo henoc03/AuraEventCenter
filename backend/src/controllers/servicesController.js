@@ -4,14 +4,14 @@
  * por ID, crear, actualizar y eliminar servicios.
  * 
  * @copyright BugBusters team 2025, Universidad de Costa Rica
-*/
+ */
 
 const { getConnection, oracledb } = require('../config/db');
 const { encrypt, decrypt } = require('../utils/encryption');
 
 /**
  * Obtiene todos los servicios disponibles.
-*/
+ */
 exports.getAllServices = async (req, res) => {
   let conn;
   try {
@@ -23,13 +23,15 @@ exports.getAllServices = async (req, res) => {
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
 
-    // Desencriptar el path de las imagenes del servicio
     const services = result.rows.map(service => {
       const decryptedPath = service.IMAGE_PATH ? decrypt(service.IMAGE_PATH) : null;
-
       return {
-        ...service,
-        IMAGE_PATH: decryptedPath
+        ID: service.ADDITIONAL_SERVICE_ID,
+        name: service.NAME,
+        description: service.DESCRIPTION,
+        price: service.PRICE,
+        imagePath: decryptedPath,
+        active: service.ACTIVE,
       };
     });
 
@@ -57,9 +59,11 @@ exports.getServiceById = async (req, res) => {
     );
 
     const service = result.rows[0];
-    if (service) service.IMAGE_PATH = service.IMAGE_PATH ? decrypt(service.IMAGE_PATH) : null;
+    if (service) {
+      service.IMAGE_PATH = service.IMAGE_PATH ? decrypt(service.IMAGE_PATH) : null;
+    }
 
-    res.json(result.rows[0] || {});
+    res.json(service || {});
   } catch (err) {
     console.error('❌ Error al obtener el servicio adicional:', err);
     res.status(500).json({ error: err.message });
@@ -69,7 +73,7 @@ exports.getServiceById = async (req, res) => {
 };
 
 /**
- * Obtiene todas las imagenes de un servicio específico.
+ * Obtiene todas las imágenes de un servicio específico.
  */
 exports.getAllServiceImages = async (req, res) => {
   let conn;
@@ -79,15 +83,13 @@ exports.getAllServiceImages = async (req, res) => {
 
     const serviceResult = await conn.execute(
       `SELECT IMAGE_PATH FROM ADMIN_SCHEMA.ADDITIONAL_SERVICES 
-      WHERE ADDITIONAL_SERVICE_ID = :serviceId`,
+       WHERE ADDITIONAL_SERVICE_ID = :serviceId`,
       [serviceId],
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
 
     let mainImage = serviceResult.rows[0]?.IMAGE_PATH || null;
-    if (mainImage) {
-      mainImage = decrypt(mainImage);
-    }
+    if (mainImage) mainImage = decrypt(mainImage);
 
     const imagesResult = await conn.execute(
       `SELECT i.IMAGE_ID, i.IMAGE_ADDRESS
@@ -104,16 +106,105 @@ exports.getAllServiceImages = async (req, res) => {
     }));
 
     const allImages = [];
-
-    if (mainImage) {
-      allImages.push({ id: 'main', path: mainImage });
-    }
-
+    if (mainImage) allImages.push({ id: 'main', path: mainImage });
     allImages.push(...secondaryImages);
 
     res.json(allImages);
   } catch (err) {
-    console.error("Error al obtener todas las imágenes:", err);
+    console.error("❌ Error al obtener todas las imágenes:", err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
+/**
+ * Crea un nuevo servicio.
+ */
+exports.createService = async (req, res) => {
+  const { name, description, price, image_path, active } = req.body;
+  let conn;
+  try {
+    conn = await getConnection();
+
+    // Encriptar el path de la imagen si existe
+    const encryptedImagePath = image_path ? encrypt(image_path) : null;
+
+    const result = await conn.execute(
+      `INSERT INTO ADMIN_SCHEMA.ADDITIONAL_SERVICES 
+        (ADDITIONAL_SERVICE_ID, NAME, DESCRIPTION, PRICE, IMAGE_PATH, ACTIVE)
+       VALUES 
+        (ADMIN_SCHEMA.ADDITIONAL_SERVICE_ID_SEQ.NEXTVAL, :name, :description, :price, :image_path, :active)
+       RETURNING ADDITIONAL_SERVICE_ID INTO :service_id`,
+      {
+        name,
+        description,
+        price,
+        image_path: encryptedImagePath,
+        active,
+        service_id: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER }
+      },
+      { autoCommit: true }
+    );
+
+    res.status(201).json({ service_id: result.outBinds.service_id[0] });
+  } catch (err) {
+    console.error('❌ Error al crear servicio:', err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
+/**
+ * Actualiza un servicio existente.
+ */
+exports.updateService = async (req, res) => {
+  const { name, description, price, image_path, active } = req.body;
+  let conn;
+  try {
+    conn = await getConnection();
+
+    // Encriptar el path de la imagen si existe, o pasar null
+    const encryptedImagePath = image_path ? encrypt(image_path) : null;
+
+    await conn.execute(
+      `UPDATE ADMIN_SCHEMA.ADDITIONAL_SERVICES SET
+        NAME = :name,
+        DESCRIPTION = :description,
+        PRICE = :price,
+        IMAGE_PATH = :image_path,
+        ACTIVE = :active
+       WHERE ADDITIONAL_SERVICE_ID = :id`,
+      [name, description, price, encryptedImagePath, active, req.params.id],
+      { autoCommit: true }
+    );
+
+    res.sendStatus(204);
+  } catch (err) {
+    console.error('❌ Error al actualizar servicio:', err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
+/**
+ * Elimina un servicio por su ID.
+ */
+exports.deleteService = async (req, res) => {
+  let conn;
+  try {
+    conn = await getConnection();
+    await conn.execute(
+      `DELETE FROM ADMIN_SCHEMA.ADDITIONAL_SERVICES WHERE ADDITIONAL_SERVICE_ID = :id`,
+      [req.params.id],
+      { autoCommit: true }
+    );
+    res.sendStatus(204);
+  } catch (err) {
+    console.error('❌ Error al eliminar servicio:', err);
+    if (conn) await conn.rollback();
     res.status(500).json({ error: err.message });
   } finally {
     if (conn) await conn.close();

@@ -1,209 +1,239 @@
 import React, { useEffect, useState } from "react";
+import Header from "../components/common/Header";
+import SideNav from "../components/common/SideNav";
+import AlertMessage from "../components/common/AlertMessage";
+import LoadingPage from "../components/common/LoadingPage";
+import ServiceCard from "../components/common/ServiceCard";
+import ServiceModal from "../components/common/ServiceModal";
+import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
 
-import Header from "../components/common/Header.jsx";
-import SideNav from "../components/common/SideNav.jsx";
-import ServiceCard from "../components/common/ServiceCard.jsx";
-// import AddEditRoomModal from "../components/common/AddEditRoomModal.jsx";
-import AlertMessage from "../components/common/AlertMessage.jsx";
-import LoadingPage from "../components/common/LoadingPage.jsx";
 
 import "../style/services-admin.css";
 
-const DEFAULT_ROUTE = "http://localhost:1522";
+const PORT = "http://localhost:1522";
 
-// Componente para la página de servicios del administrador
-function ServicesAdmin({ sections }) {
-  const [isAddEditOpen, setIsAddEditOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
+const ServicesAdmin = ({ sections }) => {
   const [services, setServices] = useState([]);
+  const [selectedService, setSelectedService] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState("");
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  const [currentUser, setCurrentUser] = useState(null);
+  
+    // Estados para mensajes
   const [showSuccess, setShowSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [showError, setShowError] = useState(false);
 
-  // Estados para información de usuario
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [lastname, setLastname] = useState("");
-  const [role, setRole] = useState("");
-
-  // Estados para los filtros y búsqueda
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterActive, setFilterActive] = useState("todos");
   const [sortOrder, setSortOrder] = useState("asc");
+  const [filterActive, setFilterActive] = useState("todos");
 
 
-  const navigate = useNavigate();
 
   useEffect(() => {
-    getSetUserInfo();
-    getServices();
+    fetchServices();
+
   }, []);
 
-  // Obtener información de usuario para el header
-  const getSetUserInfo = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
 
-    try {
-      // Obtener token de sesión
-      const sessionUserData = jwtDecode(token);
-      const res = await fetch(`${DEFAULT_ROUTE}/users/${sessionUserData.id}`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        alert(errorData.message || "Error al obtener la información del usuario");
-        return;
+      try {
+        const { id } = jwtDecode(token);
+        const res = await fetch(`${PORT}/users/${id}`);
+        const user = await res.json();
+        setCurrentUser(user);
+      } catch (err) {
+        console.error("Error al obtener usuario:", err);
       }
+    };
 
-      // Almacenar datos de usuario
-      const userData = await res.json();
-      setName(userData.FIRST_NAME);
-      setEmail(userData.EMAIL);
-      setLastname(userData.LAST_NAME_1);
-      setRole(userData.USER_TYPE);
+    fetchUserInfo();
+  }, []);
 
-    } catch {
-      alert("Ocurrió un error al obtener la información de usuario.");
-      navigate("/login");
-    }
-  };
 
-  // Obtener información de servicios
-  const getServices = async () => {
+  const fetchServices = async () => {
     try {
-      const res = await fetch(`${DEFAULT_ROUTE}/services/`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        alert(errorData.message || "Error al obtener los servicios adicionales");
-        return;
-      }
-
-      const servicesData = await res.json();
-      setServices(servicesData);
-    } catch {
-      alert("Ocurrió un error al obtener los servicios adicionales.");
-      // navigate("/login");
+      setLoading(true);
+      const res = await fetch(`${PORT}/services`);
+      const data = await res.json();
+      setServices(data);
+    } catch (err) {
+      console.error("Error al obtener servicios:", err);
     } finally {
       setLoading(false);
     }
   };
+  const openModal = (mode, service = null) => {
+    setSelectedService(service);
+    setModalMode(mode);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setSelectedService(null);
+    setModalMode("");
+    setIsModalOpen(false);
+  };
+
+  const handleDelete = async (service) => {
+    try {
+      await fetch(`${PORT}/services/${service.ID}`, { method: "DELETE" });
+      setMessage("Servicio eliminado correctamente");
+      setMessageType("success");
+      fetchServices();
+    } catch (err) {
+      console.error("Error al eliminar servicio:", err);
+      setMessage("Error al eliminar servicio");
+      setMessageType("error");
+    }
+  };
+
+  const handleAddOrEdit = async (data) => {
+    try {
+      console.log(`${PORT}/services/${selectedService.ID}`);
+      const method = modalMode === "edit" ? "PUT" : "POST";
+      const url = modalMode === "edit"
+        ? `${PORT}/services/${selectedService.ID}`
+        : `${PORT}/services`;
+
+      await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      setMessage(modalMode === "edit" ? "Servicio actualizado" : "Servicio creado");
+      setMessageType("success");
+      fetchServices();
+    } catch (err) {
+      console.error("Error al guardar servicio:", err);
+      setMessage("Error al guardar servicio");
+      setMessageType("error");
+    }
+  };
+
+  const filteredServices = services
+    .filter((service) => {
+      const matchesSearch = service.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesActive =
+        filterActive === "todos" ||
+        (filterActive === "activos" && service.active === 1) ||
+        (filterActive === "inactivos" && service.active === 0);
+      return matchesSearch && matchesActive;
+    })
+    .sort((a, b) => {
+      return sortOrder === "asc" ? a.price - b.price : b.price - a.price;
+    });
+
 
   if (loading) return <LoadingPage />;
 
-  const filteredAndSortedServices = services
-  .filter((service) => {
-    const matchesSearch = service.NAME.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesActive =
-      filterActive === "todos" ||
-      (filterActive === "activos" && service.ACTIVE === 1) ||
-      (filterActive === "inactivos" && service.ACTIVE === 0);
-    return matchesSearch && matchesActive;
-  })
-  .sort((a, b) => {
-    return sortOrder === "asc" ? a.PRICE - b.PRICE : b.PRICE - a.PRICE;
-  });
-
   return (
-    <div className="services-admin-page">
-      {showSuccess && (
+    <div className="services-page">
+    {showSuccess && (
+      <AlertMessage
+        message={successMessage}
+        type="alert-floating"
+        onClose={() => setShowSuccess(false)}
+        className="success"
+      />
+    )}
+
+      {showError && (
         <AlertMessage
-          message="Información actualizada con éxito"
+          message={errorMessage}
           type="alert-floating"
-          onClose={() => setShowSuccess(false)}
-          className="success"
+          onClose={() => setShowError(false)}
+          className="error"
         />
       )}
-
       <Header
-        name={name}
-        lastname={lastname}
-        role={role}
-        email={email}
+        name={currentUser?.FIRST_NAME}
+        lastname={currentUser?.LAST_NAME_1}
+        role={currentUser?.USER_TYPE}
+        email={currentUser?.EMAIL}
       />
 
-      <div className={`services-admin-container ${isAddEditOpen ? "modal-open" : ""}`}>
-        <SideNav className= "services-admin-nav" sections={sections} />
+      <div className="services-dashboard">
+        <SideNav sections={sections} />
+        <main className="services-dashboard-content">
+          <div className="services-content-wrapper">
+            <section className="services-section">
+              <div className="services-section-header">
+                <h2 className="services-section-title">Servicios</h2>
+                <button className="btn services-section-add-button" onClick={() => openModal("add")}>
+                  Agregar Servicio
+                </button>
+              </div>
 
-        <main className="services-admin-main">
-          <div className="title-add-service-cont">
-            <h1>Servicios adicionales</h1>
-            <button
-              className="add-service-button"
-              onClick={() => setIsAddEditOpen(true)}
-            >
-              Agregar
-            </button>
-          </div>
+              <div className="services-controls">
+                <label htmlFor="search">Buscar: </label>
+                <input
+                  id="search"
+                  type="text"
+                  placeholder="Buscar servicio..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="services-search-input"
+                />
+                <label htmlFor="filterActive">Estado:</label>
+                <select
+                  id="filterActive"
+                  value={filterActive}
+                  onChange={(e) => setFilterActive(e.target.value)}
+                  className="services-filter-select"
+                >
+                  <option value="todos">Todos</option>
+                  <option value="activos">Activos</option>
+                  <option value="inactivos">Inactivos</option>
+                </select>
 
-          {/* Filtros */}
-          <div className="filters">
-            <div className="service-search-input">
-              <label htmlFor="search">Buscar: </label>
-              <input
-                id="search"
-                type="text"
-                placeholder="Buscar por nombre..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="filter-input"
-              />
-            </div>
+                <label htmlFor="sort">Orden:</label>
+                <select
+                  id="sort"
+                  value={sortOrder}
+                  onChange={(e) => setSortOrder(e.target.value)}
+                  className="services-sort-select"
+                >
+                  <option value="asc">A-Z</option>
+                  <option value="desc">Z-A</option>
+                </select>
+              </div>
 
-            <div className="service-filter-input">
-              <label htmlFor="active">Filtrar: </label>
-              <select
-                id="active"
-                value={filterActive}
-                onChange={(e) => setFilterActive(e.target.value)}
-                className="filter-select"
-              >
-                <option value="todos">Todos</option>
-                <option value="activos">Activos</option>
-                <option value="inactivos">Inactivos</option>
-              </select>
-            </div>
-
-            <div className="service-sort-input">
-              <label htmlFor="sort">Ordenar: </label>
-              <select
-                id="sort"
-                value={sortOrder}
-                onChange={(e) => setSortOrder(e.target.value)}
-                className="filter-select"
-              >
-                <option value="asc">Precio: menor a mayor</option>
-                <option value="desc">Precio: mayor a menor</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="services-admin-cards">
-            {filteredAndSortedServices.map((service) => (
-              <ServiceCard className="service-admin-card" service={service} />
-            ))}
+              <div className="services-grid">
+                {filteredServices.map((service) => (
+                  <ServiceCard
+                    key={service.ID}
+                    service={service}
+                    onView={() => openModal("view", service)}
+                    onEdit={() => openModal("edit", service)}
+                    onDelete={() => openModal("delete", service)}
+                  />
+                ))}
+              </div>
+            </section>
           </div>
         </main>
       </div>
 
-      {/* {isAddEditOpen && (
-        <AddEditRoomModal
-          isModalOpen={true}
-          onClose={() => {
-            setIsAddEditOpen(false);
-            getServices();
-          }}
-          isAdd={true}
-        />
-      )} */}
+      <ServiceModal
+        isOpen={isModalOpen}
+        mode={modalMode}
+        service={selectedService}
+        onClose={closeModal}
+        onDelete={handleDelete}
+        onSave={handleAddOrEdit}
+      />
     </div>
   );
-}
+};
 
 export default ServicesAdmin;

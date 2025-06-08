@@ -53,8 +53,8 @@ describe('Services Controller', () => {
 
     expect(res.statusCode).toBe(200);
     expect(res.body).toEqual([
-      { ADDITIONAL_SERVICE_ID: 1, NAME: 'Servicio A', DESCRIPTION: 'Desc A', PRICE: 100, IMAGE_PATH: 'pathA' },
-      { ADDITIONAL_SERVICE_ID: 2, NAME: 'Servicio B', DESCRIPTION: 'Desc B', PRICE: 200, IMAGE_PATH: null },
+      { ID: 1, name: 'Servicio A', description: 'Desc A', price: 100, imagePath: 'pathA', active: undefined },
+      { ID: 2, name: 'Servicio B', description: 'Desc B', price: 200, imagePath: null, active: undefined },
     ]);
   });
 
