@@ -1,0 +1,38 @@
+.compact-room {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  cursor: pointer;
+}
+
+
+.compact-room >.compact-room-image {
+  height: 73%;
+  width: 100%;
+  object-fit: cover;
+}
+
+.compact-room-info {
+  padding: 1rem;
+  text-align: center;
+}
+
+.compact-room-info h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.compact-room-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+  color: #007bff;
+  font-weight: 500;
+  text-decoration: underline;
+}

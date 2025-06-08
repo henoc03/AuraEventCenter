@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 // Páginas públicas
 import Home from './pages/Home';
+import RoomsClient from './pages/RoomsClient';
 import SignIn from './pages/SignIn';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
@@ -13,6 +14,8 @@ import NotFound from './pages/Notfound';
 import ChangePassword from './pages/ChangePassword';
 import AccountSettings from './pages/AccountSettings';
 import VerifyAccountCode from './pages/VerifyAccountCode';
+import ServicesClient from './pages/ServicesClient';
+import MenusClient from './pages/MenusClient';
 
 // Páginas protegidas
 import AdminDashboard from "./pages/AdminDashBoard";
@@ -20,6 +23,7 @@ import Clients from './pages/Clients';
 import Administrators from './pages/Administrator';
 import RoomsAdmin from './pages/RoomsAdmin';
 import ServicesAdmin from './pages/ServicesAdmin';
+import Products from './pages/Products';
 
 // Contexto y utilidades
 import { AuthProvider } from './context/AuthContext';
@@ -36,6 +40,7 @@ function App() {
           {/* Páginas públicas */}
           <Route path="/" element={<Home />} />
           <Route path="/inicio" element={<Home />} />
+          <Route path="/salas" element={<RoomsClient />} />
           <Route path="/iniciar-sesion" element={<SignIn />} />
           <Route path="/registro" element={<Register />} />
           <Route path="/recuperar-contraseña" element={<RecoverEmail />} />
@@ -45,6 +50,10 @@ function App() {
           <Route path="/cuenta" element={<AccountSettings sections={SectionProfile}/>} />
           <Route path="/cuenta/cambiar-contraseña" element={<ChangePassword sections={SectionProfile}/>} />
           <Route path="/cuenta/verificar-codigo" element={<VerifyAccountCode sections={SectionProfile}/>} />
+          <Route path="/admin/servicios/catering/productos" element={<Products sections={SectionAdmin} />} />
+          
+          <Route path="/servicios" element={<ServicesClient />} />
+          <Route path="/menus" element={<MenusClient />} />
 
           {/* Rutas protegidas para administradores comunes */}
           <Route element={<PrivateRoute allowedRoles={['admin']} />}>
@@ -52,6 +61,7 @@ function App() {
             <Route path="/admin/tablero" element={<AdminDashboard sections={SectionAdmin} />} />
             <Route path="/admin/clientes" element={<Clients sections={SectionAdmin} />} />
             <Route path="/admin/servicios" element={<ServicesAdmin sections={SectionAdmin} />} />
+            <Route path="/admin/servicios/catering/productos" element={<Products sections={SectionAdmin} />} />
           </Route>
 
           {/* Rutas protegidas para root-admin */}
@@ -61,6 +71,7 @@ function App() {
             <Route path="/root-admin/clientes" element={<Clients sections={SectionRoot} />} />
             <Route path="/root-admin/administradores" element={<Administrators sections={SectionRoot} />} />
             <Route path="/root-admin/servicios" element={<ServicesAdmin sections={SectionRoot} />} />
+            <Route path="/root-admin/servicios/catering/productos" element={<Products sections={SectionRoot} />} />
           </Route>
 
           {/* Página 404 */}
