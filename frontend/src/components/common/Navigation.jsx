@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Logo from '../icons/Logo';
 import navigationLinks from '../utils/content';
 import DropDownMenu from '../common/DropDownMenu';
@@ -8,10 +8,11 @@ import DropDownMenu from '../common/DropDownMenu';
 function Navigation() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [activeLink, setActiveLink] = useState(1);
   const [currentUser, setCurrentUser] = useState(null);
 
   const navigate = useNavigate();
+  const location = useLocation();
+  console.log(location);
 
   const handleScroll = () => {
     setScrolled(window.scrollY > window.innerHeight);
@@ -19,8 +20,7 @@ function Navigation() {
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
 
-  const handleLinkClick = (link) => {
-    setActiveLink(link);
+  const handleLinkClick = () => {
     setMenuOpen(false);
   };
 
@@ -81,7 +81,7 @@ function Navigation() {
 
   return (
     <nav className={`nav ${scrolled ? 'scrolled' : ''}`}>
-      <a data-aos="fade-down" data-aos-duration="1500" className="logo" href="#">
+      <a data-aos="fade-down" data-aos-duration="1500" className="logo" href="/">
         <Logo className="logo-img" />
       </a>
 
@@ -93,9 +93,9 @@ function Navigation() {
                 data-aos="fade-down"
                 data-aos-delay="350"
                 data-aos-duration="3500"
-                className={`navIndex ${activeLink === link.id ? 'active' : ''}`}
+                className={`navIndex ${location.pathname === link.href ? 'active' : ''}`}
                 href={link.href}
-                onClick={() => handleLinkClick(link.id)}
+                onClick={() => handleLinkClick()}
               >
                 {link.link}
               </a>

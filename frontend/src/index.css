@@ -68,11 +68,16 @@
   line-height: 1.5;
 }
 
-.nav {
-  display: flex;
+.home-nav-container {
   position: fixed;
   top: 0;
   left: 0;
+  width: 100%;
+  z-index: 6;
+}
+
+.nav {
+  display: flex;
   width: 100%;
   background-color: transparent;
   z-index: 7;
@@ -82,7 +87,7 @@
   padding: 1rem 4vw;
 }
 
-.nav.scrolled {
+.home-nav-container .nav.scrolled {
   background-color:  rgba(0, 0, 0, 0.7);;
   backdrop-filter: blur(10px);
 }
