@@ -9,6 +9,7 @@ const dashboardRoutes = require('./routes/dashboard');
 const servicesRoutes = require('./routes/services');
 const menusRoutes = require('./routes/menus');
 const verifyToken = require('./middleware/verifyToken');
+const productsRoutes = require('./routes/products');
 
 const app = express();
 app.use(cors());
@@ -17,6 +18,7 @@ app.use('/users', usersRoutes);
 app.use('/email', emailRoutes);
 app.use('/zones', zonesRoutes);
 app.use('/dashboard', dashboardRoutes);
+app.use('/products', productsRoutes);
 app.use('/services', servicesRoutes);
 app.use('/menus', menusRoutes);
 app.use(express.urlencoded({ extended: true }));
