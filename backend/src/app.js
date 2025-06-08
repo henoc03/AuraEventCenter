@@ -6,6 +6,7 @@ const usersRoutes = require('./routes/users');
 const emailRoutes = require('./routes/emails');
 const zonesRoutes = require('./routes/zones');
 const dashboardRoutes = require('./routes/dashboard');
+const servicesRoutes = require('./routes/services');
 const verifyToken = require('./middleware/verifyToken');
 const productsRoutes = require('./routes/products');
 
@@ -17,6 +18,7 @@ app.use('/email', emailRoutes);
 app.use('/zones', zonesRoutes);
 app.use('/dashboard', dashboardRoutes);
 app.use('/products', productsRoutes);
+app.use('/services', servicesRoutes);
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
