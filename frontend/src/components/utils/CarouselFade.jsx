@@ -1,37 +1,28 @@
-import Carousel from 'react-bootstrap/Carousel';
-import salaLiberia from "../../assets/images/salas/sala1.png"
-import salaCahuita from "../../assets/images/salas/sala2.png"
-import salaGrecia from "../../assets/images/salas/sala3.png"
+// src/components/CarouselFadeExample.jsx
+import React from 'react';
+import { Carousel } from 'react-bootstrap';
 
 
-function CarouselFadeExample() {
+const CarouselFadeExample = ({ imagePaths = [], className = "" }) => {
+  if (imagePaths.length === 0) return null;
+
   return (
-    <div className="carousel-container">
+    <div className={`carousel-container ${className}`} style={{ height: "100%", width: "100%" }}>
       <Carousel fade interval={3000} indicators={false} controls={false}>
-        <Carousel.Item>
-          <img
-            className="d-block w-100"
-            src={salaLiberia}
-            alt="Sala Liberia"
-          />
-        </Carousel.Item>
-        <Carousel.Item>
-          <img
-            className="d-block w-100"
-            src={salaCahuita}
-            alt="Sala Cahuita"
-          />
-        </Carousel.Item>
-        <Carousel.Item>
-          <img
-            className="d-block w-100"
-            src={salaGrecia}
-            alt="Sala Grecia"
-          />
-        </Carousel.Item>
+        {imagePaths.map((src, index) => (
+          <Carousel.Item key={index}>
+            <img
+              className="d-block w-100 h-100"
+              src={src}
+              alt={`Imagen ${index + 1}`}
+              style={{ objectFit: "cover" }}
+            />
+          </Carousel.Item>
+        ))}
       </Carousel>
     </div>
   );
-}
+};
+
 
 export default CarouselFadeExample;
