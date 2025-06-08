@@ -138,6 +138,7 @@ exports.deleteProduct = async (req, res) => {
     res.sendStatus(204);
   } catch (err) {
     console.error('❌ Error al eliminar producto:', err);
+    if (conn) await conn.rollback();
     res.status(500).json({ error: err.message });
   } finally {
     if (conn) await conn.close();
