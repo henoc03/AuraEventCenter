@@ -18,89 +18,73 @@ const { getConnection, oracledb } = require('../config/db');
 exports.getDashboardStats = async (req, res) => {
   let conn;
   try {
-    // Obtiene una conexión a la base de datos
     conn = await getConnection();
 
-    // Ejecuta simultáneamente las 3 consultas principales
-    const [usersRes, roomsRes, bookingsRes] = await Promise.all([
-      // Cuenta total de usuarios en CLIENT_SCHEMA.USERS
-      conn.execute(
-        `SELECT COUNT(*) AS USERS FROM CLIENT_SCHEMA.USERS`, 
-        [], 
-        { outFormat: oracledb.OUT_FORMAT_OBJECT }
-      ),
-      // Cuenta de salas activas (ACTIVE = 1) en ADMIN_SCHEMA.ZONES
-      conn.execute(
-        `SELECT COUNT(*) AS ACTIVE_ROOMS FROM ADMIN_SCHEMA.ZONES WHERE ACTIVE = 1`, 
-        [], 
-        { outFormat: oracledb.OUT_FORMAT_OBJECT }
-      ),
-      // Cuenta de eventos con fecha de inicio dentro de la semana actual
-      conn.execute(
-        `SELECT COUNT(*) AS EVENTS_THIS_WEEK
-         FROM CLIENT_SCHEMA.BOOKINGS
-         WHERE START_TIME >= TRUNC(SYSDATE, 'IW')
-           AND START_TIME < TRUNC(SYSDATE + 7, 'IW')`,
-        [],
-        { outFormat: oracledb.OUT_FORMAT_OBJECT }
-      )
-    ]);
+    const result = await conn.execute(
+      `BEGIN
+         ADMIN_SCHEMA.DASHBOARD_PKG.GET_DASHBOARD_STATS(:p_users, :p_rooms, :p_events);
+       END;`,
+      {
+        p_users: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
+        p_rooms: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
+        p_events: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER }
+      }
+    );
 
-    // Enviar la respuesta con los datos extraídos
     res.json({
-      users: usersRes.rows[0].USERS,
-      activeRooms: roomsRes.rows[0].ACTIVE_ROOMS,
-      eventsThisWeek: bookingsRes.rows[0].EVENTS_THIS_WEEK
+      users: result.outBinds.p_users,
+      activeRooms: result.outBinds.p_rooms,
+      eventsThisWeek: result.outBinds.p_events
     });
 
   } catch (err) {
-    // Manejo de error: log y respuesta 500 con mensaje
-    console.error('❌ Error en getDashboardStats:', err);
+    console.error('Error en getDashboardStats:', err);
     res.status(500).json({ error: err.message });
   } finally {
-    // Siempre cerrar la conexión si fue abierta
     if (conn) await conn.close();
   }
 };
 
 
-/**
- * Obtiene las reservas realizadas durante la semana actual,
- * incluyendo estado, propietario y fecha formateada para Costa Rica.
- * Responde con un arreglo JSON de reservas.
- */
 exports.getWeeklyReservations = async (req, res) => {
   let conn;
   try {
     conn = await getConnection();
 
-    // Consulta reservas en la semana actual ordenadas por fecha descendente
     const result = await conn.execute(
-      `SELECT STATUS, USER_ID, START_TIME
-       FROM CLIENT_SCHEMA.BOOKINGS
-       WHERE START_TIME >= TRUNC(SYSDATE, 'IW')
-         AND START_TIME < TRUNC(SYSDATE + 7, 'IW')
-       ORDER BY START_TIME DESC`,
-      [],
-      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+      `BEGIN
+         ADMIN_SCHEMA.DASHBOARD_PKG.GET_WEEKLY_RESERVATIONS(:p_cursor);
+       END;`,
+      {
+        p_cursor: { dir: oracledb.BIND_OUT, type: oracledb.CURSOR }
+      }
     );
 
-    // Mapea filas a un formato más legible para el cliente
-    const reservations = result.rows.map(row => ({
-      status: row.STATUS,
-      owner: row.USER_ID,
-      date: new Date(row.START_TIME).toLocaleDateString('es-CR', {
+    const resultSet = result.outBinds.p_cursor;
+
+    const rows = await resultSet.getRows();
+
+    await resultSet.close();
+
+const reservations = rows.map(row => {
+
+    return {
+      status: row[0],
+      owner: row[1],
+      date: new Date(row[2]).toLocaleDateString('es-CR', {
         weekday: 'short',
         year: 'numeric',
         month: 'short',
         day: 'numeric'
       })
-    }));
+    };
+  });
+
 
     res.json(reservations);
 
   } catch (err) {
-    console.error('❌ Error al obtener reservas semanales:', err);
+    console.error('Error al obtener reservas semanales:', err);
     res.status(500).json({ error: err.message });
   } finally {
     if (conn) await conn.close();
@@ -118,16 +102,23 @@ exports.getAllClients = async (req, res) => {
     conn = await getConnection();
 
     const result = await conn.execute(
-      `SELECT USER_ID, EMAIL, FIRST_NAME, LAST_NAME_1, LAST_NAME_2, PHONE, USER_TYPE , ACTIVE
-       FROM CLIENT_SCHEMA.USERS WHERE USER_TYPE = 'cliente'`,
-      [],
-      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+      `BEGIN ADMIN_SCHEMA.DASHBOARD_PKG.GET_ALL_CLIENTS(:cursor); END;`,
+      {
+        cursor: { dir: oracledb.BIND_OUT, type: oracledb.CURSOR }
+      },
+        {
+    outFormat: oracledb.OUT_FORMAT_OBJECT
+  }
     );
 
-    res.json(result.rows);
+    const resultSet = result.outBinds.cursor;
+    const rows = await resultSet.getRows();
+    await resultSet.close();
+
+    res.json(rows);
 
   } catch (err) {
-    console.error('❌ Error al obtener usuarios:', err);
+    console.error("Error al obtener clientes:", err);
     res.status(500).json({ error: err.message });
   } finally {
     if (conn) await conn.close();
@@ -145,17 +136,23 @@ exports.getAllAdmins = async (req, res) => {
     conn = await getConnection();
 
     const result = await conn.execute(
-      `SELECT USER_ID, EMAIL, FIRST_NAME, LAST_NAME_1, LAST_NAME_2, PHONE, USER_TYPE, ACTIVE
-       FROM CLIENT_SCHEMA.USERS
-       WHERE USER_TYPE = 'admin'`,
-      [],
-      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+      `BEGIN ADMIN_SCHEMA.DASHBOARD_PKG.GET_ALL_ADMINS(:cursor); END;`,
+      {
+        cursor: { dir: oracledb.BIND_OUT, type: oracledb.CURSOR }
+      },
+      {
+        outFormat: oracledb.OUT_FORMAT_OBJECT
+      }
     );
 
-    res.json(result.rows);
+    const resultSet = result.outBinds.cursor;
+    const rows = await resultSet.getRows();
+    await resultSet.close();
+
+    res.json(rows);
 
   } catch (err) {
-    console.error('❌ Error al obtener administradores:', err);
+    console.error("Error al obtener administradores:", err);
     res.status(500).json({ error: err.message });
   } finally {
     if (conn) await conn.close();
@@ -163,10 +160,12 @@ exports.getAllAdmins = async (req, res) => {
 };
 
 
+
 /**
- * Obtiene las 5 salas más reservadas junto con el número de reservas,
- * basándose en la relación entre BOOKINGS y ZONES.
- * Responde con un arreglo JSON ordenado descendentemente por cantidad de reservas.
+ * Obtiene las 5 salas más reservadas utilizando el procedimiento almacenado
+ * ADMIN_SCHEMA.DASHBOARD_PKG.GET_TOP_BOOKED_ROOMS.
+ * Responde con un arreglo JSON con el nombre de la sala y la cantidad de reservas,
+ * ordenado descendentemente por cantidad de reservas.
  */
 exports.getMostBookedRooms = async (req, res) => {
   let conn;
@@ -174,22 +173,31 @@ exports.getMostBookedRooms = async (req, res) => {
     conn = await getConnection();
 
     const result = await conn.execute(
-      `SELECT a.NAME AS ROOM_NAME, COUNT(b.BOOKING_ID) AS RESERVATIONS
-       FROM CLIENT_SCHEMA.BOOKINGS b
-       JOIN ADMIN_SCHEMA.ZONES a ON b.ZONE_ID = a.ZONE_ID
-       GROUP BY a.NAME
-       ORDER BY RESERVATIONS DESC
-       FETCH FIRST 5 ROWS ONLY`,
-      [],
-      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+      `BEGIN
+         ADMIN_SCHEMA.DASHBOARD_PKG.GET_TOP_BOOKED_ROOMS(:p_cursor);
+       END;`,
+      {
+        p_cursor: { dir: oracledb.BIND_OUT, type: oracledb.CURSOR }
+      }
     );
 
-    res.json(result.rows);
+    const resultSet = result.outBinds.p_cursor;
+    const rows = await resultSet.getRows();
+
+    await resultSet.close();
+
+    const topRooms = rows.map(row => ({
+      roomName: row[0],
+      reservations: row[1]
+    }));
+
+    res.json(topRooms);
 
   } catch (err) {
-    console.error('❌ Error al obtener salas más reservadas:', err);
+    console.error('Error al obtener salas más reservadas:', err);
     res.status(500).json({ error: err.message });
   } finally {
     if (conn) await conn.close();
   }
 };
+
