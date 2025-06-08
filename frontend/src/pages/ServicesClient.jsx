@@ -3,7 +3,7 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 import "../style/services-client.css";
 import heroImage from "../assets/images/services-hero.jpg";
-import Hero from "../components/sections/RoomsServicesHero";
+import Hero from "../components/sections/ClientDefaultHero";
 import Footer from "../components/common/Footer";
 import LoadingPage from "../components/common/LoadingPage";
 import defaultImage from "../assets/images/default_no_image.jpg"

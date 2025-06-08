@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 import CompactRoom from "../components/common/CompactRoom";
 import ExpandedRoom from "../components/common/ExpandedRoom";
 import LoadingPage from "../components/common/LoadingPage";
-import ClientNav from "../components/common/ClientNav";
-import ClientHero from "../components/sections/ClientHero";
+import Hero from "../components/sections/ClientDefaultHero";
 import Footer from "../components/common/Footer";
-
+import heroImage from "../assets/images/clienthero.png";
 import "../style/rooms-client.css";
 
 const DEFAULT_ROUTE = "http://localhost:1522";
@@ -15,10 +16,13 @@ function RoomsClient() {
   const [loading, setLoading] = useState(true);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const expandedRoomRef = useRef(null);
-
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("todos");
   const [sortOrder, setSortOrder] = useState("asc");
+
+  useEffect(() => {
+    AOS.init(); // ← ¡ESTO FALTABA!
+  }, []);
 
   useEffect(() => {
     getZones();
@@ -64,18 +68,23 @@ function RoomsClient() {
     .filter((room) => {
       const matchesSearch = room.NAME.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesType = filterType === "todos" || room.TYPE.toLowerCase() === filterType.toLowerCase();
-      return room.ZONE_ID !== selectedRoom && matchesSearch && matchesType; // Se excluye la sala seleccionada
+      return room.ZONE_ID !== selectedRoom && matchesSearch && matchesType;
     })
-    .sort((a, b) => {
-      return sortOrder === "asc" ? a.PRICE - b.PRICE : b.PRICE - a.PRICE;
-    });
+    .sort((a, b) => sortOrder === "asc" ? a.PRICE - b.PRICE : b.PRICE - a.PRICE);
 
   if (loading) return <LoadingPage />;
 
   return (
     <div>
-      <ClientNav/>
-      <ClientHero/>
+      <Hero
+        subtitle="Tu evento, tu espacio"
+        title="Transforma tu evento en una experiencia inolvidable"
+        message="Creamos momentos únicos con atención personalizada, espacios
+          versátiles y todos los servicios que necesitas para hacer realidad
+          cualquier tipo de evento."
+        imgSrc={heroImage}
+      />
+
       <div className="rooms-client-container">
         <h1 className="client-title">Conoce nuestros espacios</h1>
 
