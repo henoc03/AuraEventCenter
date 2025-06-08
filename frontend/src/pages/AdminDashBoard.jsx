@@ -134,11 +134,12 @@ const AdminDashboard = ({ sections }) => {
               ) : (
                 <Bar
                   data={{
-                    labels: topRooms.map(room => room.ROOM_NAME),
+                    labels: topRooms.map(room => room.roomName),
+
                     datasets: [
                       {
                         label: 'Reservas',
-                        data: topRooms.map(room => room.RESERVATIONS),
+                        data: topRooms.map(room => room.reservations),
                         backgroundColor: '#1565c0',
                       }
                     ]
