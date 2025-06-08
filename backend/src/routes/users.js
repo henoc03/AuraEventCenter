@@ -11,6 +11,7 @@ router.get('/getNameLastNameRole/:id', usersController.getNameLastnameRole);
 router.post('/', usersController.createUser);
 router.put('/deactivate', verifyToken, usersController.deactivateUser);
 router.put('/:id', usersController.updateUser);
+router.put('/profile/:id', usersController.updateProfile);
 router.delete('/:id', usersController.deleteUser);
 router.post('/login', usersController.login);
 router.post('/register', usersController.registerUser);

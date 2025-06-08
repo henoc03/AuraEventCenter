@@ -20,6 +20,8 @@ function Profile({sections}) {
   const [email, setEmail] = useState("");
   const [lastname, setLastname] = useState("");
   const [role, setRole] = useState("");
+  const [imageFile, setImageFile] = useState(null);
+  const [imageName, setImageName] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
   const navigate = useNavigate();
 
@@ -88,11 +90,12 @@ function Profile({sections}) {
       lastName1: apellido1,
       lastName2: apellido2,
       email: data.email,
-      phone: data.phone
+      phone: data.phone,
+      imageName: imageName
     };
     
     try {
-      const res = await fetch(`${DEFAULT_ROUTE}/users/updateProfile/${sessionUserData.id}`, {
+      const res = await fetch(`${DEFAULT_ROUTE}/users/profile/${sessionUserData.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userToSend)
@@ -111,6 +114,14 @@ function Profile({sections}) {
       console.error('Error:', error);
       alert('Ocurrió un error al actualizar la información de usuario.');
       navigate('/login');
+    }
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setImageName(file.name);
     }
   };
 
@@ -149,7 +160,7 @@ function Profile({sections}) {
                   <div className="edit-icon-container"><i className="bi bi-pencil profile-edit-icon"></i></div>
                   <img src={ProfilePhoto} alt="Foto de perfil editable"/>
                 </label>
-                <input id="profile-image-upload" type="file" accept="image/*" style={{ display: "none" }} />
+                <input id="profile-image-upload" type="file" accept="image/*" onChange={handleImageChange} style={{ display: "none" }} />
               </div>
 
               <div className="user-info-form">

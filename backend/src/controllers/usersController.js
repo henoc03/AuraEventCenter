@@ -15,6 +15,7 @@ const { sendWelcomeEmail } = require('./emailController');
 const jwt = require('jsonwebtoken');
 const secretKey = process.env.JWT_SECRET || 'defaultSecret';
 const bcrypt = require('bcrypt');
+const { encrypt, decrypt } = require('../utils/encryption');
 
 exports.deactivateUser = async (req, res) => {
   const { password } = req.body;
@@ -198,6 +199,53 @@ exports.updateUser = async (req, res) => {
         last_name_2,
         phone,
         user_type,
+        req.params.id
+      ],
+      { autoCommit: true }
+    );
+    res.sendStatus(204);
+  } catch (err) {
+    console.error('❌ Error al actualizar usuario:', err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
+/**
+ * Actualiza el perfil de un usuario.
+ */
+exports.updateProfile = async (req, res) => {
+  const {firstName, lastName1, lastName2, email, phone, imageName } = req.body;
+  let conn;
+
+  let imagePath = null;
+  let encryptedPath = null;
+  if (imageName != "") {
+    imagePath = `uploads/users/${imageName}`;
+    encryptedPath = encrypt(imagePath);
+  }
+
+  try {
+    conn = await getConnection();
+    await conn.execute(
+      `UPDATE CLIENT_SCHEMA.USERS SET 
+        FIRST_NAME = :firstName,
+        LAST_NAME_1 = :lastName1,
+        LAST_NAME_2 = :lastName2,
+        EMAIL = :email,
+        PHONE = :phone,
+        PROFILE_IMAGE_NAME = :imageName,
+        PROFILE_IMAGE_PATH = :encryptedPath
+       WHERE USER_ID = :user_id`,
+      [
+        firstName,
+        lastName1,
+        lastName2,
+        email,
+        phone,
+        imageName,
+        encryptedPath,
         req.params.id
       ],
       { autoCommit: true }
