@@ -22,6 +22,7 @@ import AdminDashboard from "./pages/AdminDashBoard";
 import Clients from './pages/Clients';
 import Administrators from './pages/Administrator';
 import RoomsAdmin from './pages/RoomsAdmin';
+import ServicesAdmin from './pages/ServicesAdmin';
 import Products from './pages/Products';
 
 // Contexto y utilidades
@@ -59,6 +60,7 @@ function App() {
             <Route path="/admin/salas" element={<RoomsAdmin sections={SectionAdmin}/>} />
             <Route path="/admin/tablero" element={<AdminDashboard sections={SectionAdmin} />} />
             <Route path="/admin/clientes" element={<Clients sections={SectionAdmin} />} />
+            <Route path="/admin/servicios" element={<ServicesAdmin sections={SectionAdmin} />} />
             <Route path="/admin/servicios/catering/productos" element={<Products sections={SectionAdmin} />} />
           </Route>
 
@@ -68,6 +70,7 @@ function App() {
             <Route path="/root-admin/tablero" element={<AdminDashboard sections={SectionRoot} />} />
             <Route path="/root-admin/clientes" element={<Clients sections={SectionRoot} />} />
             <Route path="/root-admin/administradores" element={<Administrators sections={SectionRoot} />} />
+            <Route path="/root-admin/servicios" element={<ServicesAdmin sections={SectionRoot} />} />
             <Route path="/root-admin/servicios/catering/productos" element={<Products sections={SectionRoot} />} />
           </Route>
 

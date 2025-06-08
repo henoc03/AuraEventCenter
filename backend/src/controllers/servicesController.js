@@ -17,7 +17,7 @@ exports.getAllServices = async (req, res) => {
   try {
     conn = await getConnection();
     const result = await conn.execute(
-      `SELECT ADDITIONAL_SERVICE_ID, NAME, DESCRIPTION, PRICE, IMAGE_PATH
+      `SELECT ADDITIONAL_SERVICE_ID, NAME, DESCRIPTION, PRICE, IMAGE_PATH, ACTIVE
        FROM ADMIN_SCHEMA.ADDITIONAL_SERVICES`,
       [],
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
@@ -50,7 +50,7 @@ exports.getServiceById = async (req, res) => {
   try {
     conn = await getConnection();
     const result = await conn.execute(
-      `SELECT ADDITIONAL_SERVICE_ID, NAME, DESCRIPTION, PRICE, IMAGE_PATH
+      `SELECT ADDITIONAL_SERVICE_ID, NAME, DESCRIPTION, PRICE, IMAGE_PATH, ACTIVE
        FROM ADMIN_SCHEMA.ADDITIONAL_SERVICES WHERE ADDITIONAL_SERVICE_ID = :id`,
       [req.params.id],
       { outFormat: oracledb.OUT_FORMAT_OBJECT }

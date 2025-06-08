@@ -18,8 +18,8 @@ app.use('/users', usersRoutes);
 app.use('/email', emailRoutes);
 app.use('/zones', zonesRoutes);
 app.use('/dashboard', dashboardRoutes);
-app.use('/products', productsRoutes);
 app.use('/services', servicesRoutes);
+app.use('/products', productsRoutes);
 app.use('/menus', menusRoutes);
 app.use(express.urlencoded({ extended: true }));
 
