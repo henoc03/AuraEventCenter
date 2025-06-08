@@ -15,6 +15,10 @@ function ServicesClient() {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Estados para los filtros y búsqueda
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortOrder, setSortOrder] = useState("asc");
+
   useEffect(() => {
     AOS.init();
   }, []);
@@ -51,6 +55,16 @@ function ServicesClient() {
 
   if (loading) return <LoadingPage />;
 
+  const filteredAndSortedServices = services
+  .filter((service) => {
+    const matchesSearch = service.NAME.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesSearch;
+  })
+  .sort((a, b) => {
+    return sortOrder === "asc" ? a.PRICE - b.PRICE : b.PRICE - a.PRICE;
+  });
+
+
   return (
     <div className="services-client-page">
       <Hero
@@ -62,20 +76,48 @@ function ServicesClient() {
 
       <main className="services-client-main">
         <h2>Conoce nuestros servicios</h2>
-        {services.map((service) => (
+        {/* Filtros */}
+        <div className="services-client-filters">
+          <div className="service-search-input">
+            <label htmlFor="search">Buscar: </label>
+            <input
+              id="search"
+              type="text"
+              placeholder="Buscar por nombre..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="filter-input"
+            />
+          </div>
+
+          <div className="service-sort-input">
+            <label htmlFor="sort">Ordenar: </label>
+            <select
+              id="sort"
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+              className="filter-select"
+            >
+              <option value="asc">Precio: menor a mayor</option>
+              <option value="desc">Precio: mayor a menor</option>
+            </select>
+          </div>
+        </div>
+
+        {filteredAndSortedServices.map((service, index) => (
           <div 
-            key={service.ADDITIONAL_SERVICE_ID}   className="service-container">
+            key={service.ADDITIONAL_SERVICE_ID} className="service-container">
             <img 
               src={service.IMAGE_PATH && service.IMAGE_PATH.trim() !== ""
                 ? `${DEFAULT_ROUTE}/${service.IMAGE_PATH}` : defaultImage
               }
               alt={service.NAME}
-              data-aos={service.ADDITIONAL_SERVICE_ID %2 != 0 ? "fade-right" : "fade-left"}
+              data-aos={index % 2 === 0 ? "fade-left" : "fade-right"}
               data-aos-duration="1500"
             />
             <div
               className="service-info-container"
-              data-aos={service.ADDITIONAL_SERVICE_ID %2 != 0 ? "fade-left" : "fade-right"}
+              data-aos={index % 2 !== 0 ? "fade-left" : "fade-right"}
               data-aos-duration="1500"
             >
               <h3>{service.NAME}</h3>
