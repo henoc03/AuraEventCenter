@@ -9,6 +9,7 @@
 .admin-dashboard {
     display: flex;
     height: 100%;
+    width: 100%;
   }
 
   .dashboard-content {
@@ -20,6 +21,8 @@
       "chart reservas";
     gap: 20px;
     padding: 20px;
+    width: 100%;
+
   }
   
   .main-content {
@@ -109,7 +112,9 @@
     flex-grow: 1;
     margin-bottom: 16px;
   }
-  
+  .placeholder{
+    background:transparent
+  }
   .view-stats {
     margin-top: auto;
     color: #007bff;
@@ -119,42 +124,46 @@
   .view-stats:hover {
     text-decoration: underline;
   }
-  
-  @media (max-width: 1024px) {
-    .dashboard-content {
-      grid-template-columns: 1fr;
-      grid-template-areas:
-        "cards"
-        "chart"
-        "reservas";
-    }
-  
-    .main-content,
-    .chart-section,
-    .reservations-section {
-      width: auto;
-    }
-    
-    .reservations-section {
-      min-height: 300px;
-      height: auto !important;
-    }
-    
+@media (max-width: 1340px) {
+  .dashboard-content {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "cards"
+      "chart"
+      "reservas";
   }
-  
-  @media (max-width: 768px) {
-    
-    .rooms-title {
-      flex-direction: column;
-      gap: 10px;
-    }
-  
-    .dashboard-cards {
-      grid-template-columns: 1fr;
-    }
-  
-    .reservations-section table {
-      font-size: 0.85rem;
-    }
+
+  .dashboard-cards {
+    grid-template-columns: repeat(auto-fit, minmax(1100px, 1fr));
   }
-  
+
+  .main-content,
+  .chart-section,
+  .reservations-section {
+    width: 87%;
+    max-width: 100%;
+  }
+}
+
+/* Tablets */
+@media (max-width: 1024px) {
+  .dashboard-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .reservations-section {
+    min-height: 300px;
+  }
+}
+
+/* Móviles */
+@media (max-width: 768px) {
+  .rooms-title {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .reservations-section table {
+    font-size: 0.85rem;
+  }
+}

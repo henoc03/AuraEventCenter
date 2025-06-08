@@ -112,7 +112,7 @@ bugbusters/
 │   │       ├── *.css            # Estilos específicos
 │   └── vite.config.js           # Configuración de Vite (servidor de desarrollo)
 │
-├── package-lock.json            # Archivo raíz de dependencias del proyecto (si usas monorepo)
+├── package-lock.json            # Archivo raíz de dependencias del proyecto
 ├── package.json                 # Configuración del monorepo o proyecto raíz
 └── README.md                    # Documentación general del proyecto
 ```
@@ -225,3 +225,442 @@ Si tienes dudas de cómo instalar Node.js, visita [este video tutorial](https://
 - **Henoc Rojas** - C26764
 - **Sharon Jiménez** - C13956
 - **Bryan Rivera** - C26477
+
+```
+bugbusters
+├─ backend
+│  ├─ .env
+│  ├─ package-lock.json
+│  ├─ package.json
+│  ├─ readme.md
+│  └─ src
+│     ├─ app.js
+│     ├─ config
+│     │  └─ db.js
+│     ├─ controllers
+│     │  ├─ dashboardController.js
+│     │  ├─ emailController.js
+│     │  ├─ usersController.js
+│     │  └─ zonesController.js
+│     ├─ middleware
+│     │  └─ verifyToken.js
+│     ├─ routes
+│     │  ├─ dashboard.js
+│     │  ├─ emails.js
+│     │  ├─ users.js
+│     │  └─ zones.js
+│     ├─ server.js
+│     ├─ uploads
+│     │  └─ zones
+│     │     ├─ image-1748147689797-637536213.png
+│     │     ├─ image-1748199845143-777019567.png
+│     │     ├─ image-1748200692967-22978846.png
+│     │     ├─ image-1748201095031-510044800.png
+│     │     ├─ image-1748201098206-763570854.png
+│     │     ├─ image-1748202582835-530893085.png
+│     │     ├─ image-1748202585512-570716024.png
+│     │     ├─ image-1748203231484-167884618.png
+│     │     ├─ image-1748203234081-503732350.png
+│     │     ├─ image-1748203369883-446159492.png
+│     │     ├─ image-1748203372569-73148879.png
+│     │     ├─ image-1748203485497-207320631.png
+│     │     ├─ image-1748203488085-238789403.png
+│     │     ├─ image-1748203605432-602024171.png
+│     │     ├─ image-1748203607923-63556748.png
+│     │     ├─ image-1748203883752-989025887.png
+│     │     ├─ image-1748203886349-895878100.png
+│     │     ├─ image-1748204517434-819120047.png
+│     │     ├─ image-1748204520209-245587107.png
+│     │     ├─ image-1748204729551-172797106.png
+│     │     ├─ image-1748204732139-459002832.png
+│     │     ├─ image-1748205441557-709678211.png
+│     │     ├─ image-1748205444052-215596349.png
+│     │     ├─ image-1748206022855-189211638.png
+│     │     ├─ image-1748207016998-393672215.png
+│     │     └─ image-1748207019526-375468146.png
+│     └─ utils
+│        └─ encryption.js
+├─ CONTRIBUTING.md
+├─ frontend
+│  ├─ eslint.config.js
+│  ├─ index.html
+│  ├─ package-lock.json
+│  ├─ package.json
+│  ├─ public
+│  │  └─ default-image.jpg
+│  ├─ src
+│  │  ├─ App.jsx
+│  │  ├─ assets
+│  │  │  └─ images
+│  │  │     ├─ background.png
+│  │  │     ├─ default-profile-photo.png
+│  │  │     ├─ logo-no-background.png
+│  │  │     ├─ logo.png
+│  │  │     └─ salas
+│  │  │        ├─ default_zone.jpg
+│  │  │        ├─ sala1.png
+│  │  │        ├─ Sala2.png
+│  │  │        └─ sala3.png
+│  │  ├─ components
+│  │  │  ├─ common
+│  │  │  │  ├─ AddEditRoomModal.jsx
+│  │  │  │  ├─ AlertMessage.jsx
+│  │  │  │  ├─ Auth.jsx
+│  │  │  │  ├─ CompactRoom.jsx
+│  │  │  │  ├─ DropDownMenu.jsx
+│  │  │  │  ├─ ExpandedRoom.jsx
+│  │  │  │  ├─ Footer.jsx
+│  │  │  │  ├─ Header.jsx
+│  │  │  │  ├─ LoadingPage.jsx
+│  │  │  │  ├─ Main.jsx
+│  │  │  │  ├─ Nav.jsx
+│  │  │  │  ├─ Navigation.jsx
+│  │  │  │  ├─ Page.jsx
+│  │  │  │  ├─ RoomCard.jsx
+│  │  │  │  ├─ SideBar.jsx
+│  │  │  │  ├─ SideNav.jsx
+│  │  │  │  ├─ UserCard.jsx
+│  │  │  │  └─ UserModal.jsx
+│  │  │  ├─ context
+│  │  │  │  └─ PrivateRoute.jsx
+│  │  │  ├─ icons
+│  │  │  │  ├─ Logo.jsx
+│  │  │  │  └─ ProfilePhoto.jsx
+│  │  │  ├─ sections
+│  │  │  │  ├─ About.jsx
+│  │  │  │  ├─ Hero.jsx
+│  │  │  │  ├─ OTPInput.jsx
+│  │  │  │  └─ Users.jsx
+│  │  │  └─ utils
+│  │  │     ├─ admin-nav.jsx
+│  │  │     ├─ CarouselFade.jsx
+│  │  │     ├─ content.js
+│  │  │     ├─ profile-nav.jsx
+│  │  │     └─ root-nav.jsx
+│  │  ├─ context
+│  │  │  └─ AuthContext.jsx
+│  │  ├─ index.css
+│  │  ├─ main.jsx
+│  │  ├─ pages
+│  │  │  ├─ AccountSettings.jsx
+│  │  │  ├─ AdminDashBoard.jsx
+│  │  │  ├─ Administrator.jsx
+│  │  │  ├─ ChangePassword.jsx
+│  │  │  ├─ Clients.jsx
+│  │  │  ├─ Home.jsx
+│  │  │  ├─ NotFound.jsx
+│  │  │  ├─ Profile.jsx
+│  │  │  ├─ RecoverEmail.jsx
+│  │  │  ├─ Register.jsx
+│  │  │  ├─ ResetPassword.jsx
+│  │  │  ├─ RoomsAdmin.jsx
+│  │  │  ├─ RoomsClient.jsx
+│  │  │  ├─ SignIn.jsx
+│  │  │  ├─ VerifyAccountCode.jsx
+│  │  │  └─ VerifyCode.jsx
+│  │  └─ style
+│  │     ├─ account-settings.css
+│  │     ├─ addEditRoomModal.css
+│  │     ├─ admin-dashboard.css
+│  │     ├─ admin-users.css
+│  │     ├─ auth.css
+│  │     ├─ compact-room.css
+│  │     ├─ dropDownMenu.css
+│  │     ├─ expanded-room.css
+│  │     ├─ header.css
+│  │     ├─ layout.css
+│  │     ├─ loading-page.css
+│  │     ├─ nav.css
+│  │     ├─ profile.css
+│  │     ├─ room-card.css
+│  │     ├─ rooms-admin.css
+│  │     ├─ rooms-client.css
+│  │     ├─ side-nav.css
+│  │     ├─ sideBar.css
+│  │     └─ user-modal.css
+│  └─ vite.config.js
+├─ package-lock.json
+├─ package.json
+└─ README.md
+
+```
+```
+bugbusters
+├─ backend
+│  ├─ .env
+│  ├─ package-lock.json
+│  ├─ package.json
+│  ├─ readme.md
+│  └─ src
+│     ├─ app.js
+│     ├─ config
+│     │  └─ db.js
+│     ├─ controllers
+│     │  ├─ dashboardController.js
+│     │  ├─ emailController.js
+│     │  ├─ usersController.js
+│     │  └─ zonesController.js
+│     ├─ middleware
+│     │  └─ verifyToken.js
+│     ├─ routes
+│     │  ├─ dashboard.js
+│     │  ├─ emails.js
+│     │  ├─ users.js
+│     │  └─ zones.js
+│     ├─ server.js
+│     ├─ tests
+│     │  └─ zones-test.js
+│     ├─ uploads
+│     │  └─ zones
+│     │     ├─ image-1749253791729-8319761.png
+│     │     ├─ image-1749253794343-17603510.png
+│     │     └─ image-1749253797165-431108285.png
+│     └─ utils
+│        ├─ dbMock.js
+│        └─ encryption.js
+├─ CONTRIBUTING.md
+├─ frontend
+│  ├─ eslint.config.js
+│  ├─ index.html
+│  ├─ package-lock.json
+│  ├─ package.json
+│  ├─ public
+│  │  └─ default-image.jpg
+│  ├─ src
+│  │  ├─ App.jsx
+│  │  ├─ assets
+│  │  │  └─ images
+│  │  │     ├─ background.png
+│  │  │     ├─ default-profile-photo.png
+│  │  │     ├─ logo-no-background.png
+│  │  │     ├─ logo.png
+│  │  │     └─ salas
+│  │  │        ├─ default_zone.jpg
+│  │  │        ├─ sala1.png
+│  │  │        ├─ Sala2.png
+│  │  │        └─ sala3.png
+│  │  ├─ components
+│  │  │  ├─ common
+│  │  │  │  ├─ AddEditRoomModal.jsx
+│  │  │  │  ├─ AlertMessage.jsx
+│  │  │  │  ├─ Auth.jsx
+│  │  │  │  ├─ CompactRoom.jsx
+│  │  │  │  ├─ DropDownMenu.jsx
+│  │  │  │  ├─ ExpandedRoom.jsx
+│  │  │  │  ├─ Footer.jsx
+│  │  │  │  ├─ Header.jsx
+│  │  │  │  ├─ LoadingPage.jsx
+│  │  │  │  ├─ Main.jsx
+│  │  │  │  ├─ Nav.jsx
+│  │  │  │  ├─ Navigation.jsx
+│  │  │  │  ├─ Page.jsx
+│  │  │  │  ├─ RoomCard.jsx
+│  │  │  │  ├─ SideBar.jsx
+│  │  │  │  ├─ SideNav.jsx
+│  │  │  │  ├─ UserCard.jsx
+│  │  │  │  └─ UserModal.jsx
+│  │  │  ├─ context
+│  │  │  │  └─ PrivateRoute.jsx
+│  │  │  ├─ icons
+│  │  │  │  ├─ Logo.jsx
+│  │  │  │  └─ ProfilePhoto.jsx
+│  │  │  ├─ sections
+│  │  │  │  ├─ About.jsx
+│  │  │  │  ├─ Hero.jsx
+│  │  │  │  ├─ OTPInput.jsx
+│  │  │  │  └─ Users.jsx
+│  │  │  └─ utils
+│  │  │     ├─ admin-nav.jsx
+│  │  │     ├─ CarouselFade.jsx
+│  │  │     ├─ content.js
+│  │  │     ├─ page-image-paths.js
+│  │  │     ├─ profile-nav.jsx
+│  │  │     └─ root-nav.jsx
+│  │  ├─ context
+│  │  │  └─ AuthContext.jsx
+│  │  ├─ index.css
+│  │  ├─ main.jsx
+│  │  ├─ pages
+│  │  │  ├─ AccountSettings.jsx
+│  │  │  ├─ AdminDashBoard.jsx
+│  │  │  ├─ Administrator.jsx
+│  │  │  ├─ ChangePassword.jsx
+│  │  │  ├─ Clients.jsx
+│  │  │  ├─ Home.jsx
+│  │  │  ├─ NotFound.jsx
+│  │  │  ├─ Profile.jsx
+│  │  │  ├─ RecoverEmail.jsx
+│  │  │  ├─ Register.jsx
+│  │  │  ├─ ResetPassword.jsx
+│  │  │  ├─ RoomsAdmin.jsx
+│  │  │  ├─ RoomsClient.jsx
+│  │  │  ├─ SignIn.jsx
+│  │  │  ├─ VerifyAccountCode.jsx
+│  │  │  └─ VerifyCode.jsx
+│  │  └─ style
+│  │     ├─ account-settings.css
+│  │     ├─ addEditRoomModal.css
+│  │     ├─ admin-dashboard.css
+│  │     ├─ admin-users.css
+│  │     ├─ auth.css
+│  │     ├─ compact-room.css
+│  │     ├─ dropDownMenu.css
+│  │     ├─ expanded-room.css
+│  │     ├─ header.css
+│  │     ├─ layout.css
+│  │     ├─ loading-page.css
+│  │     ├─ nav.css
+│  │     ├─ profile.css
+│  │     ├─ room-card.css
+│  │     ├─ rooms-admin.css
+│  │     ├─ rooms-client.css
+│  │     ├─ side-nav.css
+│  │     ├─ sideBar.css
+│  │     └─ user-modal.css
+│  └─ vite.config.js
+├─ jest.config.js
+├─ package-lock.json
+├─ package.json
+└─ README.md
+
+```
+```
+bugbusters
+├─ backend
+│  ├─ .env
+│  ├─ package-lock.json
+│  ├─ package.json
+│  ├─ readme.md
+│  └─ src
+│     ├─ app.js
+│     ├─ config
+│     │  └─ db.js
+│     ├─ controllers
+│     │  ├─ dashboardController.js
+│     │  ├─ emailController.js
+│     │  ├─ usersController.js
+│     │  └─ zonesController.js
+│     ├─ middleware
+│     │  └─ verifyToken.js
+│     ├─ routes
+│     │  ├─ dashboard.js
+│     │  ├─ emails.js
+│     │  ├─ users.js
+│     │  └─ zones.js
+│     ├─ server.js
+│     ├─ tests
+│     │  └─ zones-test.js
+│     ├─ uploads
+│     │  └─ zones
+│     │     ├─ image-1749253791729-8319761.png
+│     │     ├─ image-1749253794343-17603510.png
+│     │     └─ image-1749253797165-431108285.png
+│     └─ utils
+│        ├─ dbMock.js
+│        └─ encryption.js
+├─ CONTRIBUTING.md
+├─ frontend
+│  ├─ eslint.config.js
+│  ├─ index.html
+│  ├─ package-lock.json
+│  ├─ package.json
+│  ├─ public
+│  │  └─ default-image.jpg
+│  ├─ src
+│  │  ├─ App.jsx
+│  │  ├─ assets
+│  │  │  └─ images
+│  │  │     ├─ background.png
+│  │  │     ├─ default-profile-photo.png
+│  │  │     ├─ logo-no-background.png
+│  │  │     ├─ logo.png
+│  │  │     └─ salas
+│  │  │        ├─ default_zone.jpg
+│  │  │        ├─ sala1.png
+│  │  │        ├─ Sala2.png
+│  │  │        └─ sala3.png
+│  │  ├─ components
+│  │  │  ├─ common
+│  │  │  │  ├─ AddEditRoomModal.jsx
+│  │  │  │  ├─ AlertMessage.jsx
+│  │  │  │  ├─ Auth.jsx
+│  │  │  │  ├─ CompactRoom.jsx
+│  │  │  │  ├─ DropDownMenu.jsx
+│  │  │  │  ├─ ExpandedRoom.jsx
+│  │  │  │  ├─ Footer.jsx
+│  │  │  │  ├─ Header.jsx
+│  │  │  │  ├─ LoadingPage.jsx
+│  │  │  │  ├─ Main.jsx
+│  │  │  │  ├─ Nav.jsx
+│  │  │  │  ├─ Navigation.jsx
+│  │  │  │  ├─ Page.jsx
+│  │  │  │  ├─ RoomCard.jsx
+│  │  │  │  ├─ SideBar.jsx
+│  │  │  │  ├─ SideNav.jsx
+│  │  │  │  ├─ UserCard.jsx
+│  │  │  │  └─ UserModal.jsx
+│  │  │  ├─ context
+│  │  │  │  └─ PrivateRoute.jsx
+│  │  │  ├─ icons
+│  │  │  │  ├─ Logo.jsx
+│  │  │  │  └─ ProfilePhoto.jsx
+│  │  │  ├─ sections
+│  │  │  │  ├─ About.jsx
+│  │  │  │  ├─ Hero.jsx
+│  │  │  │  ├─ OTPInput.jsx
+│  │  │  │  └─ Users.jsx
+│  │  │  └─ utils
+│  │  │     ├─ admin-nav.jsx
+│  │  │     ├─ CarouselFade.jsx
+│  │  │     ├─ content.js
+│  │  │     ├─ page-image-paths.js
+│  │  │     ├─ profile-nav.jsx
+│  │  │     └─ root-nav.jsx
+│  │  ├─ context
+│  │  │  └─ AuthContext.jsx
+│  │  ├─ index.css
+│  │  ├─ main.jsx
+│  │  ├─ pages
+│  │  │  ├─ AccountSettings.jsx
+│  │  │  ├─ AdminDashBoard.jsx
+│  │  │  ├─ Administrator.jsx
+│  │  │  ├─ ChangePassword.jsx
+│  │  │  ├─ Clients.jsx
+│  │  │  ├─ Home.jsx
+│  │  │  ├─ NotFound.jsx
+│  │  │  ├─ Profile.jsx
+│  │  │  ├─ RecoverEmail.jsx
+│  │  │  ├─ Register.jsx
+│  │  │  ├─ ResetPassword.jsx
+│  │  │  ├─ RoomsAdmin.jsx
+│  │  │  ├─ RoomsClient.jsx
+│  │  │  ├─ SignIn.jsx
+│  │  │  ├─ VerifyAccountCode.jsx
+│  │  │  └─ VerifyCode.jsx
+│  │  └─ style
+│  │     ├─ account-settings.css
+│  │     ├─ addEditRoomModal.css
+│  │     ├─ admin-dashboard.css
+│  │     ├─ admin-users.css
+│  │     ├─ auth.css
+│  │     ├─ compact-room.css
+│  │     ├─ dropDownMenu.css
+│  │     ├─ expanded-room.css
+│  │     ├─ header.css
+│  │     ├─ layout.css
+│  │     ├─ loading-page.css
+│  │     ├─ nav.css
+│  │     ├─ profile.css
+│  │     ├─ room-card.css
+│  │     ├─ rooms-admin.css
+│  │     ├─ rooms-client.css
+│  │     ├─ side-nav.css
+│  │     ├─ sideBar.css
+│  │     └─ user-modal.css
+│  └─ vite.config.js
+├─ jest.config.js
+├─ package-lock.json
+├─ package.json
+└─ README.md
+
+```

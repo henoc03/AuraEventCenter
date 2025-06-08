@@ -1,12 +1,13 @@
 import React from "react";
 import "../../style/compact-room.css";
-import SalaDefault from "../../assets/images/salas/sala2.png";
+import DefaultRoom from "../../assets/images/salas/default_zone.jpg";
 
 const CompactRoom = ({ room }) => {
+  const DEFAULT_ROUTE = "http://localhost:1522";
   return (
     <div className="compact-room">
       <img
-        src={SalaDefault}
+        src={room.IMAGE_PATH && room.IMAGE_PATH.trim() !== "" ? `${DEFAULT_ROUTE}/${room.IMAGE_PATH}` : DefaultRoom}
         alt={`Imagen de ${room.NAME}`}
         className="compact-room-image"
       />
