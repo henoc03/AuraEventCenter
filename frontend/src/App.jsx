@@ -21,6 +21,7 @@ import AdminDashboard from "./pages/AdminDashBoard";
 import Clients from './pages/Clients';
 import Administrators from './pages/Administrator';
 import RoomsAdmin from './pages/RoomsAdmin';
+import Products from './pages/Products';
 
 // Contexto y utilidades
 import { AuthProvider } from './context/AuthContext';
@@ -47,6 +48,8 @@ function App() {
           <Route path="/cuenta" element={<AccountSettings sections={SectionProfile}/>} />
           <Route path="/cuenta/cambiar-contraseña" element={<ChangePassword sections={SectionProfile}/>} />
           <Route path="/cuenta/verificar-codigo" element={<VerifyAccountCode sections={SectionProfile}/>} />
+          <Route path="/admin/servicios/catering/productos" element={<Products sections={SectionAdmin} />} />
+          
           <Route path="/servicios" element={<ServicesClient />} />
 
           {/* Rutas protegidas para administradores comunes */}
@@ -54,6 +57,7 @@ function App() {
             <Route path="/admin/salas" element={<RoomsAdmin sections={SectionAdmin}/>} />
             <Route path="/admin/tablero" element={<AdminDashboard sections={SectionAdmin} />} />
             <Route path="/admin/clientes" element={<Clients sections={SectionAdmin} />} />
+            <Route path="/admin/servicios/catering/productos" element={<Products sections={SectionAdmin} />} />
           </Route>
 
           {/* Rutas protegidas para root-admin */}
@@ -62,6 +66,7 @@ function App() {
             <Route path="/root-admin/tablero" element={<AdminDashboard sections={SectionRoot} />} />
             <Route path="/root-admin/clientes" element={<Clients sections={SectionRoot} />} />
             <Route path="/root-admin/administradores" element={<Administrators sections={SectionRoot} />} />
+            <Route path="/root-admin/servicios/catering/productos" element={<Products sections={SectionRoot} />} />
           </Route>
 
           {/* Página 404 */}
