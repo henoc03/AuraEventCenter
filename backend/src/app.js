@@ -19,8 +19,8 @@ app.use('/email', emailRoutes);
 app.use('/zones', zonesRoutes);
 app.use('/dashboard', dashboardRoutes);
 app.use('/services', servicesRoutes);
-app.use('/products', productsRoutes);
 app.use('/menus', menusRoutes);
+app.use('/products', productsRoutes);
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

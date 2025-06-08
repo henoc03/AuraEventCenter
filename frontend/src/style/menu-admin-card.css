@@ -1,0 +1,295 @@
+.menu-card {
+    display: flex;
+    flex-direction: column;
+    align-self: left;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    border-radius: 16px;
+    width: 30%;
+    max-width: 410px;
+    height: 320px;
+    margin: 15px 30px 15px 0px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  
+}
+  
+.menu-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+  
+.menu-card-body h2{
+    color: #868585;
+    text-align: center;
+    margin: 15px;
+    height: 25px;
+    font-family: "Merriweather Sans", sans-serif;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+  
+.menu-card img {
+    width: 100%;
+    height: 160px;
+    border-radius: 0;
+    object-fit: cover;
+    border-radius: 16px 16px 0 0 ;
+}
+  
+.menu-card-body .menu-card-title{
+    text-align: center;
+    font-family: "Merriweather Sans", sans-serif;
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    margin-top: 20px;
+}
+  
+.menu-status-indicator {
+    width: 8px;
+    height: 8px;
+    transform: rotate(45deg);
+    display: inline-block;
+    margin-bottom: 4px;
+    margin-right: 3px;
+}
+
+.menu-status-indicator.active {
+    background-color: #22c55e;
+}
+
+.menu-status-indicator.inactive {
+    background-color: #ef4444;
+}
+
+.menu-card-body .menu-card-buttons {
+    display: flex;
+    justify-content: space-evenly;
+    height: 38px;
+}
+
+.menu-card-buttons .button {
+    font-family: "Merriweather Sans", sans-serif;
+    font-size: 0.8rem;
+    background-color: #F0F4F8;
+    color: #007AFF;
+    width: 30%;
+    max-width: 110px;
+    border-radius: 4px;
+    padding: 9px 0;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: none;
+}
+
+.menu-card-buttons .button:hover {
+    background-color: #2563eb;
+    color: white;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    border: solid 1px white;
+}
+
+.menu-deleted {
+    display: none;
+}
+
+.menu-info-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 4000;
+    overflow-y: scroll;
+}
+
+.modal-menu-info-content {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    background-color: #fff;
+    padding: 1.5rem 1.5rem;
+    border-radius: 10px;
+    max-width: 1000px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    position: relative;
+    margin: 0 30px;
+}
+
+.modal-menu-info-content button {
+    align-self: flex-end;
+    background: none;
+    border: none;
+    color: black;
+    width: 30px;
+}
+
+.menu-info-photo-container img{
+    display: flex;
+    flex-direction: row;
+    width: 400px;
+    height: auto;
+    border-radius: 0;
+    object-fit: cover;
+}
+
+.menu-info-photo-container{
+    display: flex;
+    flex-direction: row;
+    width: fit-content;
+    height: fit-content;
+    border-radius: 0;
+    object-fit: cover;
+    margin-bottom: 30px;
+    font-family: "Merriweather Sans", sans-serif;
+    font-size: 0.8rem;
+
+}
+
+.menu-info-content{
+    margin-left: 20px;
+    width: 60%;
+}
+
+.menu-info-content h2 {
+    font-family: "Merriweather Sans", sans-serif;
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+.menu-info-content p{
+    font-family: "Merriweather Sans", sans-serif;
+    font-size: 0.95rem;
+    margin: 15px 0;
+}
+
+.menu-info-content h3 {
+    margin: 0.25rem 0;
+    color: #222;
+    font-size: 1.1rem;
+    font-family: 'Merriweather sans', sans-serif;
+    font-weight: bold;
+    margin-top: 25px;
+}
+
+.menu-info-content li {
+    color: #222;
+    font-size: 0.95rem;
+    font-family: 'Merriweather sans', sans-serif;
+    list-style: none;
+}
+
+.menu-info-content ul {
+    padding: 0;
+}
+
+.menus-products-buttons {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.menus-products-buttons button{
+    width: 48%;
+    height: 40px;
+    font-size: 0.9rem;
+    font-family: 'Merriweather sans';
+    background-color: #F0F4F8;
+    color: #007AFF;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: none;
+}
+
+.menus-products-buttons button:hover {
+    background-color: #2563eb;
+    color: white;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    border: solid 1px white;
+}
+
+.menu-products-button button{
+    background-color: #F0F4F8;
+    color: #007AFF;
+}
+
+@media (max-width: 1440px) {
+    .menu-card {
+        margin-right: 0; 
+    }
+}
+
+@media (max-width: 1300px) {
+    .menu-card {
+        width: 45%;
+        max-width: 450px;
+        margin-right: 0; 
+    }
+
+    .menu-card-buttons .button {
+        width: 28%;
+        font-size: 0.7rem;
+    }
+}
+
+@media (max-width: 800px) {
+    .menu-card {
+        width: 90%;
+        max-width: 450px;
+        margin-right: 0; 
+    }
+}
+
+@media(max-width: 768px) {
+    .menu-card {
+        width: 47%;
+    }
+
+    .menu-card-buttons .button {
+        width: 30%
+    }
+
+    .menu-info-photo-container{
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .menu-info-photo-container img{
+        max-width: 620px;
+        max-height: 400px;
+        width: 100%;
+        height: 70%;
+    }
+
+    .menu-info-content{
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .modal-menu-info-content {
+        margin-top: 25vw;
+        margin-bottom: 5vw;
+    }
+
+    .modal-menu-info-content button {
+        margin-bottom: 10px;
+    }
+    .menu-info-photo-container img {
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 550px) {
+    .menu-card {
+        width: 90%;
+        justify-self: center;
+    }
+
+    .menu-card-buttons .button {
+        width: 28%
+    }
+}
