@@ -25,10 +25,12 @@
 }
 
 .menus-client-main h2{
-    text-align: center;
-    margin-bottom: 40px;
-    font-family: 'Merriweather sans', sans-serif;
-    font-size: 1.75rem;
+    display: flex;
+    justify-content: center;
+    font-family: 'Merriweather sans', serif;
+    font-weight: bold;
+    font-size: 1.85rem;
+    margin-bottom: 60px;
 }
 
 .menus-client-main button{
@@ -114,7 +116,8 @@
 
 @media (max-width: 768px) {
     .menus-client-main h2{
-        font-size: 1.4rem;
+        font-size: 1.6rem;
+        text-align: center;
     }
 
     .menus-client-main{
