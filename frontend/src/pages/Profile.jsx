@@ -125,7 +125,18 @@ function Profile({sections}) {
     }
   };
 
+  // Ref para el input de imagen
+  const imageInputRef = React.useRef(null);
+
   if (loading) return <LoadingPage />;
+
+  // Maneja el click en el icono de editar
+  const handleEditImageClick = (e) => {
+    e.preventDefault();
+    if (imageInputRef.current) {
+      imageInputRef.current.click();
+    }
+  };
 
   return (
     <> 
@@ -156,18 +167,32 @@ function Profile({sections}) {
             <h1>Información de perfil</h1>
             <div className="image-form-container">
               <div className="profile-image-container">
-                <label htmlFor="profile-image-upload" className="upload-label">
+                <label className="upload-label">
                   <div className="edit-delete-icons">
-                    <i className="bi bi-pencil profile-edit-icon"></i>
-                    <i className="bi bi-x profile-delete-icon" onClick={() => setImageFile(null)}></i>
+                    <i
+                      className="bi bi-pencil profile-edit-icon"
+                      onClick={handleEditImageClick}
+                      style={{ cursor: "pointer" }}
+                    ></i>
+                    <i
+                      className="bi bi-x profile-delete-icon"
+                      onClick={() => {setImageFile(null); setImagePath("")}}
+                    ></i>
                   </div>
                   <img src={imagePath ? `${DEFAULT_ROUTE}/${imagePath}` : ProfilePhoto} alt="Foto de perfil editable"/>
                 </label>
-                <input id="profile-image-upload" type="file" accept="image/*" onChange={handleImageChange} style={{ display: "none" }} />
+                <input
+                  ref={imageInputRef}
+                  id="profile-image-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  style={{ display: "none" }}
+                />
               </div>
 
               <div className="user-info-form">
-                <form onSubmit={(handleSubmit(onSubmit))} className="auth-form" id="profile-auth-form">
+                <form onSubmit={handleSubmit(onSubmit)} className="auth-form" id="profile-auth-form">
                   <label htmlFor="name">
                     Nombre <span style={{ color: 'red' }}>*</span>
                   </label>
