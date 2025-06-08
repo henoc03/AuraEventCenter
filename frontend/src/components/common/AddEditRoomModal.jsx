@@ -217,16 +217,16 @@ const handleDeletePrimaryImage = async () => {
             <p>Los campos marcados con <span style={{ color: "red" }}>*</span> son obligatorios</p>
             <form onSubmit={handleSubmit(onSubmit)} className="room-modal-form">
               <label>Nombre de la sala <span style={{ color: "red" }}>*</span></label>
-              <input type="text" defaultValue={name} className="input" {...register("name", { required: isAdd && "Nombre de sala requerido" })} />
+              <input type="text" placeholder={name} className="input" {...register("name", { required: isAdd && "Nombre de sala requerido" })} />
               {errors.name && <span className="error">{errors.name.message}</span>}
 
               <label>Categoría <span style={{ color: "red" }}>*</span></label>
-              <input type="text" defaultValue={type} className="input" {...register("type")} />
+              <input type="text" placeholder={type} className="input" {...register("type")} />
 
               <label>Precio <span style={{ color: "red" }}>*</span></label>
               <input
                 type="text"
-                defaultValue={price}
+                placeholder={price}
                 className="input"
                 {...register("price", {
                   required: isAdd && "Precio requerido",
@@ -238,7 +238,7 @@ const handleDeletePrimaryImage = async () => {
               <label>Capacidad <span style={{ color: "red" }}>*</span></label>
               <input
                 type="text"
-                defaultValue={`${capacity} personas`}
+                placeholder={`${capacity} personas`}
                 className="input"
                 {...register("capacity", {
                   required: isAdd && "Capacidad requerida",
@@ -248,7 +248,7 @@ const handleDeletePrimaryImage = async () => {
               {errors.capacity && <span className="error">{errors.capacity.message}</span>}
 
               <label>Descripción <span style={{ color: "red" }}>*</span></label>
-              <input type="text" defaultValue={description} className="input" {...register("description", { required: isAdd && "Descripción requerida" })} />
+              <input type="text" placeholder={description} className="input" {...register("description", { required: isAdd && "Descripción requerida" })} />
               {errors.description && <span className="error">{errors.description.message}</span>}
 
               {/* Imagen principal */}

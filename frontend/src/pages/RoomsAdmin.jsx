@@ -100,7 +100,7 @@ s
     }, 4000);
   };
 
-  const handleSuccess = (msg = "Operación exitosa") => {
+  const handleSuccess = (msg = "Sala agregada con éxito") => {
     setIsAddEditOpen(false);
     getZones();
     setSuccessMessage(msg);
