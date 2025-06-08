@@ -93,7 +93,6 @@ function RoomsAdmin({ sections }) {
   const showErrorAlert = (message) => {
     setErrorMessage(message);
     setShowError(true);
-s
     setTimeout(() => {
       setShowError(false);
       setErrorMessage("");
