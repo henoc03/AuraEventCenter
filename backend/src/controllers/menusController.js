@@ -212,3 +212,70 @@ exports.createMenu = async (req, res) => {
     if (conn) await conn.close();
   }
 };
+
+/**
+ * Actualizar un menú
+ */
+exports.updateMenu = async (req, res) => {
+  const { name, description, type, price, available, products, imagePath } = req.body;
+  const menuId = req.params.id;
+  let conn;
+
+  try {
+    conn = await getConnection();
+
+    let finalImagePath = imagePath;
+    if (imagePath === null || imagePath === undefined) {
+      const result = await conn.execute(
+        `SELECT IMAGE_PATH FROM ADMIN_SCHEMA.CATERING_MENUS WHERE MENU_ID = :id`,
+        [menuId],
+        { outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
+      finalImagePath = result.rows[0]?.IMAGE_PATH || null;
+    }
+
+    await conn.execute(
+      `UPDATE ADMIN_SCHEMA.CATERING_MENUS SET 
+        NAME = :name,
+        DESCRIPTION = :description,
+        TYPE = :type,
+        PRICE = :price,
+        AVAILABLE = :available,
+        IMAGE_PATH = :imagePath
+       WHERE MENU_ID = :menuId`,
+      {
+        name,
+        description,
+        type,
+        price,
+        available,
+        imagePath: finalImagePath,
+        menuId: menuId
+      },
+      { autoCommit: true }
+    );
+
+    // Antes del for que inserta los productos:
+    await conn.execute(
+      `DELETE FROM ADMIN_SCHEMA.PRODUCTS_MENUS WHERE MENU_ID = :menuId`,
+      { menuId },
+      { autoCommit: true }
+    );
+
+    // Insertar los nuevos productos asociados al menú
+    for (const productId of products) {
+      await conn.execute(
+      `INSERT INTO ADMIN_SCHEMA.PRODUCTS_MENUS (MENU_ID, PRODUCT_ID) VALUES (:menuId, :productId)`,
+      { menuId, productId },
+      { autoCommit: true }
+      );
+    }
+
+    res.status(200).json({ message: 'Menu actualizado correctamente' });
+  } catch (err) {
+  console.error('❌ Error al actualizar el menú:', err);
+  res.status(500).json({ message: 'Error al actualizar el menú: ' + err.message });
+} finally {
+    if (conn) await conn.close();
+  }
+};

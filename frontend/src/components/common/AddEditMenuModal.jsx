@@ -6,16 +6,52 @@ import "../../style/add-edit-menu-modal.css";
 
 const DEFAULT_ROUTE = "http://localhost:1522";
 
-function AddEditMenuModal({ isModalOpen, onClose, onSuccess }) {
+function AddEditMenuModal({
+    menu = null,
+    isModalOpen,
+    onClose,
+    onSuccess,
+    existingImagePath = null,
+    isAdd = false
+  }) {
   const { register, handleSubmit, formState: { errors, isValid } } = useForm({ mode: "onChange" });
 
   const [products, setProducts] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [imageFile, setImageFile] = useState(null);
+  const [secondaryFiles, setSecondaryFiles] = useState([]);
+  const [showImageUploadSuccess, setShowImageUploadSuccess] = useState(false);
+  const [existingSecondaryImages, setExistingSecondaryImages] = useState([]);
   const [primaryImageName, setPrimaryImageName] = useState("");
+  const [primaryImageExists, setPrimaryImageExist] = useState(false);
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [showUpdateSuccess, setShowUpdateSuccess] = useState(false);
 
+  // Obtener todas imagenes de los menús
+  useEffect(() => {
+    if (!isAdd && menu && menu.MENU_ID) {
+      fetch(`${DEFAULT_ROUTE}/menus/${menu.MENU_ID}/images`)
+        .then(res => res.json())
+        .then(data => {
+          const images = Array.isArray(data) ? data : data.images || [];
+          const primaryImage = images.find(img => img.id === "main");
+          const secondaryImages = images.filter(img => img.id !== "main");
+  
+          if (primaryImage) {
+            setPrimaryImageName(primaryImage.path);
+            setPrimaryImageExist(true);
+          } else {
+            setPrimaryImageName("");
+          }
+  
+          setExistingSecondaryImages(secondaryImages);
+        })
+      .catch(err => console.error("Error cargando imágenes", err));
+    }
+  }, [menu?.MENU_ID, isAdd]);
+
+  // Obtener todos los productos existentes
   useEffect(() => {
     fetch(`${DEFAULT_ROUTE}/products/`)
       .then(res => res.json())
@@ -25,6 +61,19 @@ function AddEditMenuModal({ isModalOpen, onClose, onSuccess }) {
         setShowError(true);
       });
   }, []);
+
+  // Setear lista de producto seleccionados para el modal de editar
+  useEffect(() => {
+    if (!isAdd && menu && Array.isArray(menu.PRODUCTS)) {
+      // Mapear los productos para cambiar NAME por name
+      const mappedProducts = menu.PRODUCTS.map(prod => ({
+        ...prod,
+        name: prod.NAME || prod.name,
+        id: prod.PRODUCT_ID || prod.id,
+      }));
+      setSelectedProducts(mappedProducts);
+    }
+  }, [menu, isAdd]);
 
   const handleAddProduct = () => {
     const input = document.getElementById("product-input");
@@ -58,7 +107,7 @@ function AddEditMenuModal({ isModalOpen, onClose, onSuccess }) {
   };
 
   const onSubmit = async (data) => {
-    let imagePath = null;
+    let encryptedImagePath = existingImagePath;
 
     if (imageFile) {
       const formData = new FormData();
@@ -69,7 +118,7 @@ function AddEditMenuModal({ isModalOpen, onClose, onSuccess }) {
           body: formData,
         });
         const result = await res.json();
-        imagePath = result.imagePath;
+        encryptedImagePath = result.imagePath;
       } catch {
         setErrorMessage("Error al subir imagen");
         setShowError(true);
@@ -82,34 +131,54 @@ function AddEditMenuModal({ isModalOpen, onClose, onSuccess }) {
       description: data.description,
       type: data.type,
       price: parseFloat(data.price),
-      available: data.available,
+      available: data.available ? 1 : 0,
       products: selectedProducts.map(p => p.ID || p.id),
-      imagePath,
+      imagePath: encryptedImagePath,
     };
 
     try {
-      const res = await fetch(`${DEFAULT_ROUTE}/menus/`, {
-        method: "POST",
+      const res = await fetch(`${DEFAULT_ROUTE}/menus/${isAdd ? '' : menu.MENU_ID}`, {
+        method: isAdd ? 'POST' : 'PUT',
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(menuData),
       });
-      if (!res.ok) throw new Error();
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        setErrorMessage(errorData.message || 'Error al guardar el menú');
+        setShowError(true);
+        return;
+      }
       if (onSuccess) onSuccess();
-      onClose();
     } catch {
       setErrorMessage("Error al guardar menú");
       setShowError(true);
     }
+
+    onClose();
   };
 
   return isModalOpen ? (
     <div className="add-edit-modal" onClick={onClose}>
       <div className="room-modal-content" onClick={(e) => e.stopPropagation()}>
-        <button className="room-modal-close" onClick={onClose}>×</button>
-        <h2>Agregar Menú</h2>
-
-				<p>Los campos marcados con <span style={{ color: "red" }}>*</span> son obligatorios</p>
-
+        {showUpdateSuccess && (
+          <AlertMessage
+            message="Menú actualizado con éxito"
+            type="alert-floating"
+            onClose={() => setShowUpdateSuccess(false)}
+            duration={3000}
+            className="success"
+          />
+        )}
+        {showImageUploadSuccess && (
+          <AlertMessage
+            message="Imagen subida con éxito"
+            type="alert-floating"
+            onClose={() => setShowImageUploadSuccess(false)}
+            duration={3000}
+            className="success"
+          />
+        )}
         {showError && (
           <AlertMessage
             message={errorMessage}
@@ -119,24 +188,49 @@ function AddEditMenuModal({ isModalOpen, onClose, onSuccess }) {
           />
         )}
 
+        <button className="room-modal-close" onClick={onClose}>×</button>
+        <h2>Agregar Menú</h2>
+
+        <p>Los campos marcados con <span style={{ color: "red" }}>*</span> son obligatorios</p>
+
         <form onSubmit={handleSubmit(onSubmit)} className="room-modal-form">
           <label>Nombre <span style={{ color: "red" }}>*</span></label>
-          <input type="text" className="input" {...register("name", { required: "Nombre requerido" })} />
+          <input
+            type="text"
+            className="input"
+            defaultValue={menu && !isAdd ? menu.NAME : ""}
+            {...register("name", { required: "Nombre requerido" })}
+          />
           {errors.name && <span className="error">{errors.name.message}</span>}
 
           <label>Descripción <span style={{ color: "red" }}>*</span></label>
-          <input type="text" className="input" {...register("description", { required: "Descripción requerida" })} />
+          <input
+            type="text"
+            className="input"
+            defaultValue={menu && !isAdd ? menu.DESCRIPTION : ""}
+            {...register("description", { required: "Descripción requerida" })}
+          />
           {errors.description && <span className="error">{errors.description.message}</span>}
 
           <label>Tipo de menú <span style={{ color: "red" }}>*</span></label>
-          <input type="text" className="input"{...register("type", { required: "Tipo requerido" })}/>
+          <input
+            type="text"
+            className="input"
+            defaultValue={menu && !isAdd ? menu.TYPE : ""}
+            {...register("type", { required: "Tipo requerido" })}
+          />
           {errors.type && <span className="error">{errors.type.message}</span>}
 
           <label>Precio Unitario <span style={{ color: "red" }}>*</span></label>
-          <input type="text" className="input" {...register("price", {
-            required: "Precio requerido",
-            pattern: { value: /^[0-9]+(\.[0-9]{1,2})?$/, message: "Debe ser un número válido" }
-          })} />
+          <input
+            type="text"
+            className="input"
+            defaultValue={menu && !isAdd ? menu.PRICE : ""}
+            {...register("price", {
+              required: "Precio requerido",
+              pattern: { value: /^[0-9]+(\.[0-9]{1,2})?$/, message: "Debe ser un número válido" }
+            })}
+          />
           {errors.price && <span className="error">{errors.price.message}</span>}
 
           <label>Productos <span style={{ color: "red" }}>*</span></label>
@@ -146,21 +240,27 @@ function AddEditMenuModal({ isModalOpen, onClose, onSuccess }) {
           </div>
 
           {selectedProducts.length > 0 && (
-						<div className="tag-container">
-							{selectedProducts.map((p) => (
-								<div key={p.ID} className="tag">
-									{p.name}
-									<button type="button" onClick={() => handleRemoveProduct(p)}>×</button>
-								</div>
-							))}
-						</div>
-					)}
-					<div className="available-checkbox">
-						<label>
-							Disponible
-							<input type="checkbox" {...register("available")} />
-						</label>
-					</div>
+            <div className="tag-container">
+              {selectedProducts.map((p) => (
+                <div key={p.id} className="tag">
+                  {p.name}
+                  <button type="button" onClick={() => handleRemoveProduct(p)}>×</button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="available-checkbox">
+            <label>
+              Disponible
+              <input
+                type="checkbox"
+                defaultChecked={menu && !isAdd ? menu.AVAILABLE === 1 : false}
+                {...register("available")}
+              />
+            </label>
+          </div>
+
           <label htmlFor="menu-image" className="upload-image-button">Subir imagen principal</label>
           <input id="menu-image" type="file" accept="image/*" onChange={handleImageChange} style={{ display: "none" }} />
           {primaryImageName && (

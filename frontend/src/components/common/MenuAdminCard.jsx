@@ -1,6 +1,6 @@
 import React from 'react';
 import {useState} from 'react';
-// import AddEditMenuModal from './AddEditMenuModal';
+import AddEditMenuModal from './AddEditMenuModal';
 import defaultImage from '../../assets/images/default_no_image.jpg'
 import '../../style/menu-admin-card.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -9,10 +9,11 @@ import { faSquare } from '@fortawesome/free-solid-svg-icons';
 const DEFAULT_ROUTE = "http://localhost:1522";
 
 // Componente para la tarjeta de un menú en la vista de administrador
-function MenuAdminCard ({menu, onClose}) {
+function MenuAdminCard ({id, menu, onClose, onSuccess}) {
   const [isDeleted, setIsDeleted] = useState(false);
   const [isEditClicked, setIsEditClicked] = useState(false);
   const [isViewClicked, setIsViewClicked] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
   // Maneja el cerrar la vista de un servicio
   const handleClose = () => {
@@ -33,7 +34,7 @@ function MenuAdminCard ({menu, onClose}) {
 
         if (!res.ok) {
           const errorData = await res.json();
-          alert(errorData.message || 'Error al eliminar el menú');
+          if (onError) onError(errorData.message || 'Error al eliminar la zona');
           return;
         }
         
@@ -67,13 +68,19 @@ function MenuAdminCard ({menu, onClose}) {
         </div>
       </div>
 
-      {/* {isEditClicked && (
+      {isEditClicked && (
         <AddEditMenuModal 
-        isModalOpen={true} 
-        onClose={() => setIsEditClicked(false)}
-        menu = {menu}
-      />
-      )} */}
+          menu={menu}
+          isModalOpen={true} 
+          onClose={() => { setIsEditClicked(false); onClose(); }}
+          onSuccess={() => {
+            if (typeof onSuccess === "function") onSuccess("Sala actualizada con éxito");
+            setIsEditClicked(false);
+            onSuccess();
+          }}
+          isAdd={false}
+        />
+      )}
 
       {isViewClicked && (
         <div className="menu-info-modal" onClick={handleClose}>
