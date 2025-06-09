@@ -3,6 +3,9 @@ import { useForm } from "react-hook-form";
 import AlertMessage from "./AlertMessage.jsx";
 import "../../style/AddEditRoomModal.css";
 
+
+const DEFAULT_ROUTE = "http://localhost:1522";
+
 const ServiceModal = ({ isOpen, mode, service, onClose, onDelete, onSave }) => {
   const isEditMode = mode === "edit";
   const isAddMode = mode === "add";
@@ -181,13 +184,14 @@ const ServiceModal = ({ isOpen, mode, service, onClose, onDelete, onSave }) => {
                   })}
                 />
                 {errors.price && <span className="error">{errors.price.message}</span>}
-
+                <label htmlFor="room-image" className="upload-image-button"  style={{ marginBottom: "20px" }}>Subir imagen principal</label>
                 <label>Imagen Principal</label>
                 <input
+                  id="room-image"
                   type="file"
-                  className="input"
                   accept="image/*"
                   onChange={handleImageChange}
+                   style={{ display: "none" }}
                 />
 
                 {(imagePath || imageFile) && (
@@ -203,11 +207,11 @@ const ServiceModal = ({ isOpen, mode, service, onClose, onDelete, onSave }) => {
                   </div>
                 )}
 
-                <div className="modal-buttons">
+                <div className="save-cancel-container">
                   <button type="submit" className="btn" disabled={!isValid}>
                     {isAddMode ? "Registrar Servicio" : "Guardar Cambios"}
                   </button>
-                  <button type="button" className="btn-text-close" onClick={onClose}>
+                  <button type="button" className="cancel-button" onClick={onClose}>
                     Cerrar
                   </button>
                 </div>
@@ -216,28 +220,23 @@ const ServiceModal = ({ isOpen, mode, service, onClose, onDelete, onSave }) => {
           )}
 
           {isViewMode && service && (
-            <div className="room-info-modal text-center">
+          <div className="room-info-modal" onClick={onClose}>
+          <div className="modal-room-info-content" onClick={(e) => e.stopPropagation()}>
+            <button className="close-button" type="button" onClick={onClose}><i className="bi bi-x-lg"></i></button>
+             
+            <div className='room-info-photo-container'>
+              <img src={service.imagePath && service.imagePath.trim() !== ""
+                                  ? `${DEFAULT_ROUTE}/${service.imagePath}`: defaultImage} alt={`Foto de la sala ${service.name}`}/>
+              <div className='room-info-content'>
               <h2>Detalle del Servicio</h2>
-              {service.image_path && (
-                <img
-                  src={service.image_path}
-                  alt={service.name}
-                  className="service-image-view"
-                />
-              )}
-              <p>
-                <strong>Nombre:</strong> {service.name}
-              </p>
-              <p>
-                <strong>Descripción:</strong> {service.description}
-              </p>
-              <p>
-                <strong>Precio:</strong> ₡{service.price}
-              </p>
-              <button className="btn-text-close" onClick={onClose}>
-                Cerrar
-              </button>
+             <p><strong>Nombre:</strong> {service.name}</p>
+              <p><strong>Descripción:</strong> {service.description}</p>
+              <p><strong>Precio:</strong> ₡{service.price}</p>
+
+                          </div>
             </div>
+          </div>
+        </div>
           )}
 
           {isDeleteMode && service && (
