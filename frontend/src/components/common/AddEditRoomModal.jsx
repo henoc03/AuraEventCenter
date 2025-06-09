@@ -30,6 +30,7 @@ function AddEditRoomModal({
   const [existingSecondaryImages, setExistingSecondaryImages] = useState([]);
   const [primaryImageName, setPrimaryImageName] = useState("");
   const [primaryImageExists, setPrimaryImageExist] = useState(false);
+  
 useEffect(() => {
   if (id && !isAdd) {
     fetch(`${DEFAULT_ROUTE}/zones/${id}/images`)

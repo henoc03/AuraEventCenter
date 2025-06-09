@@ -1,12 +1,15 @@
 import React from "react";
 import "../../style/menu-cards.css";
-import MenuDefault from "../../assets/images/default_no_image.jpg";
+import defaultImage from "../../assets/images/default_no_image.jpg";
+
+const DEFAULT_ROUTE = "http://localhost:1522";
 
 const CompactMenu = ({ menu }) => {
   return (
     <div className="compact-menu">
       <img
-        src={menu.IMAGE_PATH || MenuDefault}
+        src={menu.IMAGE_PATH && menu.IMAGE_PATH.trim() !== ""
+                    ? `${DEFAULT_ROUTE}/${menu.IMAGE_PATH}`: defaultImage}
         alt={`Imagen de ${menu.NAME}`}
         className="compact-menu-image"
       />
@@ -19,3 +22,4 @@ const CompactMenu = ({ menu }) => {
 };
 
 export default CompactMenu;
+

@@ -130,6 +130,7 @@ function MenusAdmin({ sections }) {
         <SideNav className= "menus-admin-nav" sections={sections} />
 
         <main className="menus-admin-main">
+          <button type='button' className= "back-btn" onClick={() => window.history.back()}><i class="bi bi-arrow-left"></i> Regresar</button>
           <div className="title-add-menu-cont">
             <h1>Menús</h1>
             <button

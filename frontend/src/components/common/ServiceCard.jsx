@@ -1,124 +1,45 @@
-import React from 'react';
-import {useState, useEffect} from 'react';
-import { useNavigate } from 'react-router-dom';
-// import AddEditserviceModal from './AddEditserviceModal';
-import defaultImage from '../../assets/images/default_no_image.jpg'
-import '../../style/service-card.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSquare } from '@fortawesome/free-solid-svg-icons';
+import React from "react";
+import "../../style/service-card.css";
+import defaultImage from "../../assets/images/default_no_image.jpg";
 
 const DEFAULT_ROUTE = "http://localhost:1522";
 
-// Componente para la tarjeta de un servicio adicional en la vista de administrador
-function ServiceCard ({service, onClose}) {
-  const [isDeleted, setIsDeleted] = useState(false);
-  const [isEditClicked, setIsEditClicked] = useState(false);
-  const [isViewClicked, setIsViewClicked] = useState(false);
-  const [adminType, setAdminType] = useState("");
-  const navigation = useNavigate();
-
-  useEffect(() => {
-    const currentPath = window.location.pathname;
-    if (currentPath.includes("root-admin")) {
-      setAdminType("root-admin");
-    } else {
-      setAdminType("admin");
-    }
-  }, []);
-
-  // Maneja el cerrar la vista de un servicio
-  const handleClose = () => {
-    setIsViewClicked(false);
-    if (onClose) {
-      onClose();
-    }
-  };
-
-  // Manejar cuando se clickea el botón de eliminar
-  if (isDeleted) {
-    const handleDelete  = async () => {
-      try {
-        const res = await fetch(`${DEFAULT_ROUTE}/services/${service.ADDITIONAL_SERVICE_ID}`, {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' }
-        });
-
-        if (!res.ok) {
-          const errorData = await res.json();
-          alert(errorData.message || 'Error al eliminar el servicio adicional');
-          return;
-        }
-        
-      } catch (error) {
-        console.error('Error:', error);
-        alert('Ocurrió un error al eliminar el servicio adicional.');
-      }
-      setIsDeleted(true);
-    }
-    handleDelete();
-  }
-
+const ServiceCard = ({ service, onView, onEdit, onDelete }) => {
+  const isActive = service.active === 1;
+  console.log(service.imagePath && service.imagePath.trim() !== ""
+                    ? `${DEFAULT_ROUTE}/${service.imagePath}`: defaultImage);
   return (
-    <>
-      <div className={`service-card ${isDeleted ? "service-deleted":""}`}>
-        <img src={service.IMAGE_PATH || defaultImage} className="service-card-img-top" alt={`Imagen del servicio ${service.NAME}`} />
-        <div className="service-card-body">
-          <h3 className="servide-card-title">{service.NAME}</h3>
-          <h2>
-            <FontAwesomeIcon icon={faSquare} className={service.ACTIVE == 1 ? "service-status-indicator active" : "service-status-indicator inactive"} /> {service.ACTIVE ?  "Publicada" : " No publicada"}
-          </h2>
-          <div className="service-card-buttons">
-            <a href="#" className="btn btn-primary button" onClick={() => setIsDeleted(true)}>Borrar</a>
-            <a href="#" className="btn btn-primary button" onClick={() => setIsEditClicked(!isEditClicked)}>Editar</a>
-            <a href="#" className="btn btn-primary button" onClick={() => setIsViewClicked(!isViewClicked)}>Visualizar</a>
-          </div>
+    <div className="service-card">
+      <img
+        src={service.imagePath && service.imagePath.trim() !== ""
+                    ? `${DEFAULT_ROUTE}/${service.imagePath}`: defaultImage}
+        alt={`Imagen del servicio ${service.name}`}
+        className="service-card-img-top"
+      />
+      
+
+      <div className="service-card-body">
+        <h3 className="servide-card-title">{service.name}</h3>
+        <h2>
+          <p className="service-card-status-text">
+            <span className={`status-indicator ${isActive ? "active" : "inactive"}`}></span>
+            {isActive ? "Activo" : "Inactivo"}
+          </p>
+        </h2>
+
+        <div className="service-card-buttons">
+          <button className="btn btn-primary button" onClick={() => onDelete(service)}>
+            Borrar
+          </button>
+          <button className="btn btn-primary button" onClick={() => onEdit(service)}>
+            Editar
+          </button>
+          <button className="btn btn-primary button" onClick={() => onView(service)}>
+            Visualizar
+          </button>
         </div>
       </div>
-
-      {/* {isEditClicked && (
-        <AddEditserviceModal 
-        isModalOpen={true} 
-        onClose={() => setIsEditClicked(false)}
-        service = {service}
-      />
-      )} */}
-
-      {isViewClicked && (
-        <div className="service-info-modal" onClick={handleClose}>
-          <div className="modal-service-info-content" onClick={(e) => e.stopPropagation()}>
-            <button className="service-close-button" type="button" onClick={handleClose}><i class="bi bi-x-lg"></i></button>
-
-            <div className='service-info-photo-container'>
-              <img src={service.IMAGE_PATH || defaultImage} alt={`Foto del servicio ${service.NAME}`}/>
-              <div className='service-info-content'>
-                <h2>{service.NAME}</h2>
-                <p>{`Precio: ₡${service.PRICE.toLocaleString('es-CR')}`}  |  {service.ACTIVE ?  "Disponible" : " No disponible"}</p>
-                <p>{service.DESCRIPTION}</p>
-
-                {service.NAME.toLowerCase().includes("catering") && (
-                  <div className='menus-products-buttons'>
-                    <button 
-                      type='button'
-                      onClick={() => navigation(`/${adminType}/menus`)}
-                      className="service-menus-button"
-                    >
-                      Ver menús
-                    </button>
-                    <button 
-                      type='button'
-                      onClick={() => navigation(`/${adminType}/menus`)}
-                      className="service-products-button"
-                    >
-                      Ver productos
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
+    </div>
   );
 };
 

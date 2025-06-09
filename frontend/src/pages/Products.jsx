@@ -5,7 +5,7 @@ import AlertMessage from "../components/common/AlertMessage";
 import LoadingPage from "../components/common/LoadingPage";
 import ProductCard from "../components/common/ProductCard";
 import ProductModal from "../components/common/ProductModal";
-
+import { jwtDecode } from 'jwt-decode';
 import "../style/admin-products.css";
 
 const PORT = "http://localhost:1522";
@@ -19,12 +19,32 @@ const Products = ({ sections }) => {
   const [messageType, setMessageType] = useState('');
   const [loading, setLoading] = useState(true);
 
+  
+  const [currentUser, setCurrentUser] = useState(null);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("todos");
   const [sortOrder, setSortOrder] = useState("asc");
   const uniqueTypes = Array.from(new Set(products.map(p => p.type).filter(Boolean)));
 
 
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      try {
+        const { id } = jwtDecode(token);
+        const res = await fetch(`${PORT}/users/${id}`);
+        const user = await res.json();
+        setCurrentUser(user);
+      } catch (err) {
+        console.error("Error al obtener usuario:", err);
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
 
   const fetchProducts = async () => {
     try {
@@ -116,15 +136,21 @@ const Products = ({ sections }) => {
         onClose={() => setMessage('')}
         className="alert-floating"
       />
-      <Header />
+      <Header
+        name={currentUser?.FIRST_NAME}
+        lastname={currentUser?.LAST_NAME_1}
+        role={currentUser?.USER_TYPE}
+        email={currentUser?.EMAIL}
+      />
       <div className="products-dashboard">
         <SideNav sections={sections} />
         <main className="products-dashboard-content">
+          <button type='button' className= "back-btn" onClick={() => window.history.back()}><i class="bi bi-arrow-left"></i> Regresar</button>
           <div className="products-content-wrapper">
             <section className="products-section">
             <div className="products-section-header">
             <h2 className="products-section-title">Productos</h2>
-            <button className="btn products-section-add-button" onClick={() => openModal("add")}>Agregar Producto</button>
+            <button className="btn products-section-add-button" onClick={() => openModal("add")}>Agregar</button>
             </div>
             <div className="products-controls">
               <label htmlFor="search">Buscar: </label>

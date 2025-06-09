@@ -35,6 +35,7 @@
     flex: 1;
     display: flex;
     flex-direction: column;
+    margin-top: 20px;
   }
   
   /* Encabezado con título y botón */

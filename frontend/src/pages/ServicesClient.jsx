@@ -57,11 +57,11 @@ function ServicesClient() {
 
   const filteredAndSortedServices = services
   .filter((service) => {
-    const matchesSearch = service.NAME.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = service.name.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesSearch;
   })
   .sort((a, b) => {
-    return sortOrder === "asc" ? a.PRICE - b.PRICE : b.PRICE - a.PRICE;
+    return sortOrder === "asc" ? a.price - b.price : b.price - a.price;
   });
 
 
@@ -108,10 +108,10 @@ function ServicesClient() {
           <div 
             key={service.ADDITIONAL_SERVICE_ID} className="service-container">
             <img 
-              src={service.IMAGE_PATH && service.IMAGE_PATH.trim() !== ""
-                ? `${DEFAULT_ROUTE}/${service.IMAGE_PATH}` : defaultImage
+              src={service.imagePath && service.imagePath.trim() !== ""
+                ? `${DEFAULT_ROUTE}/${service.imagePath}` : defaultImage
               }
-              alt={service.NAME}
+              alt={service.name}
               data-aos={index % 2 === 0 ? "fade-left" : "fade-right"}
               data-aos-duration="1500"
             />
@@ -120,10 +120,10 @@ function ServicesClient() {
               data-aos={index % 2 !== 0 ? "fade-left" : "fade-right"}
               data-aos-duration="1500"
             >
-              <h3>{service.NAME}</h3>
-              <p>{service.DESCRIPTION}</p>
-              <p>{`Precio: ₡${service.PRICE.toLocaleString('es-CR')}`}</p>
-              {service.NAME.toLowerCase().includes("catering") && (
+              <h3>{service.name}</h3>
+              <p>{service.description}</p>
+              <p>{`Precio: ₡${service.price.toLocaleString('es-CR')}`}</p>
+              {service.name.toLowerCase().includes("catering") && (
                 <a href="/menus" className="service-menu-link">
                   <button type='button'>Ver menús</button>
                 </a>
