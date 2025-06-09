@@ -7,6 +7,8 @@
 */
 
 const { getConnection, oracledb } = require('../config/db');
+const path = require('path');
+const fs = require('fs').promises;
 const { encrypt, decrypt } = require('../utils/encryption');
 
 /**
@@ -100,6 +102,79 @@ exports.getMenuById = async (req, res) => {
 };
 
 /**
+ * Sube una imagen principal para un menú.
+ */
+exports.uploadMenuPrimaryImage = (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'No se recibió ningún archivo' });
+
+    const imagePath = `uploads/menus/${req.file.filename}`;
+    const encryptedPath = encrypt(imagePath);
+
+    res.status(200).json({ imagePath: encryptedPath });
+  } catch (err) {
+    console.error("Error al subir imagen:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.deleteMenuPrimaryImage = async (req, res) => {
+  let conn;
+  try {
+    const menuId = req.params.id;
+
+    conn = await getConnection();
+
+    // Obtener la ruta
+    const result = await conn.execute(
+      `SELECT IMAGE_PATH FROM ADMIN_SCHEMA.CATERING_MENUS WHERE MENU_ID = :id`,
+      [menuId],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    const encryptedPath = result.rows[0]?.IMAGE_PATH;
+    if (!encryptedPath) {
+      return res.status(404).json({ error: "No hay imagen principal para eliminar." });
+    }
+
+    const decryptedPath = decrypt(encryptedPath);
+
+    // Eliminar archivo físico
+    await deletePhysicalFile(decryptedPath);
+
+    // Actualizar campo IMAGE_PATH a null
+    await conn.execute(
+      `UPDATE ADMIN_SCHEMA.CATERING_MENUS SET IMAGE_PATH = NULL WHERE MENU_ID = :id`,
+      [menuId],
+      { autoCommit: true }
+    );
+
+    res.status(200).json({ message: "Imagen principal eliminada correctamente" });
+
+  } catch (error) {
+    console.error("❌ Error al eliminar imagen principal:", error);
+    res.status(500).json({ error: error.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
+const deletedFiles = new Set();
+
+async function deletePhysicalFile(filePath) {
+  const fullPath = path.join(__dirname, '..', filePath);
+  if (deletedFiles.has(fullPath)) return;
+
+  try {
+    await fs.unlink(fullPath);
+    deletedFiles.add(fullPath);
+  } catch (err) {
+    console.error(`❌ No se pudo borrar el archivo: ${fullPath}`, err.message);
+  }
+}
+
+
+/**
  * Obtiene todas las imagenes de un menú específico.
  */
 exports.getAllMenuImages = async (req, res) => {
@@ -123,7 +198,7 @@ exports.getAllMenuImages = async (req, res) => {
     const imagesResult = await conn.execute(
       `SELECT i.IMAGE_ID, i.IMAGE_ADDRESS
        FROM ADMIN_SCHEMA.IMAGES i
-       JOIN ADMIN_SCHEMA.MENU_IMAGES zi ON zi.IMAGE_ID = i.IMAGE_ID
+       JOIN ADMIN_SCHEMA.CATERING_IMAGES zi ON zi.IMAGE_ID = i.IMAGE_ID
        WHERE zi.MENU_ID = :menuId`,
       [menuId],
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
@@ -224,15 +299,15 @@ exports.updateMenu = async (req, res) => {
   try {
     conn = await getConnection();
 
-    let finalImagePath = imagePath;
-    if (imagePath === null || imagePath === undefined) {
-      const result = await conn.execute(
-        `SELECT IMAGE_PATH FROM ADMIN_SCHEMA.CATERING_MENUS WHERE MENU_ID = :id`,
-        [menuId],
-        { outFormat: oracledb.OUT_FORMAT_OBJECT }
-      );
-      finalImagePath = result.rows[0]?.IMAGE_PATH || null;
-    }
+    // let finalImagePath = imagePath;
+    // if (imagePath === null || imagePath === undefined) {
+    //   const result = await conn.execute(
+    //     `SELECT IMAGE_PATH FROM ADMIN_SCHEMA.CATERING_MENUS WHERE MENU_ID = :id`,
+    //     [menuId],
+    //     { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    //   );
+    //   finalImagePath = result.rows[0]?.IMAGE_PATH || null;
+    // }
 
     await conn.execute(
       `UPDATE ADMIN_SCHEMA.CATERING_MENUS SET 
@@ -249,7 +324,7 @@ exports.updateMenu = async (req, res) => {
         type,
         price,
         available,
-        imagePath: finalImagePath,
+        imagePath,
         menuId: menuId
       },
       { autoCommit: true }

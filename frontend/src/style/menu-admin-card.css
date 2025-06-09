@@ -67,6 +67,10 @@
     height: 38px;
 }
 
+.menu-card-buttons {
+    margin-bottom: 20px;
+}
+
 .menu-card-buttons .button {
     font-family: "Merriweather Sans", sans-serif;
     font-size: 0.8rem;
@@ -79,6 +83,7 @@
     cursor: pointer;
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
     box-shadow: none;
+
 }
 
 .menu-card-buttons .button:hover {

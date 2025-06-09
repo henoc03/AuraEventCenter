@@ -20,10 +20,9 @@ function AddEditMenuModal({
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [imageFile, setImageFile] = useState(null);
   const [secondaryFiles, setSecondaryFiles] = useState([]);
-  const [showImageUploadSuccess, setShowImageUploadSuccess] = useState(false);
-  const [existingSecondaryImages, setExistingSecondaryImages] = useState([]);
   const [primaryImageName, setPrimaryImageName] = useState("");
   const [primaryImageExists, setPrimaryImageExist] = useState(false);
+  const [showImageUploadSuccess, setShowImageUploadSuccess] = useState(false);
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showUpdateSuccess, setShowUpdateSuccess] = useState(false);
@@ -36,7 +35,6 @@ function AddEditMenuModal({
         .then(data => {
           const images = Array.isArray(data) ? data : data.images || [];
           const primaryImage = images.find(img => img.id === "main");
-          const secondaryImages = images.filter(img => img.id !== "main");
   
           if (primaryImage) {
             setPrimaryImageName(primaryImage.path);
@@ -44,8 +42,6 @@ function AddEditMenuModal({
           } else {
             setPrimaryImageName("");
           }
-  
-          setExistingSecondaryImages(secondaryImages);
         })
       .catch(err => console.error("Error cargando imágenes", err));
     }
@@ -106,21 +102,49 @@ function AddEditMenuModal({
     }
   };
 
+  const handleDeletePrimaryImage = async () => {
+    console.log(`${DEFAULT_ROUTE}/menus/${menu.MENU_ID}/delete-primary-image`);
+    if (imageFile) {
+      setImageFile(null);
+      setPrimaryImageName("");
+    } else if (primaryImageExists) {
+      try {
+        const res = await fetch(`${DEFAULT_ROUTE}/menus/${menu.MENU_ID}/delete-primary-image`, { method: 'DELETE' });
+        if (res.ok) {
+          setPrimaryImageName("");
+          setImageFile(null);
+          setErrorMessage("");
+        } else {
+          throw new Error("No se pudo eliminar la imagen principal");
+        }
+      } catch (err) {
+        console.error(err);
+        setErrorMessage("Error al eliminar la imagen principal");
+        setShowError(true);
+      }
+    }
+  };
+
   const onSubmit = async (data) => {
     let encryptedImagePath = existingImagePath;
 
     if (imageFile) {
       const formData = new FormData();
       formData.append("image", imageFile);
+
       try {
-        const res = await fetch(`${DEFAULT_ROUTE}/menus/upload-image`, {
+        const res = await fetch(`${DEFAULT_ROUTE}/menus/upload-primary-image`, {
           method: "POST",
           body: formData,
         });
-        const result = await res.json();
-        encryptedImagePath = result.imagePath;
+
+        if (!res.ok) throw new Error("Error al subir imagen principal");
+
+        const imageData = await res.json();
+        encryptedImagePath = imageData.imagePath;
+        setShowImageUploadSuccess(true);
       } catch {
-        setErrorMessage("Error al subir imagen");
+        setErrorMessage("Error al subir imagen principal");
         setShowError(true);
         return;
       }
@@ -149,7 +173,28 @@ function AddEditMenuModal({
         setShowError(true);
         return;
       }
-      if (onSuccess) onSuccess();
+
+      const responseData = await res.json();
+
+      // Subir imágenes secundarias
+      if (secondaryFiles.length > 0 && responseData.menu_id) {
+        for (const file of secondaryFiles) {
+          const formData = new FormData();
+          formData.append('image', file);
+          formData.append('menuId', responseData.menu_id);
+
+          try {
+            await fetch(`${DEFAULT_ROUTE}/menus/upload-secondary-image`, {
+              method: 'POST',
+              body: formData,
+            });
+          } catch (err) {
+            console.error('Error subiendo imagen secundaria:', err);
+          }
+        }
+      }
+
+      if (typeof onSuccess === 'function') onSuccess();
     } catch {
       setErrorMessage("Error al guardar menú");
       setShowError(true);
@@ -264,7 +309,18 @@ function AddEditMenuModal({
           <label htmlFor="menu-image" className="upload-image-button">Subir imagen principal</label>
           <input id="menu-image" type="file" accept="image/*" onChange={handleImageChange} style={{ display: "none" }} />
           {primaryImageName && (
-            <p className="image-name">Imagen seleccionada: {primaryImageName}</p>
+            <div className="image-name" style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginTop: "0.5rem" }}>
+              Imagen seleccionada: {primaryImageName}
+              <button
+                type="button"
+                className="delete-image-button"
+                onClick={() => {
+                  handleDeletePrimaryImage();
+                }}
+              >
+                ✕
+              </button>
+            </div>
           )}
 
           <div className="save-cancel-container">

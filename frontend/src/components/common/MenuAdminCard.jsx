@@ -47,10 +47,11 @@ function MenuAdminCard ({id, menu, onClose, onSuccess}) {
     handleDelete();
   }
 
+  console.log(menu.IMAGE_PATH && menu.IMAGE_PATH.trim() !== "" ? '${DEFAULT_ROUTE}/${menu.IMAGE_PATH}': defaultImage);
   return (
     <>
       <div className={`menu-card ${isDeleted ? "menu-deleted":""}`}>
-        <img src={menu.IMAGE_PATH || defaultImage} className="menu-card-img-top" alt={`Imagen del menú ${menu.NAME}`} />
+        <img src={menu.IMAGE_PATH && menu.IMAGE_PATH.trim() !== "" ? `${DEFAULT_ROUTE}/${menu.IMAGE_PATH}`: defaultImage} className="menu-card-img-top" alt={`Imagen del menú ${menu.NAME}`} />
         <div className="menu-card-body">
           <h3 className="menu-card-title">{menu.NAME}</h3>
           <h2>
@@ -81,14 +82,14 @@ function MenuAdminCard ({id, menu, onClose, onSuccess}) {
           isAdd={false}
         />
       )}
-
+      
       {isViewClicked && (
         <div className="menu-info-modal" onClick={handleClose}>
           <div className="modal-menu-info-content" onClick={(e) => e.stopPropagation()}>
             <button className="menu-close-button" type="button" onClick={handleClose}><i class="bi bi-x-lg"></i></button>
 
             <div className='menu-info-photo-container'>
-              <img src={menu.IMAGE_PATH || defaultImage} alt={`Foto del servicio ${menu.NAME}`}/>
+              <img src={menu.IMAGE_PATH && menu.IMAGE_PATH.trim() !== "" ? `${DEFAULT_ROUTE}/${menu.IMAGE_PATH}`: defaultImage} alt={`Foto del menú ${menu.NAME}`}/>
               <div className='menu-info-content'>
                 <h2>{menu.NAME}</h2>
                 <p>{menu.DESCRIPTION}</p>
