@@ -248,9 +248,6 @@ exports.deleteZone = async (req, res) => {
   }
 };
 
-
-
-
 exports.uploadZonePrimaryImage = (req, res) => {
     try {
       if (!req.file) {

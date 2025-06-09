@@ -187,7 +187,19 @@ function MenusAdmin({ sections }) {
 
           <div className="menus-admin-cards">
             {filteredAndSortedMenus.map((menu) => (
-              <MenuAdminCard className="menu-admin-card" menu={menu} />
+              <MenuAdminCard 
+                key={menu.MENU_ID}
+                className="menu-admin-card"
+                menu={menu}
+                onClose={() => {
+                  getMenus();
+                  setIsAddEditOpen(false);
+                }}
+                onSuccess={() => {
+                  getMenus();
+                  setShowSuccess(true);
+                }}
+              />
             ))}
           </div>
         </main>
@@ -196,11 +208,15 @@ function MenusAdmin({ sections }) {
       {isAddEditOpen && (
         <AddEditMenuModal
           isModalOpen={true}
-          onClose={() => setIsAddEditOpen(false)}
+          onClose={() => {
+            getMenus();
+            setIsAddEditOpen(false);
+          }}
           onSuccess={() => {
             getMenus();
             setShowSuccess(true);
           }}
+          isAdd={true}
         />
       )}
     </div>

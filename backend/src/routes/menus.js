@@ -22,9 +22,12 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 router.post('/upload-primary-image', upload.single('image'), menusController.uploadMenuPrimaryImage);
+router.delete('/:id/delete-primary-image', menusController.deleteMenuPrimaryImage);
 router.get('/', menusController.getAllMenus);
 router.get('/:id', menusController.getMenuById);
 router.get('/:menuId/images', menusController.getAllMenuImages);
 router.post('/', menusController.createMenu);
+router.put('/:id', menusController.updateMenu);
+router.delete('/:id', menusController.deleteMenu);
 
 module.exports = router;
