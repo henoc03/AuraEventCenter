@@ -48,6 +48,7 @@ console.log(image);
     <>
       <div className={`room-card ${isDeleted ? "deleted":""}`}>
         <img src={image} className="card-img-top" alt={`Imagen de la sala ${name}`} />
+        {console.log(image)}
         <div className="card-body">
           <h3 className="card-title">{name}</h3>
           <h2>

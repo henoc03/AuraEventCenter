@@ -1,13 +1,14 @@
 import React, {useEffect, useState } from "react";
 import { useForm} from 'react-hook-form';
 import {jwtDecode} from 'jwt-decode';
+import { useNavigate } from "react-router-dom";
 import Header from "../components/common/Header";
 import ProfilePhoto from "/default-image.jpg"
 import SideNav from "../components/common/SideNav.jsx"
 import AlertMessage from "../components/common/AlertMessage.jsx"
+import LoadingPage from "../components/common/LoadingPage.jsx";
 import '../style/auth.css';
 import '../style/profile.css';
-import { useNavigate } from "react-router-dom";
 
 
 const DEFAULT_ROUTE = "http://localhost:1522";
@@ -19,6 +20,9 @@ function Profile({sections}) {
   const [email, setEmail] = useState("");
   const [lastname, setLastname] = useState("");
   const [role, setRole] = useState("");
+  const [imageFile, setImageFile] = useState(null);
+  const [imageName, setImageName] = useState("");
+  const [imagePath, setImagePath] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
   const navigate = useNavigate();
 
@@ -57,19 +61,17 @@ function Profile({sections}) {
         phone: userData.PHONE
       });
 
-       // Guarda los datos traidos
-        setName(userData.FIRST_NAME)
-        setEmail(userData.EMAIL)
-        setLastname(userData.LAST_NAME_1)
-        setRole(userData.USER_TYPE)
-
-        // Cambia el estado de la página
-        setLoading(false);
+      // Guarda los datos traidos
+      setName(userData.FIRST_NAME)
+      setEmail(userData.EMAIL)
+      setLastname(userData.LAST_NAME_1)
+      setRole(userData.USER_TYPE)
+      setImagePath(userData.PROFILE_IMAGE_PATH)
     } catch {
       alert('Ocurrió un error al obtener la información de usuario.');
       navigate('/login');
     } finally {
-      () => setLoading(true)
+      setLoading(false);
     }
   };
 
@@ -82,23 +84,21 @@ function Profile({sections}) {
     const sessionUserData = jwtDecode(token);
 
     const apellidos = data.lastname.trim().split(' ');
-
     const apellido1 = apellidos[0] || '';
     const apellido2 = apellidos[1] || '';
 
-    const userToSend = {
-      firstName: data.name,
-      lastName1: apellido1,
-      lastName2: apellido2,
-      email: data.email,
-      phone: data.phone
-    };
+    const formData = new FormData();
+    formData.append('firstName', data.name);
+    formData.append('lastName1', apellido1);
+    formData.append('lastName2', apellido2);
+    formData.append('email', data.email);
+    formData.append('phone', data.phone);
+    formData.append('image', imageFile);
     
     try {
-      const res = await fetch(`${DEFAULT_ROUTE}/users/updateProfile/${sessionUserData.id}`, {
+      const res = await fetch(`${DEFAULT_ROUTE}/users/profile/${sessionUserData.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userToSend)
+        body: formData
       });
 
       if (!res.ok) {
@@ -117,20 +117,42 @@ function Profile({sections}) {
     }
   };
 
-  if (!loading) {return (
-    <>   
-      <Header name={name} lastname={lastname} role={role} email={email}>
-        {/*Menu de hamburguesa*/}
-        <SideNav id="side-nav-mobile" sections={sections} />
-      </Header>
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setImageName(file.name);
+    }
+  };
 
-      <div className="main-container-profile">
-        <div id="side-nav-desktop">
-          <SideNav className="profile-nav" sections={sections} />
+  // Ref para el input de imagen
+  const imageInputRef = React.useRef(null);
+
+  if (loading) return <LoadingPage />;
+
+  // Maneja el click en el icono de editar
+  const handleEditImageClick = (e) => {
+    e.preventDefault();
+    if (imageInputRef.current) {
+      imageInputRef.current.click();
+    }
+  };
+
+  return (
+    <> 
+      <div className="profile-header-container">
+        <Header name={name} lastname={lastname} role={role} email={email}>
+          {/*Menu de hamburguesa*/}
+          <SideNav id="profile-sidenav-mobile" sections={sections} />
+        </Header>
+      </div>  
+
+      <div className="profile-sidenav-main">
+        <div id="profile-sidenav-desktop">
+          <SideNav className="profile-sidenav" sections={sections} />
         </div>
 
-
-        <div className="main">
+        <div className="profile-main">
           {showSuccess && (
             <AlertMessage
               message={"Información actualizada con éxito"}
@@ -141,20 +163,39 @@ function Profile({sections}) {
             />
           )}
 
-          <div className="profile-container">
+          <div className="profile-title-form-container">
             <h1>Información de perfil</h1>
             <div className="image-form-container">
-              <div className="image-container-profile">
-                <label htmlFor="image-upload-profile" className="upload-label">
-                  <i className="bi bi-pencil edit-icon"></i>
-                  <img src={ProfilePhoto} alt="Foto de perfil editable" className="editable-profile-photo" width='400' height='400'/>
+              <div className="profile-image-container">
+                <label className="upload-label">
+                  <div className="edit-delete-icons">
+                    <i
+                      className="bi bi-pencil profile-edit-icon"
+                      onClick={handleEditImageClick}
+                      style={{ cursor: "pointer" }}
+                    ></i>
+                    <i
+                      className="bi bi-x profile-delete-icon"
+                      onClick={() => {setImageFile(null); setImagePath("")}}
+                    ></i>
+                  </div>
+                  <img src={imagePath ? `${DEFAULT_ROUTE}/${imagePath}` : ProfilePhoto} alt="Foto de perfil editable"/>
                 </label>
-
-
+                <input
+                  ref={imageInputRef}
+                  id="profile-image-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  style={{ display: "none" }}
+                />
               </div>
+
               <div className="user-info-form">
-                <form onSubmit={(handleSubmit(onSubmit))} className="auth-form">
-                  <label htmlFor="name">Nombre *</label>
+                <form onSubmit={handleSubmit(onSubmit)} className="auth-form" id="profile-auth-form">
+                  <label htmlFor="name">
+                    Nombre <span style={{ color: 'red' }}>*</span>
+                  </label>
                   <input
                     type="text"
                     placeholder={name}
@@ -162,7 +203,9 @@ function Profile({sections}) {
                   />
                   {errors.name && <span className="error">{errors.name.message}</span>}
 
-                  <label htmlFor="lastname">Apellidos *</label>
+                  <label htmlFor="lastname">
+                    Apellidos <span style={{ color: 'red' }}>*</span>
+                  </label>
                   <input
                     type="text"
                     placeholder=""
@@ -170,7 +213,9 @@ function Profile({sections}) {
                   />
                   {errors.lastname && <span className="error">{errors.lastname.message}</span>}
                   
-                  <label htmlFor="email">Correo electrónico *</label>
+                  <label htmlFor="email">
+                    Correo electrónico <span style={{ color: 'red' }}>*</span>
+                  </label>
                   <input
                     type="email"
                     placeholder=""
@@ -185,7 +230,9 @@ function Profile({sections}) {
                   {errors.email && <span className="error">{errors.email.message}</span>}
 
 
-                  <label htmlFor="phone">Número telefónico *</label>
+                  <label htmlFor="phone">
+                    Número telefónico <span style={{ color: 'red' }}>*</span>
+                  </label>
                   <input
                     type="tel"
                     placeholder=""
@@ -209,7 +256,7 @@ function Profile({sections}) {
         </div>
       </div>
     </>
-  )}
+  )
 }
 
 export default Profile;

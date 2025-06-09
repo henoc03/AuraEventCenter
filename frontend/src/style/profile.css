@@ -1,145 +1,114 @@
-.main-container-profile {
+.profile-sidenav-main {
     display: flex;
     flex-direction: row;
-    height: 85vh;
-    width: 100%;
-}
-
-.profile-nav {
-    box-shadow: 2px 0px 0px 0px rgba(0, 0, 0, 0.1);
-    width: 30vw;
-    min-width: 200px;
-    max-width: 260px;
-    height: 100%;
-    padding: 30px 0px;
-}
-
-.profile-nav ul{
-    height: 100%;
-    list-style: none;
-    padding: 0;
-}
-
-.profile-nav ul li{
-    display: flex;
-    flex-wrap: nowrap;
-    margin: 20px 15px;
-    padding: 8px 8px;
-    font-size: 1.1rem;
-}
-
-.profile-nav ul li:hover{
-    font-weight: bold;
-}
-
-.side-bar ul li:first-child{
-    background-color: #C3D6EA;
-    border-radius: 10px;
-    font-weight: bold;
-}
-
-.side-bar ul a{
-    text-decoration: none;
-    color: #666666;
-}
-
-.side-bar ul li span{
-    margin-left:10px;
-    font-size: 1.1rem;
-    text-decoration: none;
-    font-family: 'Merriweather Sans', sans-serif;
-}
-
-.main {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
     width: 100%;
     height: 100%;
 }
 
-.main h1 {
+.profile-main {
+    width: 100%;
+    height: 100vh;
+}
+
+.profile-title-form-container {
+    margin-top: 40px;
+    margin-left: 40px;
+}
+
+.profile-title-form-container h1 {
     width: 100%;
     text-align: left;
     font-family: 'Merriweather Sans', sans-serif;
-    margin: 20px 0px 40px 0px;
+    margin: 0px 0px 40px 80px;
     font-size: 1.6rem;
     font-weight: bold;
-}
-
-.profile-container {
-    padding: 0px 50px;
-    display: flex;
-    flex-direction: column;
-    align-items: left;
-    width: 90%;
-    height: 85%;
 }
 
 .image-form-container {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: left;
+    margin: 0 80px;
 }
 
-.image-container-profile {
+.profile-image-container {
     display: flex;
     border: 1px solid #CFCFCF;
     height: fit-content;
-    max-width: 35%;
     width: fit-content;
     border-radius: 15px;
-    padding: 10px;
-    margin-right: 30px;
     position: relative;
     text-align: center;
-    cursor: pointer;
+    padding: 20px;
 }
 
-.editable-profile-photo {
-    width: 100%;
-    height: 100%;
-    max-width: 300px;
-    max-height: 300px;
-    object-fit: cover;
+.profile-image-container img,
+.edit-delete-icons {
+    width: 15vw;
+    max-width: 250px;
+    height: 15vw;
+    max-height: 250px;
+    aspect-ratio: 1 / 1;
     border-radius: 100%;
-    transition: opacity 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.image-container-profile:hover .editable-profile-photo {
-    opacity: 0.4;
-}
-
-.edit-icon {
-    width: 22%;
-    height: 20%;
+.edit-delete-icons {
+    z-index: 1000;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
     position: absolute;
-    top: 35%;
-    left: 40%;
+    transition: opacity 0.3s ease, background-color 0.3s ease;
+    background: none;
+    top: 10;
+    left: 10;
+    width: 15vw;
+    max-width: 250px;
+    height: 15vw;
+    max-height: 250px;
+    aspect-ratio: 1 / 1;
+}
+
+.edit-delete-icons:hover{
+    opacity: 0.7;
+    background-color: gray;
+}
+
+.profile-edit-icon,
+.profile-delete-icon {
     font-size: 2rem;
     color: black;
-    border-radius: 50%;
-    padding: 0.5rem;
-    display: none;
     cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s ease, background-color 0.3s ease;
+    background: none;
+    position: relative;
 }
 
-.image-container-profile:hover .edit-icon {
-    display: block;
+/* Mostrar iconos al hacer hover en edit-delete-icons */
+.edit-delete-icons:hover .profile-edit-icon,
+.edit-delete-icons:hover .profile-delete-icon {
+    opacity: 1;
+}
+
+.profile-image-container img {
+    object-fit: cover;
     cursor: pointer;
 }
 
 .user-info-form {
-    width: 60%;
+    width: 55%;
     height: 90%;
     border: 1px solid #CFCFCF;
     border-radius: 15px;
-    padding: 50px 20px;
-    margin: 0 10px;
+    padding: 40px 0;
+    margin-left: 10%;
 }
 
-.auth-form {
+#profile-auth-form {
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -147,20 +116,26 @@
     align-items: center;
 }
 
-.auth-form label, input{
+#profile-auth-form label, input{
     width: 100%;
     font-family: 'Merriweather Sans', sans-serif;
+    font-size: 0.9rem;
 }
 
-.auth-form input{
-    margin-bottom: 5px;
+#profile-auth-form label{
+    font-weight: bold;
 }
 
-.auth-form button {
-    width: 60%;
+#profile-auth-form input{
+    margin-bottom: 12px;
+    height: 40px;
+}
+
+#profile-auth-form button {
+    width: 50%;
     height: 40px;
     padding: 6px;
-    margin: 30px 0;
+    margin: 30px 0 10px 0;
     border-radius: 10px;
     background-color: #0074D9;
     border: none;
@@ -170,53 +145,70 @@
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.auth-form button:hover {
+#profile-auth-form button:hover {
     background-color: #339CFF;
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-@media(max-width: 768px) {
-    .main {
-        display: flex;
-        justify-content: center;
+@media(max-width: 1100px) {
+    .profile-title-form-container {
+        margin-left: 0;
         align-items: center;
     }
-    .profile-container{
-        width: 100%;
-        max-width: 70vh;
-    }
-    .profile-container h1{
+
+    .profile-title-form-container h1 {
         text-align: center;
+        margin: 0px 0px 40px 0px;
+        font-size: 1.4rem;
     }
 
     .image-form-container {
         display: flex;
         flex-direction: column;
-        align-items: center;
-    }
-    
-    .image-container {
-        display: flex;
         justify-content: center;
-        margin: 0;
-        padding: 0;
-        min-width: 220px;
-        min-height: 220px;
+        align-items: center;
+        margin: 0 50px;
+    }
+
+    .profile-image-container {
+        margin-bottom: 30px;
+    }
+
+    .profile-image-container img,
+    .edit-delete-icons {
+        width: 25vw;
+        height: 25vw;
+    }
+
+    .edit-delete-icons {
+        top: 10;
+        left: 10;
+        width: 25vw;
+        height: 25vw;
     }
 
     .user-info-form {
         width: 100%;
-        min-width: 280px;
-        margin: 5vh 0;
+        margin-left: 0;
+        margin-bottom: 40px;
     }
 
-    .side-bar {
-        display: none;
+    .sidenav {
+        height: 125%;
     }
 }
 
-@media(min-width: 1440px) {
-    .profile-container {
-        max-width: 80%;
+@media(max-width: 768px) {
+    .profile-image-container img,
+    .edit-delete-icons {
+        width: 35vw;
+        height: 35vw;
+    }
+
+    .edit-delete-icons {
+        top: 10;
+        left: 10;
+        width: 35vw;
+        height: 35vw;
     }
 }
