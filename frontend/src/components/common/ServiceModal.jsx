@@ -273,7 +273,7 @@ if (
                     <div className='menus-products-buttons'>
                       <button 
                         type='button'
-                        onClick={() => navigation(`/${adminType}/menus`)}
+                        onClick={() => navigation(`/${adminType}/servicios/catering/menus`)}
                         className="service-menus-button"
                       >
                         Ver menús
