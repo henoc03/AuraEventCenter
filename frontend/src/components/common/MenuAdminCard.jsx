@@ -83,6 +83,7 @@ function MenuAdminCard ({id, menu, onClose, onSuccess}) {
             setIsEditClicked(false);
             onSuccess();
           }}
+          existingImagePath={menu.IMAGE_PATH}
           isAdd={false}
         />
       )}

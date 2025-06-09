@@ -312,7 +312,7 @@ exports.createMenu = async (req, res) => {
  * Actualizar un menú
  */
 exports.updateMenu = async (req, res) => {
-  const { name, description, type, available, products, imagePath } = req.body;
+  const { name, description, type, available, products, imagePath, isEncrypted } = req.body;
   const menuId = req.params.id;
   let conn;
 
@@ -338,6 +338,8 @@ exports.updateMenu = async (req, res) => {
     }
   }
 
+  const encryptedImagePath = isEncrypted ? imagePath : encrypt(imagePath);
+
   try {
     conn = await getConnection();
 
@@ -348,7 +350,7 @@ exports.updateMenu = async (req, res) => {
         TYPE = :type,
         PRICE = :price,
         AVAILABLE = :available,
-        IMAGE_PATH = :imagePath
+        IMAGE_PATH = :encryptedImagePath
        WHERE MENU_ID = :menuId`,
       {
         name,
@@ -356,7 +358,7 @@ exports.updateMenu = async (req, res) => {
         type,
         price,
         available,
-        imagePath,
+        encryptedImagePath,
         menuId: menuId
       },
       { autoCommit: true }

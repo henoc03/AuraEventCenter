@@ -127,7 +127,13 @@ function AddEditMenuModal({
   };
 
   const onSubmit = async (data) => {
-    let encryptedImagePath = existingImagePath;
+    let imagePath = existingImagePath;
+    let isEncrypted = false;
+
+    if (primaryImageName === "") {
+      imagePath = null;
+      isEncrypted = true;
+    }
 
     if (imageFile) {
       const formData = new FormData();
@@ -142,8 +148,9 @@ function AddEditMenuModal({
         if (!res.ok) throw new Error("Error al subir imagen principal");
 
         const imageData = await res.json();
-        encryptedImagePath = imageData.imagePath;
+        imagePath = imageData.imagePath;
         setShowImageUploadSuccess(true);
+        isEncrypted = true;
       } catch {
         setErrorMessage("Error al subir imagen principal");
         setShowError(true);
@@ -151,13 +158,15 @@ function AddEditMenuModal({
       }
     }
 
+
     const menuData = {
       name: data.name,
       description: data.description,
       type: data.type,
       available: data.available ? 1 : 0,
       products: selectedProducts.map(p => p.ID || p.id),
-      imagePath: encryptedImagePath,
+      imagePath: imagePath,
+      isEncrypted: isEncrypted
     };
 
     try {
