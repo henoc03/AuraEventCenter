@@ -1,6 +1,7 @@
 import React from 'react';
 import {useState} from 'react';
 import AddEditMenuModal from './AddEditMenuModal';
+import AlertMessage from "./AlertMessage.jsx";
 import defaultImage from '../../assets/images/default_no_image.jpg'
 import '../../style/menu-admin-card.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -14,6 +15,7 @@ function MenuAdminCard ({id, menu, onClose, onSuccess}) {
   const [isEditClicked, setIsEditClicked] = useState(false);
   const [isViewClicked, setIsViewClicked] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
 
   // Maneja el cerrar la vista de un servicio
   const handleClose = () => {
@@ -24,32 +26,34 @@ function MenuAdminCard ({id, menu, onClose, onSuccess}) {
   };
 
   // Manejar cuando se clickea el botón de eliminar
-  if (isDeleted) {
-    const handleDelete  = async () => {
-      try {
-        const res = await fetch(`${DEFAULT_ROUTE}/menus/${menu.MENU_ID}`, {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' }
-        });
+  const handleDelete  = async () => {
+    try {
+      const res = await fetch(`${DEFAULT_ROUTE}/menus/${menu.MENU_ID}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+      });
 
-        if (!res.ok) {
-          const errorData = await res.json();
-          if (onError) onError(errorData.message || 'Error al eliminar la zona');
-          return;
-        }
-        
-      } catch (error) {
-        console.error('Error:', error);
-        alert('Ocurrió un error al eliminar el menú.');
+      if (!res.ok) {
+        const errorData = await res.json();
+        if (onError) onError(errorData.message || 'Error al eliminar la zona');
+        return;
       }
-      setIsDeleted(true);
+      
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Ocurrió un error al eliminar el menú.');
     }
-    handleDelete();
+    setIsDeleted(true);
   }
 
   console.log(menu.IMAGE_PATH && menu.IMAGE_PATH.trim() !== "" ? '${DEFAULT_ROUTE}/${menu.IMAGE_PATH}': defaultImage);
+
   return (
     <>
+      {showDeleteSuccess && (
+        <AlertMessage message="Menu eliminado con éxito" type="alert-floating" onClose={() => setShowDeleteSuccess(false)} duration={3000} className="success" />
+      )}
+
       <div className={`menu-card ${isDeleted ? "menu-deleted":""}`}>
         <img src={menu.IMAGE_PATH && menu.IMAGE_PATH.trim() !== "" ? `${DEFAULT_ROUTE}/${menu.IMAGE_PATH}`: defaultImage} className="menu-card-img-top" alt={`Imagen del menú ${menu.NAME}`} />
         <div className="menu-card-body">
@@ -62,7 +66,7 @@ function MenuAdminCard ({id, menu, onClose, onSuccess}) {
             {menu.AVAILABLE ?  "Disponible" : " No disponible"}
           </h2>
           <div className="menu-card-buttons">
-            <a href="#" className="btn btn-primary button" onClick={() => setIsDeleted(true)}>Borrar</a>
+            <a href="#" className="btn btn-primary button" onClick={() => setShowDeleteConfirmation(true)}>Borrar</a>
             <a href="#" className="btn btn-primary button" onClick={() => setIsEditClicked(!isEditClicked)}>Editar</a>
             <a href="#" className="btn btn-primary button" onClick={() => setIsViewClicked(!isViewClicked)}>Visualizar</a>
           </div>
@@ -106,6 +110,30 @@ function MenuAdminCard ({id, menu, onClose, onSuccess}) {
                   )}
                 </ul>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDeleteConfirmation && (
+        <div className="user-modal-overlay">
+          <div className="user-modal-content">
+            <button className="user-modal-close" onClick={() => setShowDeleteConfirmation(false)}>×</button>
+            <h2 className="modal-title">¿Eliminar menú?</h2>
+            <p><strong>{menu.NAME}</strong> será eliminada permanentemente.</p>
+            <div className="user-modal-actions">
+              <button
+                className="btn"
+                onClick={async () => {
+                  await handleDelete();
+                  setShowDeleteConfirmation(false);
+                  setShowDeleteSuccess(true);
+                }}
+                style={{ color: "red" }}
+              >
+                Eliminar
+              </button>
+              <button className="btn" onClick={() => setShowDeleteConfirmation(false)}>Cancelar</button>
             </div>
           </div>
         </div>

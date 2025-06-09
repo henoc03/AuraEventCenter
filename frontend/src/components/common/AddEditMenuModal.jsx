@@ -107,6 +107,7 @@ function AddEditMenuModal({
     if (imageFile) {
       setImageFile(null);
       setPrimaryImageName("");
+      
     } else if (primaryImageExists) {
       try {
         const res = await fetch(`${DEFAULT_ROUTE}/menus/${menu.MENU_ID}/delete-primary-image`, { method: 'DELETE' });
@@ -154,7 +155,6 @@ function AddEditMenuModal({
       name: data.name,
       description: data.description,
       type: data.type,
-      price: parseFloat(data.price),
       available: data.available ? 1 : 0,
       products: selectedProducts.map(p => p.ID || p.id),
       imagePath: encryptedImagePath,
@@ -265,18 +265,6 @@ function AddEditMenuModal({
             {...register("type", { required: "Tipo requerido" })}
           />
           {errors.type && <span className="error">{errors.type.message}</span>}
-
-          <label>Precio Unitario <span style={{ color: "red" }}>*</span></label>
-          <input
-            type="text"
-            className="input"
-            defaultValue={menu && !isAdd ? menu.PRICE : ""}
-            {...register("price", {
-              required: "Precio requerido",
-              pattern: { value: /^[0-9]+(\.[0-9]{1,2})?$/, message: "Debe ser un número válido" }
-            })}
-          />
-          {errors.price && <span className="error">{errors.price.message}</span>}
 
           <label>Productos <span style={{ color: "red" }}>*</span></label>
           <div className="input-add-container">

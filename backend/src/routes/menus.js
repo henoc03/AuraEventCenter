@@ -28,5 +28,6 @@ router.get('/:id', menusController.getMenuById);
 router.get('/:menuId/images', menusController.getAllMenuImages);
 router.post('/', menusController.createMenu);
 router.put('/:id', menusController.updateMenu);
+router.delete('/:id', menusController.deleteMenu);
 
 module.exports = router;

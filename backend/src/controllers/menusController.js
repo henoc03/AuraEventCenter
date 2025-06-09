@@ -237,15 +237,35 @@ exports.createMenu = async (req, res) => {
       name,
       description,
       type,
-      price,
       available,
       imagePath,
       products
     } = req.body;
 
+    let price = 0;
+    if (Array.isArray(products) && products.length > 0) {
+      try {
+        conn = await getConnection();
+        // Traer los productos de la base de datos cuyos IDs estén en products
+        const placeholders = products.map((_, i) => `:id${i}`).join(',');
+        const binds = {};
+        products.forEach((id, i) => { binds[`id${i}`] = id; });
+
+        const result = await conn.execute(
+          `SELECT PRODUCT_ID, UNITARY_PRICE FROM ADMIN_SCHEMA.PRODUCTS WHERE PRODUCT_ID IN (${placeholders})`,
+          binds,
+          { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+        // Sumar los precios de los productos encontrados
+        price = result.rows.reduce((sum, prod) => sum + (Number(prod.UNITARY_PRICE) || 0), 0);
+      } catch (err) {
+        console.error('❌ Error al calcular el precio de los productos:', err);
+        price = 0;
+      }
+    }
+
     conn = await getConnection();
 
-    const isAvailable = available === true || true ? 1 : 0;
     // Insertar menú
     const result = await conn.execute(
       `INSERT INTO ADMIN_SCHEMA.CATERING_MENUS
@@ -258,7 +278,7 @@ exports.createMenu = async (req, res) => {
         type,
         price,
         imagePath: imagePath || null,
-        available: isAvailable,
+        available: available,
         serviceId: 1,
         menuId: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER }
       },
@@ -292,22 +312,34 @@ exports.createMenu = async (req, res) => {
  * Actualizar un menú
  */
 exports.updateMenu = async (req, res) => {
-  const { name, description, type, price, available, products, imagePath } = req.body;
+  const { name, description, type, available, products, imagePath } = req.body;
   const menuId = req.params.id;
   let conn;
 
+  let price = 0;
+  if (Array.isArray(products) && products.length > 0) {
+    try {
+      conn = await getConnection();
+      // Traer los productos de la base de datos cuyos IDs estén en products
+      const placeholders = products.map((_, i) => `:id${i}`).join(',');
+      const binds = {};
+      products.forEach((id, i) => { binds[`id${i}`] = id; });
+
+      const result = await conn.execute(
+        `SELECT PRODUCT_ID, UNITARY_PRICE FROM ADMIN_SCHEMA.PRODUCTS WHERE PRODUCT_ID IN (${placeholders})`,
+        binds,
+        { outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
+      // Sumar los precios de los productos encontrados
+      price = result.rows.reduce((sum, prod) => sum + (Number(prod.UNITARY_PRICE) || 0), 0);
+    } catch (err) {
+      console.error('❌ Error al calcular el precio de los productos:', err);
+      price = 0;
+    }
+  }
+
   try {
     conn = await getConnection();
-
-    // let finalImagePath = imagePath;
-    // if (imagePath === null || imagePath === undefined) {
-    //   const result = await conn.execute(
-    //     `SELECT IMAGE_PATH FROM ADMIN_SCHEMA.CATERING_MENUS WHERE MENU_ID = :id`,
-    //     [menuId],
-    //     { outFormat: oracledb.OUT_FORMAT_OBJECT }
-    //   );
-    //   finalImagePath = result.rows[0]?.IMAGE_PATH || null;
-    // }
 
     await conn.execute(
       `UPDATE ADMIN_SCHEMA.CATERING_MENUS SET 
@@ -351,6 +383,43 @@ exports.updateMenu = async (req, res) => {
   console.error('❌ Error al actualizar el menú:', err);
   res.status(500).json({ message: 'Error al actualizar el menú: ' + err.message });
 } finally {
+    if (conn) await conn.close();
+  }
+};
+
+/**
+ * Elimina un menú identificada por su ID.
+ */
+exports.deleteMenu = async (req, res) => {
+  let conn;
+  try {
+    conn = await getConnection();
+    const menuId = req.params.id;
+
+    // Obtener imagen principal (IMAGE_PATH)
+    const mainImageResult = await conn.execute(
+      `SELECT IMAGE_PATH FROM ADMIN_SCHEMA.CATERING_MENUS WHERE MENU_ID = :id`,
+      [menuId],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    const mainImagePathEncrypted = mainImageResult.rows[0]?.IMAGE_PATH;
+    const mainImagePath = mainImagePathEncrypted ? decrypt(mainImagePathEncrypted) : null;
+
+    // Eliminar archivo físico
+    if(mainImagePath != null ) await deletePhysicalFile(mainImagePath);
+
+    // Eliminar datos relacionados respetando el orden correcto
+    await conn.execute(`DELETE FROM ADMIN_SCHEMA.PRODUCTS_MENUS WHERE MENU_ID = :id`, [menuId], { autoCommit: false });
+    await conn.execute(`DELETE FROM ADMIN_SCHEMA.CATERING_MENUS WHERE MENU_ID = :id`, [menuId], { autoCommit: false });
+    await conn.commit();
+
+    res.sendStatus(204);
+  } catch (err) {
+    console.error('Error al eliminar el menú:', err);
+    if (conn) await conn.rollback();
+    res.status(500).json({ error: err.message });
+  } finally {
     if (conn) await conn.close();
   }
 };
