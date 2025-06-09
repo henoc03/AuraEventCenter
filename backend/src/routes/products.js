@@ -4,7 +4,7 @@ const productController = require('../controllers/productController');
 
 
 router.use((req, res, next) => {
-  console.log(`[Router zones] ${req.method} ${req.originalUrl}`);
+  console.log(`[Router products] ${req.method} ${req.originalUrl}`);
   next();
 });
 router.get('/', productController.getAllProducts);
