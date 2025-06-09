@@ -103,7 +103,7 @@ const ProductModal = ({ isOpen, mode, product, onClose, onDelete, onSubmit: onSu
 
         {isViewMode && product && (
           <div className="info-container">
-            <p><strong>Nombre: </strong> {product.name}</p>
+            <h3><strong> {product.name}</strong></h3>
             <p><strong>Descripción: </strong> {product.description}</p>
             <p><strong>Precio: </strong> ₡{product.price}</p>
             <p><strong>Tipo: </strong> {product.type}</p>

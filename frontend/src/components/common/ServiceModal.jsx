@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from 'react-router-dom';
 import AlertMessage from "./AlertMessage.jsx";
-import "../../style/AddEditRoomModal.css";
+import "../../style/services-admin.css";
+import DefaultRoom from "../../assets/images/salas/default_zone.jpg";
+
 
 
 const DEFAULT_ROUTE = "http://localhost:1522";
@@ -34,23 +37,38 @@ const ServiceModal = ({ isOpen, mode, service, onClose, onDelete, onSave }) => {
   const [imagePath, setImagePath] = useState(null);
   const [imageName, setImageName] = useState("");
 
-  useEffect(() => {
-    if (isAddMode) {
-      reset({ name: "", description: "", price: "" });
-      setImageFile(null);
-      setImagePath(null);
-      setImageName("");
-    } else if ((isEditMode || isViewMode || isDeleteMode) && service) {
-      reset({
-        name: service.name || "",
-        description: service.description || "",
-        price: service.price || "",
-      });
-      setImagePath(service.imagePath || null);
-      setImageFile(null);
-      setImageName("");
+const [adminType, setAdminType] = useState('');
+const navigation = useNavigate();
+
+useEffect(() => {
+  if (isAddMode) {
+    reset({ name: "", description: "", price: "" });
+    setImageFile(null);
+    setImagePath(null);
+    setImageName("");
+  } else if ((isEditMode || isViewMode || isDeleteMode) && service && typeof service === 'object') {
+    if (!service.name || !service.description || service.price == null) return;
+
+    reset({
+      name: service.name,
+      description: service.description,
+      price: service.price,
+    });
+
+    setImagePath(service.imagePath || null);
+    setImageFile(null);
+    setImageName("");
+  }
+}, [mode, service, reset]);
+
+    useEffect(() => {
+    const currentPath = window.location.pathname;
+    if (currentPath.includes('root-admin')) {
+      setAdminType('root-admin');
+    } else {
+      setAdminType('admin');
     }
-  }, [mode, service, reset]);
+  }, []);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -119,7 +137,18 @@ const ServiceModal = ({ isOpen, mode, service, onClose, onDelete, onSave }) => {
     }
   };
 
-  if (!isOpen) return null;
+if (
+  !isOpen ||
+  (isViewMode &&
+    (!service ||
+      !service.name ||
+      !service.description ||
+      service.price == null))
+) {
+  return null;
+}
+
+
 
   return (
     <>
@@ -140,9 +169,9 @@ const ServiceModal = ({ isOpen, mode, service, onClose, onDelete, onSave }) => {
         />
       )}
 
-      <div className="add-edit-modal" onClick={onClose}>
-        <div className="room-modal-content" onClick={(e) => e.stopPropagation()}>
-          <button className="room-modal-close" onClick={onClose}>
+      <div className="services-modal-overlay" onClick={onClose}>
+        <div className="service-modal-content" onClick={(e) => e.stopPropagation()}>
+          <button className="service-modal-close" onClick={onClose}>
             ×
           </button>
 
@@ -184,10 +213,10 @@ const ServiceModal = ({ isOpen, mode, service, onClose, onDelete, onSave }) => {
                   })}
                 />
                 {errors.price && <span className="error">{errors.price.message}</span>}
-                <label htmlFor="room-image" className="upload-image-button"  style={{ marginBottom: "20px" }}>Subir imagen principal</label>
+                <label htmlFor="service-image" className="upload-image-button"  style={{ marginBottom: "20px" }}>Subir imagen principal</label>
                 <label>Imagen Principal</label>
                 <input
-                  id="room-image"
+                  id="service-image"
                   type="file"
                   accept="image/*"
                   onChange={handleImageChange}
@@ -220,24 +249,51 @@ const ServiceModal = ({ isOpen, mode, service, onClose, onDelete, onSave }) => {
           )}
 
           {isViewMode && service && (
-          <div className="room-info-modal" onClick={onClose}>
-          <div className="modal-room-info-content" onClick={(e) => e.stopPropagation()}>
-            <button className="close-button" type="button" onClick={onClose}><i className="bi bi-x-lg"></i></button>
-             
-            <div className='room-info-photo-container'>
-              <img src={service.imagePath && service.imagePath.trim() !== ""
-                                  ? `${DEFAULT_ROUTE}/${service.imagePath}`: defaultImage} alt={`Foto de la sala ${service.name}`}/>
-              <div className='room-info-content'>
-              <h2>Detalle del Servicio</h2>
-             <p><strong>Nombre:</strong> {service.name}</p>
-              <p><strong>Descripción:</strong> {service.description}</p>
-              <p><strong>Precio:</strong> ₡{service.price}</p>
+            <div className="service-info-modal" onClick={onClose}>
+              <div className="modal-service-info-content" onClick={(e) => e.stopPropagation()}>
+                <button className="close-button" type="button" onClick={onClose}>
+                  <i className="bi bi-x-lg"></i>
+                </button>
 
-                          </div>
+                <div className="service-info-photo-container">
+                  <img
+                    src={
+                      service.imagePath && service.imagePath.trim() !== ""
+                        ? `${DEFAULT_ROUTE}/${service.imagePath}`
+                        : DefaultRoom
+                    }
+                    alt={`Foto del servicio ${service.name}`}
+                  />
+                  <div className="service-info-content">
+                    <h2>{service.name}</h2>
+                    <p><strong>Precio:</strong> ₡{parseFloat(service.price).toLocaleString()} |  {service.active ?  "Disponible" : " No disponible"}</p>
+                    <p><strong>Descripción:</strong> {service.description}</p>
+
+                    {service.name.toLowerCase().includes("catering") && (
+                    <div className='menus-products-buttons'>
+                      <button 
+                        type='button'
+                        onClick={() => navigation(`/${adminType}/menus`)}
+                        className="service-menus-button"
+                      >
+                        Ver menús
+                      </button>
+                      <button 
+                        type='button'
+                        onClick={() => navigation(`/${adminType}/servicios/catering/productos`)}
+                        className="service-products-button"
+                      >
+                        Ver productos
+                      </button>
+                    </div>
+                  )}
+
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
           )}
+
 
           {isDeleteMode && service && (
             <>
