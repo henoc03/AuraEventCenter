@@ -4,8 +4,6 @@ import AddEditMenuModal from './AddEditMenuModal';
 import AlertMessage from "./AlertMessage.jsx";
 import defaultImage from '../../assets/images/default_no_image.jpg'
 import '../../style/menu-admin-card.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSquare } from '@fortawesome/free-solid-svg-icons';
 
 const DEFAULT_ROUTE = "http://localhost:1522";
 
@@ -58,13 +56,10 @@ function MenuAdminCard ({id, menu, onClose, onSuccess}) {
         <img src={menu.IMAGE_PATH && menu.IMAGE_PATH.trim() !== "" ? `${DEFAULT_ROUTE}/${menu.IMAGE_PATH}`: defaultImage} className="menu-card-img-top" alt={`Imagen del menú ${menu.NAME}`} />
         <div className="menu-card-body">
           <h3 className="menu-card-title">{menu.NAME}</h3>
-          <h2>
-            <FontAwesomeIcon 
-              icon={faSquare}
-              className={menu.AVAILABLE == 1 ? "menu-status-indicator active" : "menu-status-indicator inactive"} 
-            /> 
-            {menu.AVAILABLE ?  "Disponible" : " No disponible"}
-          </h2>
+            <p className="menu-card-status-text">
+            <span className={`menu-status-indicator ${menu.AVAILABLE == 1 ? "active" : "inactive"}`}></span>
+            {menu.AVAILABLE == 1 ? "Disponible" : "No disponible"}
+            </p>
           <div className="menu-card-buttons">
             <a href="#" className="btn btn-primary button" onClick={() => setShowDeleteConfirmation(true)}>Borrar</a>
             <a href="#" className="btn btn-primary button" onClick={() => setIsEditClicked(!isEditClicked)}>Editar</a>

@@ -169,7 +169,7 @@ const ServicesAdmin = ({ sections }) => {
               <div className="services-section-header">
                 <h2 className="services-section-title">Servicios</h2>
                 <button className="btn services-section-add-button" onClick={() => openModal("add")}>
-                  Agregar Servicio
+                  Agregar
                 </button>
               </div>
 

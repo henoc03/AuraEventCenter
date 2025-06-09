@@ -150,7 +150,7 @@ const Products = ({ sections }) => {
             <section className="products-section">
             <div className="products-section-header">
             <h2 className="products-section-title">Productos</h2>
-            <button className="btn products-section-add-button" onClick={() => openModal("add")}>Agregar Producto</button>
+            <button className="btn products-section-add-button" onClick={() => openModal("add")}>Agregar</button>
             </div>
             <div className="products-controls">
               <label htmlFor="search">Buscar: </label>
