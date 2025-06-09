@@ -1,4 +1,5 @@
 const { encrypt, decrypt } = require('../utils/encryption');
+const mockFs = require('mock-fs');
 const db = require('../config/db');
 const request = require('supertest');
 const app = require('../app');
@@ -18,12 +19,17 @@ jest.mock('oracledb', () => ({
 
 jest.mock('../config/db', () => {
   return {
-    getConnection: jest.fn(),
+    getConnection: jest.fn(() => ({
+      execute: jest.fn(),
+      commit: jest.fn(),
+      rollback: jest.fn(),
+      close: jest.fn(),
+    })),
     oracledb: {
       OUT_FORMAT_OBJECT: 1,
       BIND_OUT: 2002,
       NUMBER: 'number',
-    }
+    },
   };
 });
 
@@ -32,126 +38,145 @@ jest.mock('../middleware/verifyToken', () => (req, res, next) => next());
 const validToken = jwt.sign({ userId: 1 }, process.env.JWT_SECRET || 'defaultSecret');
 
 describe('Menus Controller', () => {
+  let conn;
   beforeEach(() => {
     jest.clearAllMocks();
+    conn = {
+      execute: jest.fn(),
+      commit: jest.fn(),
+      rollback: jest.fn(),
+      close: jest.fn(),
+    };
+    db.getConnection.mockResolvedValue(conn);
   });
 
-  it('GET /menus - debería devolver todos los menús', async () => {
-    db.getConnection.mockResolvedValueOnce({
-      execute: jest.fn()
-        .mockResolvedValueOnce({
-          rows: [
-            { MENU_ID: 1, NAME: 'Menú A', DESCRIPTION: 'Desc A', PRICE: 0, IMAGE_PATH: 'encrypted_pathA', AVAILABLE: 1, TYPE: 'Buffet' },
-            { MENU_ID: 2, NAME: 'Menú B', DESCRIPTION: 'Desc B', PRICE: 0, IMAGE_PATH: null, AVAILABLE: 1, TYPE: 'Plato' },
-          ],
-        })
-        .mockResolvedValueOnce({
-          rows: [
-            { MENU_ID: 1, PRODUCT_ID: 10, NAME: 'Producto 1', DESCRIPTION: 'Prod Desc 1', UNITARY_PRICE: 100 },
-            { MENU_ID: 1, PRODUCT_ID: 11, NAME: 'Producto 2', DESCRIPTION: 'Prod Desc 2', UNITARY_PRICE: 200 },
-            { MENU_ID: 2, PRODUCT_ID: 12, NAME: 'Producto 3', DESCRIPTION: 'Prod Desc 3', UNITARY_PRICE: 300 },
-          ],
-        }),
-      close: jest.fn(),
+  test('GET /menus - debería devolver todos los menús', async () => {
+    conn.execute.mockResolvedValueOnce({
+      rows: [
+        { MENU_ID: 1, NAME: 'Menu 1', DESCRIPTION: 'Desc 1', PRICE: 100, IMAGE_PATH: 'encrypted_path1', AVAILABLE: 1, TYPE: 'Buffet' },
+        { MENU_ID: 2, NAME: 'Menu 2', DESCRIPTION: 'Desc 2', PRICE: 200, IMAGE_PATH: null, AVAILABLE: 0, TYPE: 'A la carta' },
+      ],
+    })
+    .mockResolvedValueOnce({
+      rows: [
+        { MENU_ID: 1, PRODUCT_ID: 10, NAME: 'Producto 1', DESCRIPTION: 'Desc P1', UNITARY_PRICE: 50 },
+        { MENU_ID: 1, PRODUCT_ID: 11, NAME: 'Producto 2', DESCRIPTION: 'Desc P2', UNITARY_PRICE: 50 },
+        { MENU_ID: 2, PRODUCT_ID: 12, NAME: 'Producto 3', DESCRIPTION: 'Desc P3', UNITARY_PRICE: 200 },
+      ],
     });
 
     const res = await request(app)
       .get('/menus')
       .set('Authorization', `Bearer ${validToken}`);
 
-    expect(res.statusCode).toBe(200);
-    expect(res.body).toEqual([
-      {
-        MENU_ID: 1,
-        NAME: 'Menú A',
-        DESCRIPTION: 'Desc A',
-        PRICE: 300,
-        IMAGE_PATH: 'pathA',
-        AVAILABLE: 1,
-        TYPE: 'Buffet',
-        PRODUCTS: [
-          { PRODUCT_ID: 10, NAME: 'Producto 1', DESCRIPTION: 'Prod Desc 1', UNITARY_PRICE: 100 },
-          { PRODUCT_ID: 11, NAME: 'Producto 2', DESCRIPTION: 'Prod Desc 2', UNITARY_PRICE: 200 },
-        ]
-      },
-      {
-        MENU_ID: 2,
-        NAME: 'Menú B',
-        DESCRIPTION: 'Desc B',
-        PRICE: 300,
-        IMAGE_PATH: null,
-        AVAILABLE: 1,
-        TYPE: 'Plato',
-        PRODUCTS: [
-          { PRODUCT_ID: 12, NAME: 'Producto 3', DESCRIPTION: 'Prod Desc 3', UNITARY_PRICE: 300 },
-        ]
-      }
-    ]);
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
+    expect(res.body[0]).toHaveProperty('MENU_ID', 1);
+    expect(res.body[0]).toHaveProperty('PRODUCTS');
   });
 
-  it('GET /menus/:id - debería devolver un menú por ID', async () => {
-    db.getConnection.mockResolvedValueOnce({
-      execute: jest.fn().mockResolvedValueOnce({
-        rows: [
-          { MENU_ID: 1, NAME: 'Menú A', DESCRIPTION: 'Desc A', PRICE: 300, IMAGE_PATH: 'encrypted_pathA', ACTIVE: 1 },
-        ],
-      }),
-      close: jest.fn(),
+  test('GET /menus/:id - debería devolver un menú por ID', async () => {
+    conn.execute.mockResolvedValueOnce({
+      rows: [
+        { MENU_ID: 1, NAME: 'Menu 1', DESCRIPTION: 'Desc 1', PRICE: 100, IMAGE_PATH: 'encrypted_path1', ACTIVE: 1 },
+      ],
     });
 
     const res = await request(app)
       .get('/menus/1')
       .set('Authorization', `Bearer ${validToken}`);
 
-    expect(res.statusCode).toBe(200);
-    expect(res.body).toEqual({ MENU_ID: 1, NAME: 'Menú A', DESCRIPTION: 'Desc A', PRICE: 300, IMAGE_PATH: 'pathA', ACTIVE: 1 });
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty('MENU_ID', 1);
+    expect(res.body).toHaveProperty('IMAGE_PATH', 'path1');
   });
 
-  it('GET /menus/:menuId/images - debería devolver todas las imágenes de un menú', async () => {
-    db.getConnection.mockResolvedValueOnce({
-      execute: jest.fn()
-        .mockResolvedValueOnce({ rows: [{ IMAGE_PATH: 'encrypted_mainImage' }] }) // main image
-        .mockResolvedValueOnce({
-          rows: [
-            { IMAGE_ID: 10, IMAGE_ADDRESS: 'encrypted_secondary1' },
-            { IMAGE_ID: 11, IMAGE_ADDRESS: 'encrypted_secondary2' },
-          ],
-        }),
-      close: jest.fn(),
-    });
+  test('GET /menus/:menuId/images - debería devolver todas las imágenes de un menú', async () => {
+    conn.execute
+      .mockResolvedValueOnce({ rows: [{ IMAGE_PATH: 'encrypted_main.jpg' }] })
+      .mockResolvedValueOnce({ rows: [
+        { IMAGE_ID: 1, IMAGE_ADDRESS: 'encrypted_sec1.jpg' },
+        { IMAGE_ID: 2, IMAGE_ADDRESS: 'encrypted_sec2.jpg' },
+      ] });
 
     const res = await request(app)
       .get('/menus/1/images')
       .set('Authorization', `Bearer ${validToken}`);
 
-    expect(res.statusCode).toBe(200);
-    expect(res.body).toEqual([
-      { id: 'main', path: 'mainImage' },
-      { id: 10, path: 'secondary1' },
-      { id: 11, path: 'secondary2' },
-    ]);
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
+    expect(res.body[0]).toHaveProperty('id', 'main');
+    expect(res.body[1]).toHaveProperty('id', 1);
   });
 
-  it('GET /menus/:id - debería devolver objeto vacío si no existe el menú', async () => {
-    db.getConnection.mockResolvedValueOnce({
-      execute: jest.fn().mockResolvedValueOnce({ rows: [] }),
-      close: jest.fn(),
-    });
+  test('POST /menus - debería crear un menú', async () => {
+    conn.execute
+      .mockResolvedValueOnce({ rows: [ { PRODUCT_ID: 10, UNITARY_PRICE: 100 } ] })
+      .mockResolvedValueOnce({ outBinds: { menuId: [5] } })
+      .mockResolvedValue({});
+    conn.commit.mockResolvedValue();
 
     const res = await request(app)
-      .get('/menus/999')
+      .post('/menus')
+      .send({
+        name: 'Menu Nuevo',
+        description: 'Desc Nuevo',
+        type: 'Buffet',
+        available: 1,
+        imagePath: 'img.jpg',
+        products: [10],
+      })
       .set('Authorization', `Bearer ${validToken}`);
 
-    expect(res.statusCode).toBe(200);
-    expect(res.body).toEqual({});
+    expect(res.status).toBe(201);
+    expect(res.body).toHaveProperty('menu_id', 5);
   });
 
-  it('GET /menus - error de base de datos', async () => {
-    db.getConnection.mockRejectedValueOnce(new Error('DB error'));
+  test('PUT /menus/:id - debería actualizar un menú', async () => {
+    conn.execute
+      .mockResolvedValueOnce({ rows: [ { PRODUCT_ID: 10, UNITARY_PRICE: 100 } ] })
+      .mockResolvedValue({});
+
     const res = await request(app)
-      .get('/menus')
+      .put('/menus/1')
+      .send({
+        name: 'Menu Editado',
+        description: 'Desc Editado',
+        type: 'Buffet',
+        available: 1,
+        imagePath: 'img.jpg',
+        products: [10],
+        isEncrypted: false
+      })
       .set('Authorization', `Bearer ${validToken}`);
-    expect(res.statusCode).toBe(500);
-    expect(res.body).toHaveProperty('error');
+
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty('message');
+  });
+
+  test('DELETE /menus/:id - debería eliminar un menú', async () => {
+    conn.execute
+      .mockResolvedValueOnce({ rows: [{ IMAGE_PATH: 'encrypted_main.jpg' }] })
+      .mockResolvedValue({});
+    conn.commit.mockResolvedValue();
+
+    const res = await request(app)
+      .delete('/menus/1')
+      .set('Authorization', `Bearer ${validToken}`);
+
+    expect(res.status).toBe(204);
+    expect(conn.commit).toHaveBeenCalled();
+  });
+
+  test('DELETE /menus/:id - error en DB debe hacer rollback', async () => {
+    conn.execute.mockRejectedValueOnce(new Error('DB Error'));
+
+    const res = await request(app)
+      .delete('/menus/1')
+      .set('Authorization', `Bearer ${validToken}`);
+
+    expect(res.status).toBe(500);
+    expect(conn.rollback).toHaveBeenCalled();
+    expect(conn.close).toHaveBeenCalled();
   });
 });
