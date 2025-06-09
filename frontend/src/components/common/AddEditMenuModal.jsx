@@ -13,6 +13,7 @@ function AddEditMenuModal({ isModalOpen, onClose, onSuccess }) {
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [imageFile, setImageFile] = useState(null);
   const [primaryImageName, setPrimaryImageName] = useState("");
+  const [showImageUploadSuccess, setShowImageUploadSuccess] = useState(false);
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -58,20 +59,22 @@ function AddEditMenuModal({ isModalOpen, onClose, onSuccess }) {
   };
 
   const onSubmit = async (data) => {
-    let imagePath = null;
+    let encryptedImagePath = null;
 
     if (imageFile) {
       const formData = new FormData();
       formData.append("image", imageFile);
       try {
-        const res = await fetch(`${DEFAULT_ROUTE}/menus/upload-image`, {
+        const res = await fetch(`${DEFAULT_ROUTE}/menus/upload-primary-image`, {
           method: "POST",
           body: formData,
         });
+        if (!res.ok) throw new Error("Error al subir imagen principal");
         const result = await res.json();
-        imagePath = result.imagePath;
+        encryptedImagePath = result.imagePath;
+        setShowImageUploadSuccess(true);
       } catch {
-        setErrorMessage("Error al subir imagen");
+        setErrorMessage("Error al subir imagen principal");
         setShowError(true);
         return;
       }
@@ -84,7 +87,7 @@ function AddEditMenuModal({ isModalOpen, onClose, onSuccess }) {
       price: parseFloat(data.price),
       available: data.available,
       products: selectedProducts.map(p => p.ID || p.id),
-      imagePath,
+      imagePath: encryptedImagePath,
     };
 
     try {
@@ -164,7 +167,19 @@ function AddEditMenuModal({ isModalOpen, onClose, onSuccess }) {
           <label htmlFor="menu-image" className="upload-image-button">Subir imagen principal</label>
           <input id="menu-image" type="file" accept="image/*" onChange={handleImageChange} style={{ display: "none" }} />
           {primaryImageName && (
-            <p className="image-name">Imagen seleccionada: {primaryImageName}</p>
+            <div className="image-name" style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginTop: "0.5rem" }}>
+              Imagen seleccionada: {primaryImageName}
+              <button
+                type="button"
+                className="delete-image-button"
+                onClick={() => {
+                  setImageFile(null);
+                  setPrimaryImageName("");
+                }}
+              >
+                ✕
+              </button>
+            </div>
           )}
 
           <div className="save-cancel-container">

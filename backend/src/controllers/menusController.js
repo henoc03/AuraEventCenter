@@ -100,6 +100,24 @@ exports.getMenuById = async (req, res) => {
 };
 
 /**
+ * Sube una imagen principal para un menú.
+ */
+exports.uploadMenuPrimaryImage = (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'No se recibió ningún archivo' });
+
+    const imagePath = `uploads/menus/${req.file.filename}`;
+    const encryptedPath = encrypt(imagePath);
+
+    res.status(200).json({ imagePath: encryptedPath });
+  } catch (err) {
+    console.error("Error al subir imagen:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+/**
  * Obtiene todas las imagenes de un menú específico.
  */
 exports.getAllMenuImages = async (req, res) => {
