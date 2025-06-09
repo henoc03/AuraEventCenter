@@ -4,8 +4,8 @@ import { jwtDecode } from "jwt-decode";
 
 import Header from "../components/common/Header.jsx";
 import SideNav from "../components/common/SideNav.jsx";
-import MenuCard from "../components/common/MenuAdminCard.jsx";
-// import AddEditRoomModal from "../components/common/AddEditRoomModal.jsx";
+import MenuAdminCard from "../components/common/MenuAdminCard.jsx";
+import AddEditMenuModal from "../components/common/AddEditMenuModal.jsx";
 import AlertMessage from "../components/common/AlertMessage.jsx";
 import LoadingPage from "../components/common/LoadingPage.jsx";
 
@@ -70,7 +70,7 @@ function MenusAdmin({ sections }) {
     }
   };
 
-  // Obtener información de servicios
+  // Obtener información de menús
   const getMenus = async () => {
     try {
       const res = await fetch(`${DEFAULT_ROUTE}/menus/`, {
@@ -187,22 +187,22 @@ function MenusAdmin({ sections }) {
 
           <div className="menus-admin-cards">
             {filteredAndSortedMenus.map((menu) => (
-              <MenuCard className="menu-admin-card" menu={menu} />
+              <MenuAdminCard className="menu-admin-card" menu={menu} />
             ))}
           </div>
         </main>
       </div>
 
-      {/* {isAddEditOpen && (
-        <AddEditRoomModal
+      {isAddEditOpen && (
+        <AddEditMenuModal
           isModalOpen={true}
-          onClose={() => {
-            setIsAddEditOpen(false);
+          onClose={() => setIsAddEditOpen(false)}
+          onSuccess={() => {
             getMenus();
+            setShowSuccess(true);
           }}
-          isAdd={true}
         />
-      )} */}
+      )}
     </div>
   );
 }

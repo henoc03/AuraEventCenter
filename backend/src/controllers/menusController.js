@@ -100,6 +100,24 @@ exports.getMenuById = async (req, res) => {
 };
 
 /**
+ * Sube una imagen principal para un menú.
+ */
+exports.uploadMenuPrimaryImage = (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'No se recibió ningún archivo' });
+
+    const imagePath = `uploads/menus/${req.file.filename}`;
+    const encryptedPath = encrypt(imagePath);
+
+    res.status(200).json({ imagePath: encryptedPath });
+  } catch (err) {
+    console.error("Error al subir imagen:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+/**
  * Obtiene todas las imagenes de un menú específico.
  */
 exports.getAllMenuImages = async (req, res) => {
@@ -145,6 +163,68 @@ exports.getAllMenuImages = async (req, res) => {
     res.json(allImages);
   } catch (err) {
     console.error("Error al obtener todas las imágenes:", err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
+/** 
+ * Crea un nuevo menú.
+*/
+console.log("✅ createMenu endpoint alcanzado");
+exports.createMenu = async (req, res) => {
+  let conn;
+  try {
+    const {
+      name,
+      description,
+      type,
+      price,
+      available,
+      imagePath,
+      products
+    } = req.body;
+
+    conn = await getConnection();
+
+    const isAvailable = available === true || true ? 1 : 0;
+    // Insertar menú
+    const result = await conn.execute(
+      `INSERT INTO ADMIN_SCHEMA.CATERING_MENUS
+        (NAME, DESCRIPTION, TYPE, PRICE, IMAGE_PATH, AVAILABLE, ADDITIONAL_SERVICE_ID)
+       VALUES (:name, :description, :type, :price, :imagePath, :available, :serviceId)
+       RETURNING MENU_ID INTO :menuId`,
+      {
+        name,
+        description,
+        type,
+        price,
+        imagePath: imagePath || null,
+        available: isAvailable,
+        serviceId: 1,
+        menuId: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER }
+      },
+      { autoCommit: false }
+    );
+
+    const menuId = result.outBinds.menuId[0];
+
+    // Insertar productos asociados
+    for (const productId of products) {
+      await conn.execute(
+        `INSERT INTO ADMIN_SCHEMA.PRODUCTS_MENUS (MENU_ID, PRODUCT_ID)
+         VALUES (:menuId, :productId)`,
+        { menuId, productId },
+        { autoCommit: false }
+      );
+    }
+
+    await conn.commit();
+    res.status(201).json({ message: "Menú creado", menu_id: menuId });
+  } catch (err) {
+    if (conn) await conn.rollback();
+    console.error("❌ Error al crear menú:", err);
     res.status(500).json({ error: err.message });
   } finally {
     if (conn) await conn.close();

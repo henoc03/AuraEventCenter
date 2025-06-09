@@ -19,6 +19,7 @@ app.use('/email', emailRoutes);
 app.use('/zones', zonesRoutes);
 app.use('/dashboard', dashboardRoutes);
 app.use('/services', servicesRoutes);
+console.log("✅ Cargando rutas de /menus");
 app.use('/menus', menusRoutes);
 app.use('/products', productsRoutes);
 app.use(express.urlencoded({ extended: true }));
