@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import AlertMessage from "./AlertMessage.jsx";
-import "../../style/AddEditRoomModal.css"; // Reutilizamos estilos modernos
+import "../../style/AddEditRoomModal.css";
 
 const ServiceModal = ({ isOpen, mode, service, onClose, onDelete, onSave }) => {
   const isEditMode = mode === "edit";
@@ -27,17 +27,73 @@ const ServiceModal = ({ isOpen, mode, service, onClose, onDelete, onSave }) => {
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePath, setImagePath] = useState(null);
+  const [imageName, setImageName] = useState("");
+
   useEffect(() => {
     if (isAddMode) {
       reset({ name: "", description: "", price: "" });
+      setImageFile(null);
+      setImagePath(null);
+      setImageName("");
     } else if ((isEditMode || isViewMode || isDeleteMode) && service) {
-      reset(service);
+      reset({
+        name: service.name || "",
+        description: service.description || "",
+        price: service.price || "",
+      });
+      setImagePath(service.imagePath || null);
+      setImageFile(null);
+      setImageName("");
     }
   }, [mode, service, reset]);
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setImageName(file.name);
+      setImagePath(URL.createObjectURL(file));
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImageName("");
+    setImagePath(null);
+  };
+
   const onSubmit = async (data) => {
     try {
-      const parsedData = { ...data, price: parseFloat(data.price) };
+      let encryptedImagePath = service?.imagePath || null;
+
+      if (imageFile) {
+        const formData = new FormData();
+        formData.append("image", imageFile);
+
+        const res = await fetch("http://localhost:1522/services/upload-image", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!res.ok) {
+          const errorText = await res.text();
+          throw new Error("Error al subir la imagen: " + errorText);
+        }
+
+        const imageData = await res.json();
+        encryptedImagePath = imageData.imagePath;
+      } else if (!imageFile && !imagePath) {
+        encryptedImagePath = null;
+      }
+
+      const parsedData = {
+        ...data,
+        price: parseFloat(data.price),
+        imagePath: encryptedImagePath,
+        active: 1,
+      };
       await onSave(parsedData);
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
@@ -83,13 +139,19 @@ const ServiceModal = ({ isOpen, mode, service, onClose, onDelete, onSave }) => {
 
       <div className="add-edit-modal" onClick={onClose}>
         <div className="room-modal-content" onClick={(e) => e.stopPropagation()}>
-          <button className="room-modal-close" onClick={onClose}>×</button>
+          <button className="room-modal-close" onClick={onClose}>
+            ×
+          </button>
 
           {(isAddMode || isEditMode) && (
             <>
-              <p>Los campos marcados con <span style={{ color: "red" }}>*</span> son obligatorios</p>
+              <p>
+                Los campos marcados con <span className="required">*</span> son obligatorios
+              </p>
               <form onSubmit={handleSubmit(onSubmit)} className="service-modal-form">
-                <label>Nombre <span style={{ color: "red" }}>*</span></label>
+                <label>
+                  Nombre <span className="required">*</span>
+                </label>
                 <input
                   type="text"
                   className="input"
@@ -97,53 +159,100 @@ const ServiceModal = ({ isOpen, mode, service, onClose, onDelete, onSave }) => {
                 />
                 {errors.name && <span className="error">{errors.name.message}</span>}
 
-                <label>Descripción <span style={{ color: "red" }}>*</span></label>
+                <label>
+                  Descripción <span className="required">*</span>
+                </label>
                 <textarea
                   className="input"
                   {...register("description", { required: "Descripción requerida" })}
                 />
                 {errors.description && <span className="error">{errors.description.message}</span>}
 
-                <label>Precio (₡) <span style={{ color: "red" }}>*</span></label>
+                <label>
+                  Precio (₡) <span className="required">*</span>
+                </label>
                 <input
                   type="number"
                   step="0.01"
                   className="input"
                   {...register("price", {
                     required: "Precio requerido",
-                    min: { value: 0, message: "El precio debe ser mayor o igual a 0" }
+                    min: { value: 0, message: "El precio debe ser mayor o igual a 0" },
                   })}
                 />
                 {errors.price && <span className="error">{errors.price.message}</span>}
+
+                <label>Imagen Principal</label>
+                <input
+                  type="file"
+                  className="input"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                />
+
+                {(imagePath || imageFile) && (
+                  <div className="image-name" style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  Imagen principal seleccionada: {imageName || imagePath}
+                  <button
+                    type="button"
+                    className="delete-image-button"
+                    onClick={handleRemoveImage}
+                  >
+                    ✕
+                  </button>
+                  </div>
+                )}
 
                 <div className="modal-buttons">
                   <button type="submit" className="btn" disabled={!isValid}>
                     {isAddMode ? "Registrar Servicio" : "Guardar Cambios"}
                   </button>
-                  <button type="button" className="btn-text-close" onClick={onClose}>Cerrar</button>
+                  <button type="button" className="btn-text-close" onClick={onClose}>
+                    Cerrar
+                  </button>
                 </div>
               </form>
             </>
           )}
 
           {isViewMode && service && (
-            <div className="info-container">
+            <div className="room-info-modal text-center">
               <h2>Detalle del Servicio</h2>
-              <p><strong>Nombre:</strong> {service.name}</p>
-              <p><strong>Descripción:</strong> {service.description}</p>
-              <p><strong>Precio:</strong> ₡{service.price}</p>
+              {service.image_path && (
+                <img
+                  src={service.image_path}
+                  alt={service.name}
+                  className="service-image-view"
+                />
+              )}
+              <p>
+                <strong>Nombre:</strong> {service.name}
+              </p>
+              <p>
+                <strong>Descripción:</strong> {service.description}
+              </p>
+              <p>
+                <strong>Precio:</strong> ₡{service.price}
+              </p>
+              <button className="btn-text-close" onClick={onClose}>
+                Cerrar
+              </button>
             </div>
           )}
 
           {isDeleteMode && service && (
             <>
               <h2>¿Eliminar servicio?</h2>
-              <p><strong>{service.name}</strong> será eliminado permanentemente.</p>
+              <p>
+                <strong>{service.name}</strong> será eliminado permanentemente.
+              </p>
               <div className="modal-buttons">
-                <button className="btn" onClick={handleDelete} style={{ color: "red" }}>
+                <button className="btn btn-delete" onClick={handleDelete}>
                   Eliminar
                 </button>
-                <button className="btn" onClick={onClose}>Cancelar</button>
+                <button className="btn" onClick={onClose}>
+                  Cancelar
+                </button>
               </div>
             </>
           )}

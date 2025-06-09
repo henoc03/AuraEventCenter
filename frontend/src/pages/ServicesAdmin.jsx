@@ -98,7 +98,6 @@ const ServicesAdmin = ({ sections }) => {
 
   const handleAddOrEdit = async (data) => {
     try {
-      console.log(`${PORT}/services/${selectedService.ID}`);
       const method = modalMode === "edit" ? "PUT" : "POST";
       const url = modalMode === "edit"
         ? `${PORT}/services/${selectedService.ID}`

@@ -2,17 +2,22 @@ import React from "react";
 import "../../style/service-card.css";
 import defaultImage from "../../assets/images/default_no_image.jpg";
 
+const DEFAULT_ROUTE = "http://localhost:1522";
 
 const ServiceCard = ({ service, onView, onEdit, onDelete }) => {
   const isActive = service.active === 1;
-
+  console.log(service.imagePath && service.imagePath.trim() !== ""
+                    ? `${DEFAULT_ROUTE}/${service.imagePath}`: defaultImage);
   return (
     <div className="service-card">
       <img
-        src={service.IMAGE_PATH || defaultImage}
+        src={service.imagePath && service.imagePath.trim() !== ""
+                    ? `${DEFAULT_ROUTE}/${service.imagePath}`: defaultImage}
         alt={`Imagen del servicio ${service.name}`}
         className="service-card-img-top"
       />
+      
+
       <div className="service-card-body">
         <h3 className="servide-card-title">{service.name}</h3>
         <h2>
