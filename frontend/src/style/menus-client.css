@@ -20,16 +20,16 @@
     align-self: center;
     width: 90%;
     max-width: 1800px;
-    margin: 85px 0 0 0;
+    margin: 0;
     padding: 2rem 1.5rem;
 }
 
 .menus-client-main h2{
     display: flex;
     justify-content: center;
-    font-family: 'Merriweather sans', serif;
+    font-family: 'Merriweather', serif;
     font-weight: bold;
-    font-size: 1.85rem;
+    font-size: 2.2rem;
     margin-bottom: 60px;
 }
 
@@ -50,62 +50,67 @@
     cursor: pointer;
 }
 
-.filters {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
+.menus-client-filters {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.menus-search-input,
+.menus-sort-input,
+.menus-filter-input {
+    display: flex;
+    align-items: center;
 }
 
 .filter-input{
-  padding: 0.5rem;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
-  max-width: 400px;
+    padding: 0.5rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    max-width: 400px;
 }
 
 .filter-select {
-  padding: 0.5rem;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
+    padding: 0.5rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
 }
 
 #search {
     font-family: 'Merriweather', sans-serif;
+    width: 270px;
+    margin-left: 15px;
+}
+
+#sort, #status {
+    margin-left: 15px;
 }
 
 .menu-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 3rem;
+  margin-bottom: 60px;
 }
 
-.menu-card {
+.menu-client-card {
   transition: all 0.3s ease;
-  max-height: fit-content;
+  height: fit-content;
 }
 
-.menu-card.expanded {
+.menu-client-card.expanded {
   grid-column: 1 / -1;
   z-index: 2;
   width: 100%;
-  max-height: 100% !important;
+  height: fit-content;
 }
 
 .client-menus-container {
-    min-height: 370px;
-}
-
-.client-menus-container p:first-of-type{
-    height: 100%;
-    width: 100%;
-    text-align: center;
-    margin-top: 50px;
-    font-family: 'Merriweather sans', sans-serif;
-    font-size: 1.2rem;
+    min-height: 60vh;
 }
 
 @media (max-width: 1440px) {
@@ -118,13 +123,11 @@
     .menus-client-main h2{
         font-size: 1.6rem;
         text-align: center;
-    }
-
-    .menus-client-main{
-        margin-top: 67px;
+        margin: 30px 0;
     }
 
     .menus-client-main button{
         font-size: 0.95rem;
+        margin: 0;
     }
 }

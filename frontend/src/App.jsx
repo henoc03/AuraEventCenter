@@ -51,7 +51,6 @@ function App() {
           <Route path="/cuenta" element={<AccountSettings sections={SectionProfile}/>} />
           <Route path="/cuenta/cambiar-contraseña" element={<ChangePassword sections={SectionProfile}/>} />
           <Route path="/cuenta/verificar-codigo" element={<VerifyAccountCode sections={SectionProfile}/>} />
-          
           <Route path="/servicios" element={<ServicesClient />} />
           <Route path="/menus" element={<MenusClient />} />
 
