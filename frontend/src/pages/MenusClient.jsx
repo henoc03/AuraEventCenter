@@ -7,6 +7,8 @@ import Navigation from '../components/common/Navigation';
 import LoadingPage from "../components/common/LoadingPage";
 import CompactMenu from "../components/common/CompactMenu";
 import ExpandedMenu from "../components/common/ExpandedMenu";
+import Hero from "../components/sections/ClientDefaultHero"
+import heroImage from "../assets/images/menus_hero.jpg"
 
 const DEFAULT_ROUTE = "http://localhost:1522";
 
@@ -72,49 +74,60 @@ function MenusClient() {
 
   return (
     <div className="menus-client-page">
-      <div className="menus-navigation-container">
-        <Navigation/>
-      </div>
+      <Hero
+        subtitle="Descubre nuestros sabores"
+        title="Menús deliciosos para cada ocasión"
+        message="Explora nuestra variedad de menús cuidadosamente seleccionados para satisfacer todos los gustos y necesidades. Encuentra la opción perfecta para tu evento y sorprende a tus invitados con una experiencia culinaria inolvidable."
+        imgSrc={heroImage}
+      />
 
       <main className="menus-client-main">
         <button type='button' onClick={() => window.history.back()}><i class="bi bi-arrow-left"></i> Regresar</button>
         <h2>Conoce nuestros menús</h2>
 
         {/* Filtros */}
-        <div className="filters">
-          <label htmlFor="search">Buscar: </label>
-          <input
-            id="search"
-            type="text"
-            placeholder="Buscar por nombre..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="filter-input"
-          />
-          <label htmlFor="status">Filtrar: </label>
-          <select
-            id="status"
-            value={filterType}
-            onChange={(e) => setFilterType(e.target.value)}
-            className="filter-select"
-          >
-            <option value="todos">Todos los tipos</option>
-            {uniqueTypes.map((type) => (
-              <option key={type} value={type}>
-                {type.charAt(0).toUpperCase() + type.slice(1)}
-              </option>
-            ))}
-          </select>
-          <label htmlFor="sort">Ordenar: </label>
-          <select
-            id="sort"
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
-            className="filter-select"
-          >
-            <option value="asc">Precio: menor a mayor</option>
-            <option value="desc">Precio: mayor a menor</option>
-          </select>
+        <div className="menus-client-filters">
+          <div className="menus-search-input">
+            <label htmlFor="search">Buscar: </label>
+            <input
+              id="search"
+              type="text"
+              placeholder="Buscar por nombre..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="filter-input"
+            />
+          </div>
+
+          <div className="menus-filter-input">
+            <label htmlFor="status">Filtrar: </label>
+            <select
+              id="status"
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
+              className="filter-select"
+            >
+              <option value="todos">Todos los tipos</option>
+              {uniqueTypes.map((type) => (
+                <option key={type} value={type}>
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                </option>
+              ))}
+            </select>
+          </div>
+          
+          <div className="menus-sort-input">
+            <label htmlFor="sort">Ordenar: </label>
+            <select
+              id="sort"
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+              className="filter-select"
+            >
+              <option value="asc">Precio: menor a mayor</option>
+              <option value="desc">Precio: mayor a menor</option>
+            </select>
+          </div>
         </div>
         
         <div className="client-menus-container">
@@ -124,7 +137,7 @@ function MenusClient() {
 
           {/* Menu expandido */}
           {selectedMenu && (
-            <div className="menu-card expanded" ref={expandedMenuRef}>
+            <div className="menu-client-card expanded" ref={expandedMenuRef}>
               <ExpandedMenu
                 menu={menus.find((menu) => menu.MENU_ID === selectedMenu)}
                 onClose={() => setSelectedMenu(null)}
@@ -137,7 +150,7 @@ function MenusClient() {
             {filteredAndSortedMenus.map((menu) => (
               <div
                 key={menu.MENU_ID}
-                className="menu-card"
+                className="menu-client-card"
                 onClick={() => setSelectedMenu(menu.MENU_ID)}
               >
                 <CompactMenu menu={menu} />

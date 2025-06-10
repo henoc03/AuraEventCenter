@@ -109,8 +109,7 @@ function ServicesClient() {
             key={service.ADDITIONAL_SERVICE_ID} className="service-container">
             <img 
               src={service.imagePath && service.imagePath.trim() !== ""
-                ? `${DEFAULT_ROUTE}/${service.imagePath}` : defaultImage
-              }
+                                  ? `${DEFAULT_ROUTE}/${service.imagePath}`: defaultImage}
               alt={service.name}
               data-aos={index % 2 === 0 ? "fade-left" : "fade-right"}
               data-aos-duration="1500"
@@ -122,7 +121,7 @@ function ServicesClient() {
             >
               <h3>{service.name}</h3>
               <p>{service.description}</p>
-              <p>{`Precio: ₡${service.price.toLocaleString('es-CR')}`}</p>
+              <p><span>Precio: </span>{`₡${service.price.toLocaleString('es-CR')}`}</p>
               {service.name.toLowerCase().includes("catering") && (
                 <a href="/menus" className="service-menu-link">
                   <button type='button'>Ver menús</button>

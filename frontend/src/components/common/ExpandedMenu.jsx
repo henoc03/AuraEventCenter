@@ -17,8 +17,9 @@ const ExpandedMenu = ({ menu, onClose }) => {
       />
       <div className="expanded-menu-details">
         <h2>{menu.NAME}</h2>
+        <p style={{ marginBottom: "20px" }}><span>Precio: </span>{`₡${menu.PRICE.toLocaleString('es-CR')}`} | <span>Disponilidad: </span> {menu.AVAILABLE === 1 ? "Disponible" : "No disponible"}</p>
+        <span>Descripción: </span>
         <p>{menu.DESCRIPTION}</p>
-        <p> {`Precio: ₡${menu.PRICE.toLocaleString('es-CR')}`} | {menu.AVAILABLE === 1 ? "Disponible" : "No disponible"}</p>
         <h3>Productos</h3>
         <ul>
           {menu.PRODUCTS && menu.PRODUCTS.length > 0 ? (

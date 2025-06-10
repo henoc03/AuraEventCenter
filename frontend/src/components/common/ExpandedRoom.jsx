@@ -46,8 +46,9 @@ const ExpandedRoom = ({ room, onClose }) => {
 
       <div className="expanded-room-details">
         <h2 className="room-title">{room.NAME}</h2>
-        <p><strong>{room.TYPE} | Capacidad: {room.CAPACITY} personas</strong></p>
-        <p style={{ marginBottom: "20px" }}>₡{room.PRICE}</p>
+        <p><span>Tipo: </span>{room.TYPE} | <span>Capacidad: </span>{room.CAPACITY} personas</p>
+        <p style={{ marginBottom: "20px" }}><span>Precio: </span> {`₡${room.PRICE.toLocaleString('es-CR')}`}</p>
+        <span>Descripción: </span>
         <p>{room.DESCRIPTION}</p>
       </div>
     </div>

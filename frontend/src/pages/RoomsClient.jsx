@@ -6,7 +6,7 @@ import ExpandedRoom from "../components/common/ExpandedRoom";
 import LoadingPage from "../components/common/LoadingPage";
 import Hero from "../components/sections/ClientDefaultHero";
 import Footer from "../components/common/Footer";
-import heroImage from "../assets/images/clienthero.png";
+import heroImage from "../assets/images/rooms_hero.jpg";
 import "../style/rooms-client.css";
 
 const DEFAULT_ROUTE = "http://localhost:1522";
@@ -89,45 +89,53 @@ function RoomsClient() {
         <h1 className="client-title">Conoce nuestros espacios</h1>
 
         {/* Filtros */}
-        <div className="filters">
-          <label htmlFor="search">Buscar: </label>
-          <input
-            id="search"
-            type="text"
-            placeholder="Buscar por nombre..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="filter-input"
-          />
-          <label htmlFor="status">Filtrar: </label>
-          <select
-            id="status"
-            value={filterType}
-            onChange={(e) => setFilterType(e.target.value)}
-            className="filter-select"
-          >
-            <option value="todos">Todos los tipos</option>
-            {uniqueTypes.map((type) => (
-              <option key={type} value={type}>
-                {type.charAt(0).toUpperCase() + type.slice(1)}
-              </option>
-            ))}
-          </select>
-          <label htmlFor="sort">Ordenar: </label>
-          <select
-            id="sort"
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
-            className="filter-select"
-          >
-            <option value="asc">Precio: menor a mayor</option>
-            <option value="desc">Precio: mayor a menor</option>
-          </select>
+        <div className="rooms-client-filters">
+          <div className="rooms-search-input">
+            <label htmlFor="search">Buscar: </label>
+            <input
+              id="search"
+              type="text"
+              placeholder="Buscar por nombre..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="filter-input"
+            />
+          </div>
+
+          <div className="rooms-filter-input">
+            <label htmlFor="status">Filtrar: </label>
+            <select
+              id="status"
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
+              className="filter-select"
+            >
+              <option value="todos">Todos los tipos</option>
+              {uniqueTypes.map((type) => (
+                <option key={type} value={type}>
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                </option>
+              ))}
+            </select>
+          </div>
+          
+          <div className="rooms-sort-input">
+            <label htmlFor="sort">Ordenar: </label>
+            <select
+              id="sort"
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+              className="filter-select"
+            >
+              <option value="asc">Precio: menor a mayor</option>
+              <option value="desc">Precio: mayor a menor</option>
+            </select>
+          </div>
         </div>
 
         {/* Sala expandida */}
         {selectedRoom && (
-          <div className="room-card expanded" ref={expandedRoomRef}> {/* Se pone un ref en la sala expandida para que al abrirse en arriba se lleve a esta automaticamente */}
+          <div className="room-client-card expanded" ref={expandedRoomRef}> {/* Se pone un ref en la sala expandida para que al abrirse en arriba se lleve a esta automaticamente */}
             <ExpandedRoom
               room={zones.find((room) => room.ZONE_ID === selectedRoom)}
               onClose={() => setSelectedRoom(null)}
@@ -140,7 +148,7 @@ function RoomsClient() {
           {filteredAndSortedRooms.map((room) => (
             <div
               key={room.ZONE_ID}
-              className="room-card"
+              className="room-client-card"
               onClick={() => setSelectedRoom(room.ZONE_ID)}
             >
               <CompactRoom room={room} />

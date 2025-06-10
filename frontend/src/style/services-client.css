@@ -57,9 +57,9 @@
 .services-client-main h2{
     display: flex;
     justify-content: center;
-    font-family: 'Merriweather sans', serif;
+    font-family: 'Merriweather', serif;
     font-weight: bold;
-    font-size: 1.85rem;
+    font-size: 2.2rem;
     margin-bottom: 60px;
 }
 
@@ -105,6 +105,11 @@
     line-height: 2;
 }
 
+.service-info-container span{
+    font-family: 'Merriweather sans', serif;
+    font-weight: bold;
+}
+
 .service-info-container button {
     font-family: 'Merriweather sans', serif;
     font-weight: normal;
@@ -120,6 +125,28 @@
 .service-info-container button:hover {
     background-color: #007AFF;
     color: #fff;
+}
+
+@media (min-width: 1920px) {
+    .services-client-main {
+        padding: 0 300px;
+    }
+
+    .services-client-main h2{
+        font-size: 2.7rem;
+    }
+
+    .services-client-filters {
+        padding: 0 110px;
+    }
+
+    .service-container h3{
+        font-size: 2rem;
+    }
+
+    .service-container p{
+        font-size: 1.1rem;
+    }
 }
 
 @media(max-width: 1440px) {
@@ -169,6 +196,10 @@
 
     #search {
         width: 80%;
+    }
+
+    .services-client-main{
+        margin-bottom: 50px;
     }
 
     .services-client-main h2{

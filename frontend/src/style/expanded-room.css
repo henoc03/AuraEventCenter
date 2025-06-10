@@ -6,54 +6,68 @@
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-  padding-bottom: 1rem;
   animation: fadeIn 1.7s ease;
   width: 100%;
-  height: 400px;
+  height: fit-content;
   min-height: 250px;
+  margin-bottom: 30px;
 }
 
 .expanded-room-carousel {
   width: 40%;
-  height: 100%;
+  height: 350px; /* o el valor que prefieras */
+  min-height: 250px;
+  max-height: 500px;
   overflow: hidden;
-  margin: -1.5vh 20px 0px;
-  border-radius: 10px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
 }
 
-.carousel-container > .carousel{
+.expanded-room-carousel img,
+.expanded-room-carousel .carousel img {
+  width: 100%;
   height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-    object-fit: cover;
-}
-
-.expanded-room-carousel > .expanded-room-image {
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   object-fit: cover;
-  margin-top: 50px;
-}
-.expanded-room-details {
-  width: 60%;
-  padding: 2rem 1.5rem;
-  text-align: left;
-  overflow-y: auto;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block;
+  box-sizing: border-box;
 }
 
-.expanded-room-details > h2.room-title {
-  text-align: left ;
-  margin: 0 0 0.7rem 0;
-  font-size: 1.8rem;
+.expanded-room-details {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 60%;
+  height: fit-content;
+  padding: 2rem;
+  font-family: 'Merriweather sans', sans-serif;
+}
+
+.expanded-room-details h2 {
+  text-align: left;
+  margin: 0 0 1.5rem 0;
+  font-size: 1.7rem;
   color: #000000;
+  font-weight: bold;
 }
 
 .expanded-room-details p {
-  margin: 0.25rem 0;
+  text-align: left;
   color: #222;
+  font-size: 1rem;
+  margin: 10px 0;
+}
+
+.expanded-room-details span {
+  font-family: 'Merriweather sans', sans-serif;
+  font-size: 1rem;
+  font-weight: bold;
 }
 
 .close-expanded-room {
@@ -62,11 +76,13 @@
   right: 28px;
   background: transparent;
   border: none;
-  font-size: 1.5rem;
+  font-size: 1.1rem;
   color: #888;
   cursor: pointer;
   transition: color 0.2s ease;
   z-index: 10;
+  top: 20px;
+  margin: 0;
 }
 
 .close-expanded-room:hover {
@@ -93,10 +109,28 @@
   .expanded-room-details {
     width: 100%;
     padding: 1rem;
+    min-height: 0;
   }
 
   .close-expanded-room {
-    top: 10px;
-    right: 10px;
+    right: 20px;
+  }
+
+  .expanded-room-details > h2.room-title {
+    font-size: 1rem;
+  }
+
+  .expanded-room-details p {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 1440px) {
+  .expanded-room-details > h2.room-title {
+    font-size: 1.2rem;
+  }
+
+  .expanded-room-details p {
+    font-size: 0.9rem;
   }
 }

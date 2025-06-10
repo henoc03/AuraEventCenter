@@ -1,41 +1,57 @@
-
 .rooms-client-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-self: center;
+  justify-self: center;
+  width: 90%;
+  max-width: 1800px;
+  margin: 18px 0 0 0;
+  padding: 2rem 1.5rem;
 }
 
 .client-title {
-  font-size: 2rem;
-  margin-bottom: 2rem;
+  display: flex;
+  justify-content: center;
+  font-family: 'Merriweather', serif;
+  font-weight: bold;
+  font-size: 2.2rem;
+  margin-bottom: 60px;
   text-align: center;
-  color: #333;
 }
 
 .room-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 3rem;
+  margin-bottom: 60px;
 }
 
-.room-card {
+.room-client-card {
   transition: all 0.3s ease;
-  max-height: 85%;
+  height: fit-content;
 }
 
-.room-card.expanded {
+.room-client-card.expanded {
   grid-column: 1 / -1;
   z-index: 2;
   width: 100%;
-  max-height: 100% !important;
+  height: fit-content;
 }
 
-.filters {
+.rooms-client-filters {
   display: flex;
   align-items: center;
   gap: 1rem;
   margin-bottom: 1.5rem;
   flex-wrap: wrap;
+}
+
+.rooms-search-input,
+.rooms-filter-input,
+.rooms-sort-input {
+  display: flex;
+  align-items: center;
 }
 
 .filter-input{
@@ -45,9 +61,41 @@
   font-size: 1rem;
   max-width: 400px;
 }
+
 .filter-select {
   padding: 0.5rem;
   border-radius: 8px;
   border: 1px solid #ccc;
   font-size: 1rem;
+}
+
+#search {
+  font-family: 'Merriweather', sans-serif;
+  width: 270px;
+  margin-left: 15px;
+}
+
+#sort {
+  margin-left: 15px;
+}
+
+#status {
+  margin-left: 15px;
+}
+
+@media (max-width: 1440px) {
+  .room-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
+
+@media(max-width: 768px) {
+ .rooms-client-container h1{
+    font-size: 1.6rem;
+    text-align: center;
+  }
+
+  .rooms-client-container{
+    margin: 18px 0 0 0;
+  }
 }
