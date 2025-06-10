@@ -33,7 +33,7 @@ const UsersPage = ({ title, users, onView, onEdit, onDelete, onAdd }) => {
     <section className="users-section">
       <div className="users-section-header">
         <h1 className="users-section-title">{title}</h1>
-        <button className="btn users-section-add-button" onClick={onAdd}>Agregar usuario</button>
+        <button className="btn users-section-add-button" onClick={onAdd}>Agregar</button>
       </div>
 
       <div className="users-section-search">

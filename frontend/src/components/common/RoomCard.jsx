@@ -89,9 +89,9 @@ console.log(image);
               <img src={image} alt={`Foto de la sala ${name}`}/>
               <div className='room-info-content'>
                 <h2>{name}</h2>
-                <p>{type}   |   Capacidad: {capacity} personas</p>
-                <p>{price}</p>
-                <p>{description}</p>
+                <p><strong>Tipo: </strong>{type} | <strong>Capacidad: </strong> {capacity} personas</p>
+                <p><strong>Precio: </strong>₡{parseFloat(price).toLocaleString()}</p>
+                <p><strong>Descripción: </strong>{description}</p>
               </div>
             </div>
           </div>

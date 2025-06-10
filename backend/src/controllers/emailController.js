@@ -75,7 +75,10 @@ exports.sendWelcomeEmail = async (email, username) => {
             <h1>¡Bienvenido, ${username}!</h1>
             <p>Gracias por registrarte en el Aura Event Center. Estamos emocionados de tenerte con nosotros. A continuación, puedes comenzar a disfrutar de todas las funciones que ofrecemos.</p>
             <p>Si tienes alguna duda o pregunta, no dudes en ponerte en contacto con nuestro equipo de soporte.</p>
-            <a href="http://localhost:5173" class="button">Comienza ahora</a>
+            <a href="http://localhost:5173"
+              style="display:inline-block; padding:10px 20px; background:#0074d9; border:none; color:#ffffff; text-decoration:none; border-radius:6px; font-weight:bold;">
+              Comienza ahora
+            </a>
             <hr style="border: 0; border-top: 1px solid #0074d9; margin: 20px 0;">
             <div class="footer">
               <p>&copy; 2025 Centro de Eventos Aura. Todos los derechos reservados.</p>
@@ -102,6 +105,18 @@ exports.sendWelcomeEmail = async (email, username) => {
  */
 exports.sendRecoveryCode = async (req, res) => {
   const { email } = req.body;
+  let conn;
+  try {
+    conn = await getConnection();
+    const result = await conn.execute(
+    `SELECT * FROM CLIENT_SCHEMA.USERS WHERE EMAIL = :email`,
+    { email }
+  );
+
+  if (result.rows.length === 0) {
+    // No existe el correo, no enviamos correo, pero devolvemos éxito igual
+    return res.status(200).json({ message: 'Si el correo está registrado, se ha enviado un código de recuperación.' });
+  }
 
   // Generar código aleatorio de 6 dígitos como string
   const code = Math.floor(100000 + Math.random() * 900000).toString();
@@ -171,12 +186,14 @@ exports.sendRecoveryCode = async (req, res) => {
     `
   };
 
-  try {
+  
     await transporter.sendMail(mailOptions);
-    res.status(200).json({ message: 'Código enviado', token });
+    res.status(200).json({ message: 'Si el correo está registrado, se ha enviado un código de recuperación.', token });
   } catch (error) {
     console.error('Error al enviar el correo de recuperación:', error);
     res.status(500).json({ message: 'Error al enviar el correo' });
+  }finally {
+    if (conn) await conn.close();
   }
 };
 

@@ -177,6 +177,7 @@ if (
 
           {(isAddMode || isEditMode) && (
             <>
+            <h2>{isAddMode ? "Agregar Servicio" : "Editar Servicio"}</h2>
               <p>
                 Los campos marcados con <span className="required">*</span> son obligatorios
               </p>
@@ -187,6 +188,7 @@ if (
                 <input
                   type="text"
                   className="input"
+                  placeholder= {service && !isAddMode ? service.name : "Ingrese el nombre aquí"}
                   {...register("name", { required: "Nombre requerido" })}
                 />
                 {errors.name && <span className="error">{errors.name.message}</span>}
@@ -196,17 +198,26 @@ if (
                 </label>
                 <textarea
                   className="input"
-                  {...register("description", { required: "Descripción requerida" })}
+                  placeholder= {service && !isAddMode ? service.description : "Ingrese la descripción aquí"}
+                  {...register("description", { required: "Descripción requerida",validate: {
+                    wordCount: (value) => {
+                    const wordCount = value.trim().split(/\s+/).length;
+                    if (wordCount < 70) return "La descripción debe tener al menos 70 palabras";
+                    if (wordCount > 85) return "La descripción no debe superar las 85 palabras";
+                    return true;
+                  }
+                  } })}
                 />
                 {errors.description && <span className="error">{errors.description.message}</span>}
 
                 <label>
-                  Precio (₡) <span className="required">*</span>
+                  Precio <span className="required">*</span>
                 </label>
                 <input
                   type="number"
                   step="0.01"
                   className="input"
+                  placeholder= {service && !isAddMode ? service.price : "Ingrese el precio aquí"}
                   {...register("price", {
                     required: "Precio requerido",
                     min: { value: 0, message: "El precio debe ser mayor o igual a 0" },
@@ -301,8 +312,8 @@ if (
               <p>
                 <strong>{service.name}</strong> será eliminado permanentemente.
               </p>
-              <div className="modal-buttons">
-                <button className="btn btn-delete" onClick={handleDelete}>
+              <div className="service-modal-actions">
+                <button className="btn btn-delete" style={{ color: "red" }} onClick={handleDelete}>
                   Eliminar
                 </button>
                 <button className="btn" onClick={onClose}>

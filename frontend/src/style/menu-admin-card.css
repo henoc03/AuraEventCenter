@@ -2,6 +2,7 @@
     display: flex;
     flex-direction: column;
     align-self: left;
+    background-color: #fff;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     border-radius: 16px;
     width: 30%;
@@ -44,7 +45,13 @@
     margin-top: 20px;
 }
 .menu-card-status-text{
-    text-align: center
+      font-size: 0.8rem;
+  padding: 0px 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #868585;
 }
 .menu-status-indicator {
     width: 8px;

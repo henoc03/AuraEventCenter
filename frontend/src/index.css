@@ -410,14 +410,16 @@ box-shadow: 0 0 50px var(--blue-logo);
   padding: 12px 40px 12px 16px;
   border-radius: 8px;
   font-size: 0.95rem;
-  margin: 16px 0;
+  margin: 80vh 0 0 0;
   text-align: center;
   transition: all 0.3s ease;
   animation: fadeIn 0.3s ease-in;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap:20px
+  gap:20px;
+  max-width: fit-content;
+  max-height: fit-content;
 }
 
 .alert-message span{

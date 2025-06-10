@@ -222,6 +222,12 @@
   background-color: #2563eb;
   color: white;
 }
+.alert-floating {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 1000;
+}
 
 @media (max-width: 1024px) {
   .products-dashboard-content {

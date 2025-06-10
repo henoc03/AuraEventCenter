@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 
 import Header from "../components/common/Header.jsx";
 import SideNav from "../components/common/SideNav.jsx";
@@ -20,6 +20,7 @@ function RoomsAdmin({ sections }) {
   const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [zones, setZones] = useState([]);
+  const [roomTypes, setRoomTypes] = useState([]); // <-- aquí guardamos los tipos
 
   // Estados para usuario
   const [name, setName] = useState("");
@@ -31,6 +32,12 @@ function RoomsAdmin({ sections }) {
   const [showSuccess, setShowSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showError, setShowError] = useState(false);
+
+  // Estados para filtros y orden
+  const [searchTerm, setSearchTerm] = useState("");
+  const [typeFilter, setTypeFilter] = useState("todos"); // <-- agregado
+  const [sortOrder, setSortOrder] = useState("asc"); // asc o desc para alfabético
+  const [priceOrder, setPriceOrder] = useState("none"); // 'none', 'asc' o 'desc'
 
   const navigate = useNavigate();
 
@@ -63,9 +70,14 @@ function RoomsAdmin({ sections }) {
       setRole(userData.USER_TYPE);
     } catch (err) {
       showErrorAlert("Ocurrió un error al obtener la información de usuario.");
-      navigate("/login");
+      navigate("/iniciar-sesion");
     }
   };
+const extractRoomTypes = (zonesData) => {
+  const types = zonesData.map(zone => zone.TYPE).filter(Boolean);
+  const uniqueTypes = [...new Set(types)];
+  return uniqueTypes;
+};
 
   const getZones = async () => {
     try {
@@ -82,9 +94,12 @@ function RoomsAdmin({ sections }) {
 
       const zonesData = await res.json();
       setZones(zonesData);
+
+      const extractedTypes = extractRoomTypes(zonesData);
+      setRoomTypes(extractedTypes);
     } catch (err) {
       showErrorAlert("Ocurrió un error al obtener las zonas.");
-      navigate("/login");
+      navigate("/iniciar-sesion");
     } finally {
       setLoading(false);
     }
@@ -108,27 +123,43 @@ function RoomsAdmin({ sections }) {
   };
 
   const handleError = (msg = "Ocurrió un error") => {
-  setErrorMessage(msg);
-  setShowError(true);
-  setTimeout(() => {
-    setShowError(false);
-    setErrorMessage("");
-  }, 4000);
-};
+    setErrorMessage(msg);
+    setShowError(true);
+    setTimeout(() => {
+      setShowError(false);
+      setErrorMessage("");
+    }, 4000);
+  };
 
+  const filteredZones = zones
+    .filter((zone) =>
+      zone.NAME.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      (typeFilter === "todos" || zone.TYPE === typeFilter)
+    )
+    .sort((a, b) => {
+      let result = 0;
+      if (priceOrder !== "none") {
+        result = priceOrder === "asc" ? a.PRICE - b.PRICE : b.PRICE - a.PRICE;
+      } else {
+        const nameA = a.NAME.toLowerCase();
+        const nameB = b.NAME.toLowerCase();
+        result = sortOrder === "asc" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+      }
+      return result;
+    });
 
   if (loading) return <LoadingPage />;
 
   return (
     <div className="rooms-admin-page">
-    {showSuccess && (
-      <AlertMessage
-        message={successMessage}
-        type="alert-floating"
-        onClose={() => setShowSuccess(false)}
-        className="success"
-      />
-    )}
+      {showSuccess && (
+        <AlertMessage
+          message={successMessage}
+          type="alert-floating"
+          onClose={() => setShowSuccess(false)}
+          className="success"
+        />
+      )}
 
       {showError && (
         <AlertMessage
@@ -147,13 +178,56 @@ function RoomsAdmin({ sections }) {
         <main className="rooms-content">
           <div className="title-button-container">
             <h1>Salas</h1>
-            <button className="add-room-button" onClick={() => {setIsAddEditOpen(true); setIsAddMode(true)}}>
-              Agregar Sala
+            <button
+              className="add-room-button"
+              onClick={() => {
+                setIsAddEditOpen(true);
+                setIsAddMode(true);
+              }}
+            >
+              Agregar
             </button>
+          </div>
+          
+          <div className="filter-controls">
+            <label htmlFor="search">Buscar: </label>
+            <input
+              id="search"
+              type="text"
+              placeholder="Buscar..."
+              className="filter-search-input"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <label htmlFor="type">Filtrar: </label>
+            <select
+            id="type"
+            className="sort-select"
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+          >
+            <option value="todos">Todos</option>
+            {roomTypes.map((type) => (
+              <option key={type} value={type}>
+                {type}
+              </option>
+            ))}
+          </select>
+
+            <label htmlFor="order">Ordenar: </label>
+            <select
+              id="order"
+              className="sort-select"
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+            >
+              <option value="asc">A-Z</option>
+              <option value="desc">Z-A</option>
+            </select>
           </div>
 
           <div className="rooms-container">
-            {zones.map((zone) => (
+            {filteredZones.map((zone) => (
               <RoomCard
                 key={zone.ZONE_ID}
                 id={zone.ZONE_ID}
