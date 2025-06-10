@@ -20,7 +20,7 @@ function RoomsAdmin({ sections }) {
   const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [zones, setZones] = useState([]);
-  const [roomTypes, setRoomTypes] = useState([]); // <-- aquí guardamos los tipos
+  const [roomTypes, setRoomTypes] = useState([]);
 
   // Estados para usuario
   const [name, setName] = useState("");
@@ -35,9 +35,9 @@ function RoomsAdmin({ sections }) {
 
   // Estados para filtros y orden
   const [searchTerm, setSearchTerm] = useState("");
-  const [typeFilter, setTypeFilter] = useState("todos"); // <-- agregado
-  const [sortOrder, setSortOrder] = useState("asc"); // asc o desc para alfabético
-  const [priceOrder, setPriceOrder] = useState("none"); // 'none', 'asc' o 'desc'
+  const [typeFilter, setTypeFilter] = useState("todos");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [priceOrder, setPriceOrder] = useState("none");
 
   const navigate = useNavigate();
 
