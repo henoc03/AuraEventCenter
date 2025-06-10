@@ -3,8 +3,9 @@ import UsersPage from "../components/sections/Users";
 import SideNav from "../components/common/SideNav";
 import Header from "../components/common/Header";
 import UserModal from "../components/common/UserModal";
-import AlertMessage from '../components/common/AlertMessage';
+import AlertMessage from "../components/common/AlertMessage";
 import LoadingPage from "../components/common/LoadingPage";
+import Pagination from "../components/common/Pagination";
 import { jwtDecode } from "jwt-decode";
 import "../style/admin-users.css";
 
@@ -20,7 +21,9 @@ const Administrators = ({ sections }) => {
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
 
-  
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 8;
+
   useEffect(() => {
     const fetchUserInfo = async () => {
       const token = localStorage.getItem("token");
@@ -143,6 +146,11 @@ const Administrators = ({ sections }) => {
     }
   };
 
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
+  const totalPages = Math.ceil(users.length / usersPerPage);
+
   if (loading) return <LoadingPage />;
 
   return (
@@ -165,12 +173,19 @@ const Administrators = ({ sections }) => {
           <div className="clients-content-wrapper">
             <UsersPage
               title="Administradores"
-              users={users}
+              users={currentUsers}
               onView={(user) => openModal("view", user)}
               onEdit={(user) => openModal("edit", user)}
               onDelete={(user) => openModal("delete", user)}
               onAdd={() => openModal("add")}
             />
+            {totalPages > 1 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            )}
           </div>
         </main>
       </div>
