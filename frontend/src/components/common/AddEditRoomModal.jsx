@@ -30,12 +30,15 @@ function AddEditRoomModal({
   const [existingSecondaryImages, setExistingSecondaryImages] = useState([]);
   const [primaryImageName, setPrimaryImageName] = useState("");
   const [primaryImageExists, setPrimaryImageExist] = useState(false);
+  const [active, setActive] = useState(1);
+
   
 useEffect(() => {
   if (id && !isAdd) {
     fetch(`${DEFAULT_ROUTE}/zones/${id}/images`)
       .then(res => res.json())
       .then(data => {
+        setActive(data.active);
         const images = Array.isArray(data) ? data : data.images || [];
         const primaryImage = images.find(img => img.id === "main");
         const secondaryImages = images.filter(img => img.id !== "main");
@@ -143,6 +146,7 @@ const handleDeletePrimaryImage = async () => {
       description: data.description || description,
       event_center_id: 1,
       imagePath: encryptedImagePath,
+      active:active
     };
 
     try {
@@ -252,12 +256,23 @@ const handleDeletePrimaryImage = async () => {
               <textarea type="text" placeholder={description} className="input" {...register("description", { required: isAdd && "Descripción requerida" ,validate: {
                     wordCount: (value) => {
                     const wordCount = value.trim().split(/\s+/).length;
-                    if (wordCount < 50) return "La descripción debe tener al menos 70 palabras";
+                    if (wordCount < 0) return "La descripción debe tener al menos 50 palabras";
                     if (wordCount > 85) return "La descripción no debe superar las 85 palabras";
                     return true;
                   }
                   } })} />
               {errors.description && <span className="error">{errors.description.message}</span>}
+              <label className="form-label">
+              Estado:
+              <input
+                type="checkbox"
+                checked={active === 1}
+                onChange={(e) => setActive(e.target.checked ? 1 : 0)}
+                className="form-checkbox"
+                
+              />
+              
+            </label>
 
               {/* Imagen principal */}
               <label htmlFor="room-image" className="upload-image-button">Subir imagen principal</label>
@@ -341,7 +356,7 @@ const handleDeletePrimaryImage = async () => {
               )}
 
               <div className="save-cancel-container">
-                <button type="submit" disabled={!isValid} className={`save-button ${isValid ? "active" : ""}`}>Guardar</button>
+                <button type="submit" disabled={!isValid} className={`save-button ${isValid ? "active" : ""}`}>{isAdd ? "Registrar" : "Guardar"}</button>
                 <button type="button" className="cancel-button" onClick={handleClose}>Cancelar</button>
               </div>
             </form>

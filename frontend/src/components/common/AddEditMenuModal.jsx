@@ -328,7 +328,7 @@ function AddEditMenuModal({
           )}
 
           <div className="save-cancel-container">
-            <button type="submit" className={`save-button ${isValid ? "active" : ""}`} disabled={!isValid}>Guardar</button>
+            <button type="submit" className={`save-button ${isValid ? "active" : ""}`} disabled={!isValid}>{isAdd ? "Registrar" : "Guardar"}</button>
             <button type="button" className="cancel-button" onClick={onClose}>Cancelar</button>
           </div>
         </form>

@@ -73,6 +73,7 @@ function MenusAdmin({ sections }) {
   // Obtener información de menús
   const getMenus = async () => {
     try {
+      setLoading(true);
       const res = await fetch(`${DEFAULT_ROUTE}/menus/`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },

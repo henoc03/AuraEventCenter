@@ -17,7 +17,7 @@ exports.getAllProducts = async (req, res) => {
   try {
     conn = await getConnection();
     const result = await conn.execute(
-      `SELECT PRODUCT_ID, NAME, UNITARY_PRICE, DESCRIPTION, TYPE FROM ADMIN_SCHEMA.PRODUCTS`,
+      `SELECT PRODUCT_ID, NAME, UNITARY_PRICE, DESCRIPTION, TYPE, ACTIVE FROM ADMIN_SCHEMA.PRODUCTS`,
       [],
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
@@ -27,12 +27,13 @@ exports.getAllProducts = async (req, res) => {
       name: p.NAME,
       price: p.UNITARY_PRICE,
       description: p.DESCRIPTION,
-      type: p.TYPE
+      type: p.TYPE,
+      active: p.ACTIVE
     }));
 
     res.json(products);
   } catch (err) {
-    console.error('❌ Error al obtener productos:', err);
+    console.error(' Error al obtener productos:', err);
     res.status(500).json({ error: err.message });
   } finally {
     if (conn) await conn.close();
@@ -48,7 +49,7 @@ exports.getProductById = async (req, res) => {
   try {
     conn = await getConnection();
     const result = await conn.execute(
-      `SELECT PRODUCT_ID, NAME, UNITARY_PRICE, DESCRIPTION, TYPE 
+      `SELECT PRODUCT_ID, NAME, UNITARY_PRICE, DESCRIPTION, TYPE, ACTIVE 
        FROM ADMIN_SCHEMA.PRODUCTS WHERE PRODUCT_ID = :id`,
       [req.params.id],
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
@@ -59,7 +60,7 @@ exports.getProductById = async (req, res) => {
     }
     res.json(product);
   } catch (err) {
-    console.error('❌ Error al obtener producto:', err);
+    console.error(' Error al obtener producto:', err);
     res.status(500).json({ error: err.message });
   } finally {
     if (conn) await conn.close();
@@ -70,26 +71,27 @@ exports.getProductById = async (req, res) => {
  * Crea un nuevo producto.
  */
 exports.createProduct = async (req, res) => {
-  const { name, unitary_price, description, type } = req.body;
+  const { name, unitary_price, description, type, active } = req.body;
   let conn;
   try {
     conn = await getConnection();
     const result = await conn.execute(
-      `INSERT INTO ADMIN_SCHEMA.PRODUCTS (PRODUCT_ID, NAME, UNITARY_PRICE, DESCRIPTION, TYPE)
-      VALUES (ADMIN_SCHEMA.PRODUCT_ID_SEQ.NEXTVAL, :name, :unitary_price, :description, :type)
+      `INSERT INTO ADMIN_SCHEMA.PRODUCTS (PRODUCT_ID, NAME, UNITARY_PRICE, DESCRIPTION, TYPE, ACTIVE)
+      VALUES (ADMIN_SCHEMA.PRODUCT_ID_SEQ.NEXTVAL, :name, :unitary_price, :description, :type, :active)
       RETURNING PRODUCT_ID INTO :product_id`,
       {
         name,
         unitary_price,
         description,
         type,
+        active,
         product_id: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER }
       },
       { autoCommit: true }
     );
     res.status(201).json({ product_id: result.outBinds.product_id[0] });
   } catch (err) {
-    console.error('❌ Error al crear producto:', err);
+    console.error(' Error al crear producto:', err);
     res.status(500).json({ error: err.message });
   } finally {
     if (conn) await conn.close();
@@ -100,7 +102,7 @@ exports.createProduct = async (req, res) => {
  * Actualiza un producto existente.
  */
 exports.updateProduct = async (req, res) => {
-  const { name, unitary_price, description, type } = req.body;
+  const { name, unitary_price, description, type, active } = req.body;
   let conn;
   try {
     conn = await getConnection();
@@ -109,14 +111,22 @@ exports.updateProduct = async (req, res) => {
         NAME = :name,
         UNITARY_PRICE = :unitary_price,
         DESCRIPTION = :description,
-        TYPE = :type
+        TYPE = :type,
+        ACTIVE = :active
       WHERE PRODUCT_ID = :id`,
-      [name, unitary_price, description, type, req.params.id],
+      {
+        name,
+        unitary_price,
+        description,
+        type,
+        active,
+        id: req.params.id
+      },
       { autoCommit: true }
     );
     res.sendStatus(204);
   } catch (err) {
-    console.error('❌ Error al actualizar producto:', err);
+    console.error(' Error al actualizar producto:', err);
     res.status(500).json({ error: err.message });
   } finally {
     if (conn) await conn.close();
@@ -137,7 +147,7 @@ exports.deleteProduct = async (req, res) => {
     );
     res.sendStatus(204);
   } catch (err) {
-    console.error('❌ Error al eliminar producto:', err);
+    console.error(' Error al eliminar producto:', err);
     if (conn) await conn.rollback();
     res.status(500).json({ error: err.message });
   } finally {

@@ -1,16 +1,49 @@
-import React, { useState} from "react";
+import React, { useEffect,useState} from "react";
 import { useNavigate } from "react-router-dom";
 import SideNav from "../components/common/SideNav.jsx"
+import Header from "../components/common/Header";
+import {jwtDecode} from "jwt-decode";
+
 import "../style/account-settings.css";
+
+const PORT = "http://localhost:1522";
 
 const AccountSettings = ({ sections }) => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   const navigate = useNavigate();
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
 
+      try {
+        const decoded = jwtDecode(token);
+        const now = Date.now();
+
+        if (decoded.exp && now < decoded.exp * 1000) {
+          const res = await fetch(`${PORT}/users/${decoded.id}`);
+          if (!res.ok) throw new Error("No se pudo obtener el usuario");
+
+          const user = await res.json();
+          setCurrentUser(user);
+        } else {
+          localStorage.removeItem("token");
+          setCurrentUser(null);
+        }
+      } catch (err) {
+        console.error("Error al obtener el usuario:", err);
+        localStorage.removeItem("token");
+        setCurrentUser(null);
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
   const handleEditClick = () => {
     navigate('/cuenta/verificar-codigo');
   };
@@ -64,6 +97,14 @@ const AccountSettings = ({ sections }) => {
 
   return (
     <>
+    <div className="settings">
+      <Header
+        name={currentUser?.FIRST_NAME}
+        lastname={currentUser?.LAST_NAME_1}
+        role={currentUser?.USER_TYPE}
+        email={currentUser?.EMAIL}
+      />
+    
       <div className="side-nav-mobile">
         <SideNav sections={sections} />
       </div>
@@ -108,8 +149,10 @@ const AccountSettings = ({ sections }) => {
                   <button className="modal-close" onClick={() => setShowConfirmModal(false)}>×</button>
                   <h2>¿Estás seguro?</h2>
                   <p>Esta acción es irreversible</p>
+                  <div className="modal-actions">
                   <button onClick={() => setShowConfirmModal(false)}>Cancelar</button>
                   <button onClick={handleConfirm}>Continuar</button>
+                  </div>
                 </div>
               </div>
               )}
@@ -136,6 +179,7 @@ const AccountSettings = ({ sections }) => {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </>
   );

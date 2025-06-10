@@ -140,7 +140,7 @@ const UserModal = ({ isOpen, mode, user, onClose, onDelete, onSubmit: onSubmitPr
                 disabled={!isValid}
                 className={`btn ${isValid ? "active" : ""}`}
               >
-                {isAddMode ? "Registrar Usuario" : "Guardar Cambios"}
+                {isAddMode ? "Registrar" : "Guardar"}
               </button>
               
             <button className="btn-text-close" onClick={onClose}>Cerrar</button>

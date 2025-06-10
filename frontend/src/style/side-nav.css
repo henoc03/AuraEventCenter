@@ -81,3 +81,24 @@
   .sidenav-list .active .sidenav-icon {
     color: #fff;
   }
+  @media (max-width: 1110px) {
+  .sidenav {
+    min-height: 200vh;
+  }
+
+  .sidenav.open {
+    left: 0;
+  }
+
+  /* Opcional: oscurecer fondo cuando esté abierto */
+  .sidenav-backdrop {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0,0,0,0.3);
+    z-index: 999;
+  }
+}
