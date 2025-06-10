@@ -202,7 +202,7 @@ if (
                   {...register("description", { required: "Descripción requerida",validate: {
                     wordCount: (value) => {
                     const wordCount = value.trim().split(/\s+/).length;
-                    if (wordCount < 70) return "La descripción debe tener al menos 70 palabras";
+                    if (wordCount < 0) return "La descripción debe tener al menos 70 palabras";
                     if (wordCount > 85) return "La descripción no debe superar las 85 palabras";
                     return true;
                   }

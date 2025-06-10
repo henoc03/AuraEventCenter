@@ -252,7 +252,7 @@ const handleDeletePrimaryImage = async () => {
               <textarea type="text" placeholder={description} className="input" {...register("description", { required: isAdd && "Descripción requerida" ,validate: {
                     wordCount: (value) => {
                     const wordCount = value.trim().split(/\s+/).length;
-                    if (wordCount < 50) return "La descripción debe tener al menos 70 palabras";
+                    if (wordCount < 0 ) return "La descripción debe tener al menos 70 palabras";
                     if (wordCount > 85) return "La descripción no debe superar las 85 palabras";
                     return true;
                   }
