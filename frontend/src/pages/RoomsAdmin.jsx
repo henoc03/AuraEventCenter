@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 import Header from "../components/common/Header.jsx";
 import SideNav from "../components/common/SideNav.jsx";
@@ -8,8 +8,9 @@ import RoomCard from "../components/common/RoomCard.jsx";
 import AddEditRoomModal from "../components/common/AddEditRoomModal.jsx";
 import AlertMessage from "../components/common/AlertMessage.jsx";
 import LoadingPage from "../components/common/LoadingPage.jsx";
-import DefaultRoom from "../assets/images/salas/default_zone.jpg";
+import Pagination from "../components/common/Pagination.jsx";
 
+import DefaultRoom from "../assets/images/salas/default_zone.jpg";
 import "../style/rooms-admin.css";
 
 const DEFAULT_ROUTE = "http://localhost:1522";
@@ -22,22 +23,26 @@ function RoomsAdmin({ sections }) {
   const [zones, setZones] = useState([]);
   const [roomTypes, setRoomTypes] = useState([]);
 
-  // Estados para usuario
+  // Usuario
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [lastname, setLastname] = useState("");
   const [role, setRole] = useState("");
 
-  // Estados para mensajes
+  // Mensajes
   const [showSuccess, setShowSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showError, setShowError] = useState(false);
 
-  // Estados para filtros y orden
+  // Filtros y orden
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("todos");
   const [sortOrder, setSortOrder] = useState("asc");
-  const [priceOrder, setPriceOrder] = useState("none");
+  const [priceOrder] = useState("none"); // Declarado pero no usado visualmente
+
+  // Paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const roomsPerPage = 3;
 
   const navigate = useNavigate();
 
@@ -73,11 +78,11 @@ function RoomsAdmin({ sections }) {
       navigate("/iniciar-sesion");
     }
   };
-const extractRoomTypes = (zonesData) => {
-  const types = zonesData.map(zone => zone.TYPE).filter(Boolean);
-  const uniqueTypes = [...new Set(types)];
-  return uniqueTypes;
-};
+
+  const extractRoomTypes = (zonesData) => {
+    const types = zonesData.map((zone) => zone.TYPE).filter(Boolean);
+    return [...new Set(types)];
+  };
 
   const getZones = async () => {
     try {
@@ -94,9 +99,7 @@ const extractRoomTypes = (zonesData) => {
 
       const zonesData = await res.json();
       setZones(zonesData);
-
-      const extractedTypes = extractRoomTypes(zonesData);
-      setRoomTypes(extractedTypes);
+      setRoomTypes(extractRoomTypes(zonesData));
     } catch (err) {
       showErrorAlert("Ocurrió un error al obtener las zonas.");
       navigate("/iniciar-sesion");
@@ -137,16 +140,19 @@ const extractRoomTypes = (zonesData) => {
       (typeFilter === "todos" || zone.TYPE === typeFilter)
     )
     .sort((a, b) => {
-      let result = 0;
       if (priceOrder !== "none") {
-        result = priceOrder === "asc" ? a.PRICE - b.PRICE : b.PRICE - a.PRICE;
-      } else {
-        const nameA = a.NAME.toLowerCase();
-        const nameB = b.NAME.toLowerCase();
-        result = sortOrder === "asc" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+        return priceOrder === "asc" ? a.PRICE - b.PRICE : b.PRICE - a.PRICE;
       }
-      return result;
+      const nameA = a.NAME.toLowerCase();
+      const nameB = b.NAME.toLowerCase();
+      return sortOrder === "asc" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
     });
+
+  // Paginación
+  const indexOfLastRoom = currentPage * roomsPerPage;
+  const indexOfFirstRoom = indexOfLastRoom - roomsPerPage;
+  const currentZones = filteredZones.slice(indexOfFirstRoom, indexOfLastRoom);
+  const totalPages = Math.ceil(filteredZones.length / roomsPerPage);
 
   if (loading) return <LoadingPage />;
 
@@ -188,7 +194,7 @@ const extractRoomTypes = (zonesData) => {
               Agregar
             </button>
           </div>
-          
+
           <div className="filter-controls">
             <label htmlFor="search">Buscar: </label>
             <input
@@ -197,29 +203,39 @@ const extractRoomTypes = (zonesData) => {
               placeholder="Buscar por nombre..."
               className="filter-search-input"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
             />
+
             <label htmlFor="type">Filtrar: </label>
             <select
-            id="type"
-            className="sort-select"
-            value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
-          >
-            <option value="todos">Todos</option>
-            {roomTypes.map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
-          </select>
+              id="type"
+              className="sort-select"
+              value={typeFilter}
+              onChange={(e) => {
+                setTypeFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+            >
+              <option value="todos">Todos</option>
+              {roomTypes.map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
+            </select>
 
             <label htmlFor="order">Orden: </label>
             <select
               id="order"
               className="sort-select"
               value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value)}
+              onChange={(e) => {
+                setSortOrder(e.target.value);
+                setCurrentPage(1);
+              }}
             >
               <option value="asc">A-Z</option>
               <option value="desc">Z-A</option>
@@ -227,7 +243,7 @@ const extractRoomTypes = (zonesData) => {
           </div>
 
           <div className="rooms-container">
-            {filteredZones.map((zone) => (
+            {currentZones.map((zone) => (
               <RoomCard
                 key={zone.ZONE_ID}
                 id={zone.ZONE_ID}
@@ -247,6 +263,14 @@ const extractRoomTypes = (zonesData) => {
               />
             ))}
           </div>
+
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          )}
         </main>
       </div>
 
