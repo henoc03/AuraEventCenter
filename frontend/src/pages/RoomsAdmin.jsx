@@ -86,6 +86,7 @@ function RoomsAdmin({ sections }) {
 
   const getZones = async () => {
     try {
+      setLoading(true);
       const res = await fetch(`${DEFAULT_ROUTE}/zones/`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },

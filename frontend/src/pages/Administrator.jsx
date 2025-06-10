@@ -20,6 +20,7 @@ const Administrators = ({ sections }) => {
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
 
+  
   useEffect(() => {
     const fetchUserInfo = async () => {
       const token = localStorage.getItem("token");

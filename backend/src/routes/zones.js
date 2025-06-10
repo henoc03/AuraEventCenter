@@ -21,10 +21,6 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-router.use((req, res, next) => {
-  console.log(`[Router zones] ${req.method} ${req.originalUrl}`);
-  next();
-});
 router.get('/', zonesController.getAllZones);
 router.get('/:id', zonesController.getZoneById);
 router.post('/', zonesController.createZone);

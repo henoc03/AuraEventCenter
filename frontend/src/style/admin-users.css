@@ -248,10 +248,25 @@
   .clients-content-wrapper {
     padding: 16px;
   }
+      .users-section-search {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .users-section-search label,
+  .users-section-search input,
+  .users-section-search select {
+    width: 100%;
+    max-width: 50vw;
+  }
 }
 
 @media (max-width: 768px) {
   .clients-content-wrapper h2 {
     font-size: 1.2rem;
   }
+
+
+
+
 }

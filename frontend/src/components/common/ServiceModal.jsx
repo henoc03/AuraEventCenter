@@ -36,6 +36,7 @@ const ServiceModal = ({ isOpen, mode, service, onClose, onDelete, onSave }) => {
   const [imageFile, setImageFile] = useState(null);
   const [imagePath, setImagePath] = useState(null);
   const [imageName, setImageName] = useState("");
+  const [active, setActive] = useState(1);
 
 const [adminType, setAdminType] = useState('');
 const navigation = useNavigate();
@@ -54,7 +55,7 @@ useEffect(() => {
       description: service.description,
       price: service.price,
     });
-
+    setActive(service.active);
     setImagePath(service.imagePath || null);
     setImageFile(null);
     setImageName("");
@@ -113,7 +114,7 @@ useEffect(() => {
         ...data,
         price: parseFloat(data.price),
         imagePath: encryptedImagePath,
-        active: 1,
+        active: active,
       };
       await onSave(parsedData);
       setShowSuccess(true);
@@ -224,6 +225,17 @@ if (
                   })}
                 />
                 {errors.price && <span className="error">{errors.price.message}</span>}
+                              <label className="form-label">
+              Estado:
+              <input
+                type="checkbox"
+                checked={active === 1}
+                onChange={(e) => setActive(e.target.checked ? 1 : 0)}
+                className="form-checkbox"
+                
+              />
+              
+            </label>
                 <label htmlFor="service-image" className="upload-image-button"  style={{ marginBottom: "20px" }}>Subir imagen principal</label>
                 <label>Imagen Principal</label>
                 <input
@@ -249,7 +261,7 @@ if (
 
                 <div className="save-cancel-container">
                   <button type="submit" className="btn" disabled={!isValid}>
-                    {isAddMode ? "Registrar Servicio" : "Guardar Cambios"}
+                    {isAddMode ? "Registrar" : "Guardar"}
                   </button>
                   <button type="button" className="cancel-button" onClick={onClose}>
                     Cerrar

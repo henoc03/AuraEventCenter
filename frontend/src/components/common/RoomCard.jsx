@@ -42,7 +42,6 @@ function RoomCard ({id, name, image, state, type, capacity, price, description, 
       alert("Ocurrió un error al eliminar la zona.");
     }
   };
-console.log(image);
 
   return (
     <>

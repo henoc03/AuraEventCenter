@@ -3,10 +3,6 @@ const router = express.Router();
 const upload = require("../utils/upload");
 const servicesController = require('../controllers/servicesController');
 
-router.use((req, res, next) => {
-  console.log(`[Router services] ${req.method} ${req.originalUrl}`);
-  next();
-});
 
 router.get('/', servicesController.getAllServices);
 router.get('/:id', servicesController.getServiceById);

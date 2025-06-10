@@ -6,10 +6,12 @@ body {
 }
 
 .main-container {
-  position: relative;
-  z-index: 1;
+  display: flex;
+  min-height: 100vh;
+  background-color: #f9f9f9;
 }
 
+/* SideNav para escritorio */
 .settings-container {
   display: flex;
   gap: 2rem;
@@ -303,10 +305,10 @@ body {
 }
 
 .modal {
-  position: fixed;
-  top: 0;
-  left: 0;
+  position: relative;
+margin-top: -20%;
   width: 100%;
+  min-width: 500px;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.4);
   display: flex;
@@ -320,11 +322,16 @@ body {
   background-color: #fff;
   padding: 2rem;
   border-radius: 16px;
-  max-width: 500px;
-  width: 90%;
+  width: 100%;
+
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
   text-align: center;
   font-family: 'Merriweather Sans', sans-serif;
+}
+
+.modal-actions{
+  display:flex;
+
 }
 
 .modal-content h2, p{
