@@ -29,7 +29,7 @@ const ServiceCard = ({ service, onView, onEdit, onDelete }) => {
 
         <div className="service-card-buttons">
           <button className="btn btn-primary button" onClick={() => onDelete(service)}>
-            Borrar
+            Eliminar
           </button>
           <button className="btn btn-primary button" onClick={() => onEdit(service)}>
             Editar

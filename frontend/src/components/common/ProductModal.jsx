@@ -62,6 +62,7 @@ const ProductModal = ({ isOpen, mode, product, onClose, onDelete, onSubmit: onSu
 
         {(isAddMode || isEditMode) && (
         <>
+        <h2>{isAddMode ? "Agregar Servicio" : "Editar Servicio"}</h2>
         <p>Los campos marcados con <span style={{ color: "red" }}>*</span> son obligatorios</p>
           <form onSubmit={handleSubmit(onSubmit)} className="product-modal-form">
             <label>Nombre<span style={{ color: "red" }}>*</span></label>
@@ -104,7 +105,7 @@ const ProductModal = ({ isOpen, mode, product, onClose, onDelete, onSubmit: onSu
         {isViewMode && product && (
           <div className="info-container">
             <h3><strong> {product.name}</strong></h3>
-            <p><strong>Tipo: </strong> {product.type} || <strong>Precio: </strong> ₡{product.price}</p>
+            <p><strong>Tipo: </strong> {product.type} | <strong>Precio: </strong> ₡{parseFloat(product.price).toLocaleString()}</p>
              <p><strong>Descripción: </strong> {product.description}</p>
           </div>
         )}

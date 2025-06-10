@@ -13,7 +13,7 @@
   width: 270px;
   height: 170px;
   padding: 0px 0px 15px 0px;
-  margin-top: 2vh;
+  margin-top: 1vh;
   box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.1);
   transition: 0.3s ease
 }
@@ -101,7 +101,10 @@
 .users-section-add-button {
   background-color: #2563eb;
   color: white;
-  padding: 5px 16px;
+  width: 100%;
+  max-width: 100px;
+  min-width: 120px;
+  height: 35px;
   border-radius: 6px;
   margin-top: -10px;
 }
@@ -124,6 +127,7 @@
 .users-section-title {
   font-size: 2rem;
   font-weight: bold;
+  font: "Merriweather", serif;
 }
 
 .users-section-grid {
@@ -220,7 +224,7 @@
   display: flex;
   flex-direction: column;
   flex: 1;
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 .clients-content-wrapper {

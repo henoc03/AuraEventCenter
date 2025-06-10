@@ -5,7 +5,9 @@
     margin-bottom: 1.5rem;
     flex-wrap: wrap;
 }
-
+.menus-admin-page{
+    background-color: #f9f9f9;
+}
 .menu-search-input {
     display: flex;
     align-items: center;
@@ -100,12 +102,12 @@
 }
 
 .add-menu-button {
-    width: 40%;
-    max-width: 180px;
+    width: 100%;
+    max-width: 100px;
     min-width: 120px;
     height: 35px;
-    border-radius: 10px;
-    background-color: #0074D9;
+    border-radius: 6px;
+    background-color: #2563eb;
     border: none;
     color: white;
     font-family: 'Merriweather Sans', sans-serif;
@@ -115,8 +117,8 @@
 }
 
 .add-menu-button:hover {
-    background-color: #339CFF;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  transform: scale(1.04);
+  color: white;
 }
 
 .menus-admin-cards {

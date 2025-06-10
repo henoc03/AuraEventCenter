@@ -65,7 +65,7 @@
   gap: 5px;
 }
 
-.room-modal-form input{
+.room-modal-form input, .room-modal-form textarea{
   padding: 10px 12px;
   margin: 5px 0px 15px;
   border-radius: 8px;
@@ -76,7 +76,7 @@
   transition: border 0.2s ease, background-color 0.2s ease;
 }
 
-.room-modal-form input:focus {
+.room-modal-form input:focus, .room-modal-form textarea:focus {
   outline: none;
   border-color: #2563eb;
   background-color: #fff;

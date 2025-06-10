@@ -113,7 +113,7 @@
 .auth-box label {
   font-size: 0.85rem;
   text-align: left;
-  color: #475569;
+  color: #15171b;
 
 }
 .auth-links {
@@ -127,7 +127,7 @@
   text-decoration: underline;
 }
 
-.error {
+.auth-form .error {
   color: #ffdddd;
   background-color: rgba(255, 0, 0, 0.513);
   padding: 2px 6px;
@@ -135,6 +135,7 @@
   font-size: 0.8rem;
   margin-bottom: 2px;
   display: block;
+  margin-top: 7px;
 }
 
 .terms {
@@ -143,6 +144,15 @@
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+.terms label{
+  width: 100%;
+}
+
+.terms .checkbox{
+  height: 20px;
+  width: 100px;
 }
 
 .forgot-password {

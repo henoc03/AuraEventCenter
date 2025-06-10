@@ -34,7 +34,6 @@ const ServicesAdmin = ({ sections }) => {
   const [filterActive, setFilterActive] = useState("todos");
 
 
-
   useEffect(() => {
     fetchServices();
 
@@ -129,8 +128,11 @@ const ServicesAdmin = ({ sections }) => {
       return matchesSearch && matchesActive;
     })
     .sort((a, b) => {
-      return sortOrder === "asc" ? a.price - b.price : b.price - a.price;
-    });
+        return sortOrder === "asc"
+          ? a.name.localeCompare(b.name)
+          : b.name.localeCompare(a.name);
+      });
+
 
 
   if (loading) return <LoadingPage />;
@@ -183,7 +185,7 @@ const ServicesAdmin = ({ sections }) => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="services-search-input"
                 />
-                <label htmlFor="filterActive">Estado:</label>
+                <label htmlFor="filterActive">Filtrar:</label>
                 <select
                   id="filterActive"
                   value={filterActive}
@@ -195,7 +197,7 @@ const ServicesAdmin = ({ sections }) => {
                   <option value="inactivos">Inactivos</option>
                 </select>
 
-                <label htmlFor="sort">Orden:</label>
+                <label htmlFor="sort">Ordenar:</label>
                 <select
                   id="sort"
                   value={sortOrder}

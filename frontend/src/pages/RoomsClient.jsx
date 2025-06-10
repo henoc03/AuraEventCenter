@@ -21,7 +21,7 @@ function RoomsClient() {
   const [sortOrder, setSortOrder] = useState("asc");
 
   useEffect(() => {
-    AOS.init(); // ← ¡ESTO FALTABA!
+    AOS.init();
   }, []);
 
   useEffect(() => {
