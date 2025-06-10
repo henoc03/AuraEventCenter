@@ -64,6 +64,10 @@
   color: #fff;
 }
 
+.room-modal-content textarea {
+  font-family: "Merriweather Sans", sans-serif;
+}
+
 .input-add-container {
     display: flex;
     align-items: center;

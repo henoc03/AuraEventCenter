@@ -42,6 +42,7 @@
 }
 
 .user-card-actions {
+  font-family: 'Merriweather sans', sans-serif;
   margin-top: 12px;
   display: flex;
   justify-content: space-around;
@@ -99,6 +100,7 @@
   color: white;
 }
 .users-section-add-button {
+  font-family: 'Merriweather Sans', sans-serif;
   background-color: #2563eb;
   color: white;
   width: 100%;

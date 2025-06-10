@@ -163,7 +163,7 @@ function MenusAdmin({ sections }) {
                 onChange={(e) => setFilterType(e.target.value)}
                 className="filter-select"
               >
-                <option value="todos">Todos los tipos</option>
+                <option value="todos">Todos</option>
                 {uniqueTypes.map((type) => (
                 <option key={type} value={type}>
                     {type.charAt(0).toUpperCase() + type.slice(1)}
@@ -173,15 +173,15 @@ function MenusAdmin({ sections }) {
             </div>
 
             <div className="menu-sort-input">
-              <label htmlFor="sort">Ordenar: </label>
+              <label htmlFor="sort">Orden: </label>
               <select
                 id="sort"
                 value={sortOrder}
                 onChange={(e) => setSortOrder(e.target.value)}
                 className="filter-select"
               >
-                <option value="asc">Precio: menor a mayor</option>
-                <option value="desc">Precio: mayor a menor</option>
+                <option value="asc">Precio (menor a mayor)</option>
+                <option value="desc">Precio (mayor a menor)</option>
               </select>
             </div>
           </div>

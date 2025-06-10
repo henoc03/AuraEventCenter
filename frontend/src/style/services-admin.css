@@ -32,7 +32,7 @@
 }
 
 .services-section-title {
-  font-family: 'Merriweather Sans', sans-serif;
+  font-family: "Merriweather", serif;
   font-size: 2rem;
   font-weight: bold;
   margin: 0;
@@ -88,6 +88,10 @@
   gap: 1rem;
   flex-wrap: wrap;
   margin-bottom: 1.5rem;
+}
+
+.services-controls label {
+  font-weight: bold;
 }
 
 .services-grid {
