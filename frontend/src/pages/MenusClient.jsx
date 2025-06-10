@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import "../style/menus-client.css";
@@ -9,20 +9,23 @@ import CompactMenu from "../components/common/CompactMenu";
 import ExpandedMenu from "../components/common/ExpandedMenu";
 import Hero from "../components/sections/ClientDefaultHero"
 import heroImage from "../assets/images/menus_hero.jpg"
+import Pagination from "../components/common/Pagination";
 
 const DEFAULT_ROUTE = "http://localhost:1522";
 
-// Componente de la pagina de menus para el cliente
 function MenusClient() {
   const [menus, setMenus] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedMenu, setSelectedMenu] = useState(null);
   const expandedMenuRef = useRef(null);
 
-  // Estados para los filtros y búsqueda
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("todos");
   const [sortOrder, setSortOrder] = useState("asc");
+
+  // Paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const menusPerPage = 4;
 
   useEffect(() => {
     AOS.init();
@@ -32,10 +35,8 @@ function MenusClient() {
     getMenus();
   }, []);
 
-  // Función pra traer los menús de la base de datos
   const getMenus = async () => {
     try {
-      // Solicitud de todos los menus al backend
       const res = await fetch(`${DEFAULT_ROUTE}/menus/`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
@@ -47,12 +48,11 @@ function MenusClient() {
         return;
       }
 
-      // Almacenar respuesta con los menus
       const menusData = await res.json();
       setMenus(menusData);
     } catch (error) {
       console.error("Error al obtener menús:", error);
-      alert("Ocurrió un error al obtener los menus.");
+      alert("Ocurrió un error al obtener los menús.");
     } finally {
       setLoading(false);
     }
@@ -66,9 +66,13 @@ function MenusClient() {
       const matchesType = filterType === "todos" || menu.TYPE.toLowerCase() === filterType.toLowerCase();
       return menu.MENU_ID !== selectedMenu && matchesSearch && matchesType;
     })
-    .sort((a, b) => {
-      return sortOrder === "asc" ? a.PRICE - b.PRICE : b.PRICE - a.PRICE;
-    });
+    .sort((a, b) => sortOrder === "asc" ? a.PRICE - b.PRICE : b.PRICE - a.PRICE);
+
+  // Paginación
+  const indexOfLastMenu = currentPage * menusPerPage;
+  const indexOfFirstMenu = indexOfLastMenu - menusPerPage;
+  const currentMenus = filteredAndSortedMenus.slice(indexOfFirstMenu, indexOfLastMenu);
+  const totalPages = Math.ceil(filteredAndSortedMenus.length / menusPerPage);
 
   if (loading) return <LoadingPage />;
 
@@ -80,9 +84,14 @@ function MenusClient() {
         message="Explora nuestra variedad de menús cuidadosamente seleccionados para satisfacer todos los gustos y necesidades. Encuentra la opción perfecta para tu evento y sorprende a tus invitados con una experiencia culinaria inolvidable."
         imgSrc={heroImage}
       />
+      <div className="menus-navigation-container">
+        <Navigation />
+      </div>
 
       <main className="menus-client-main">
-        <button type='button' onClick={() => window.history.back()}><i class="bi bi-arrow-left"></i> Regresar</button>
+        <button type="button" onClick={() => window.history.back()}>
+          <i className="bi bi-arrow-left"></i> Regresar
+        </button>
         <h2>Conoce nuestros menús</h2>
 
         {/* Filtros */}
@@ -129,13 +138,11 @@ function MenusClient() {
             </select>
           </div>
         </div>
-        
-        <div className="client-menus-container">
-          {menus.length === 0 && (
-            <p>No hay menús disponibles</p>
-          )}
 
-          {/* Menu expandido */}
+        <div className="client-menus-container">
+          {menus.length === 0 && <p>No hay menús disponibles</p>}
+
+          {/* Menú expandido */}
           {selectedMenu && (
             <div className="menu-client-card expanded" ref={expandedMenuRef}>
               <ExpandedMenu
@@ -145,9 +152,9 @@ function MenusClient() {
             </div>
           )}
 
-          {/* Menus compactados */}
+          {/* Menús compactos */}
           <div className="menu-grid">
-            {filteredAndSortedMenus.map((menu) => (
+            {currentMenus.map((menu) => (
               <div
                 key={menu.MENU_ID}
                 className="menu-client-card"
@@ -157,6 +164,15 @@ function MenusClient() {
               </div>
             ))}
           </div>
+
+          {/* Paginación */}
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          )}
         </div>
       </main>
       <Footer />

@@ -67,6 +67,7 @@ const UserModal = ({ isOpen, mode, user, onClose, onDelete, onSubmit: onSubmitPr
 
         {(isAddMode || isEditMode) && (
           <>
+            <h2>{isAddMode ? "Agregar Usuario" : "Editar Usuario"}</h2>
             <p>Los campos marcados con <span style={{ color: "red" }}>*</span> son obligatorios</p>
             <form onSubmit={handleSubmit(onSubmit)} className="user-modal-form">
               <label>Nombre completo<span style={{ color: "red" }}>*</span></label>
@@ -133,16 +134,13 @@ const UserModal = ({ isOpen, mode, user, onClose, onDelete, onSubmit: onSubmitPr
             </>
              )}
 
-
-              <label>Foto de perfil</label>
-              <input type="file" accept="image/*" {...register("image")} />
              <div className="modal-btns">
               <button
                 type="submit"
                 disabled={!isValid}
                 className={`btn ${isValid ? "active" : ""}`}
               >
-                {isAddMode ? "Registrar Usuario" : "Guardar Cambios"}
+                {isAddMode ? "Registrar" : "Guardar"}
               </button>
               
             <button className="btn-text-close" onClick={onClose}>Cerrar</button>

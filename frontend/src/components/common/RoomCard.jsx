@@ -42,7 +42,6 @@ function RoomCard ({id, name, image, state, type, capacity, price, description, 
       alert("Ocurrió un error al eliminar la zona.");
     }
   };
-console.log(image);
 
   return (
     <>
@@ -51,9 +50,10 @@ console.log(image);
         {console.log(image)}
         <div className="card-body">
           <h3 className="card-title">{name}</h3>
-          <h2>
-            <FontAwesomeIcon icon={faSquare} className={state == 1 ? "status-indicator active" : "status-indicator inactive"} /> {state ?  "Publicada" : " No publicada"}
-          </h2>
+          <p className="menu-card-status-text">
+            <span className={`status-indicator ${state == 1 ? "active" : "inactive"}`}></span>
+            {state == 1 ? "Publicada" : "No publicada"}
+            </p>
           <div className="buttons">
             <a href="#" className="btn btn-primary button" onClick={(e) => { e.preventDefault(); setShowDeleteConfirmation(true); }}>Borrar</a>
             <a href="#" className="btn btn-primary button" onClick={() => setIsEditClicked(!isEditClicked)}>Editar</a>
@@ -89,9 +89,9 @@ console.log(image);
               <img src={image} alt={`Foto de la sala ${name}`}/>
               <div className='room-info-content'>
                 <h2>{name}</h2>
-                <p>{type}   |   Capacidad: {capacity} personas</p>
-                <p>{price}</p>
-                <p>{description}</p>
+                <p><strong>Tipo: </strong>{type} | <strong>Capacidad: </strong> {capacity} personas</p>
+                <p><strong>Precio: </strong>₡{parseFloat(price).toLocaleString()}</p>
+                <p><strong>Descripción: </strong>{description}</p>
               </div>
             </div>
           </div>

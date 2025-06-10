@@ -1,6 +1,7 @@
-/* Fija el header para que siempre esté visible */
-  
-  /* Contenedor principal de la vista */
+
+ .rooms-admin-page{
+  background-color: #f9f9f9;
+ }
   .room-main-container {
     display: flex;
     flex-direction: row;
@@ -8,7 +9,6 @@
     height: 100%;
   }
   
-  /* SideNav fijo a la izquierda */
   .zones-nav {
     box-shadow: 2px 0px 0px rgba(0, 0, 0, 0.1);
     width: 30vw;
@@ -21,7 +21,6 @@
     left: 0;
   }
   
-  /* Marca visual para la sección activa del SideNav */
   .zones-nav li:nth-of-type(3) {
     background-color: #C3D6EA;
     border-radius: 10px;
@@ -29,7 +28,6 @@
     width: 90%;
   }
   
-  /* Contenido de la derecha de la vista (dashboard de salas) */
   .rooms-content {
     padding: 20px;
     flex: 1;
@@ -38,7 +36,6 @@
     margin-top: 20px;
   }
   
-  /* Encabezado con título y botón */
   .title-button-container {
     display: flex;
     flex-direction: row;
@@ -50,20 +47,19 @@
   }
   
   .title-button-container h1 {
-    font-family: 'Merriweather Sans', sans-serif;
+    font-family: "Merriweather", serif;
     font-weight: bold;
-    font-size: 1.8rem;
+    font-size: 2rem;
     margin: 0;
   }
-  
-  /* Botón para agregar sala */
+
   .add-room-button {
-    width: 40%;
-    max-width: 180px;
+    width: 100%;
+    max-width: 100px;
     min-width: 120px;
     height: 35px;
-    border-radius: 10px;
-    background-color: #0074D9;
+    border-radius: 6px;
+    background-color: #2563eb;
     border: none;
     color: white;
     font-family: 'Merriweather Sans', sans-serif;
@@ -73,11 +69,10 @@
   }
   
   .add-room-button:hover {
-    background-color: #339CFF;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    transform: scale(1.04);
+    color: white;
   }
   
-  /* Contenedor que agrupa las RoomCard */
   .rooms-container {
     display: flex;
     flex-wrap: wrap;
@@ -86,11 +81,60 @@
     justify-content: flex-start;
   }
   
-  /* Para evitar scroll bloqueado si hay modal */
   .modal-open {
     overflow: hidden;
   }
-  
+
+.filter-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 1rem;
+  align-items: center;
+}
+
+.filter-controls label {
+  font-weight: bold;
+}
+
+.filter-search-input {
+  flex: 1;
+  max-width: 400px;
+  padding: 8px 12px;
+  font-size: 0.95rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.filter-search-input:focus {
+  border-color: #007aff;
+  box-shadow: 0 0 0 2px #007aff33;
+}
+
+.filter-select,
+.sort-select {
+  padding: 6px 16x 6px 10px;
+  font-size: 0.9rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+  min-width: 150px;
+}
+
+.filter-select:hover,
+.sort-select:hover {
+  background-color: #f0f4ff;
+  cursor: pointer;
+}
+
+.filter-select:focus,
+.sort-select:focus {
+  border-color: #007aff;
+  box-shadow: 0 0 0 2px #007aff33;
+}
+
   /* Responsive */
   @media (max-width: 768px) {
     .main-container {

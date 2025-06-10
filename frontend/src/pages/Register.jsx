@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import Auth from '../components/common/Auth';
@@ -7,9 +7,13 @@ import '../style/auth.css';
 const PORT = "http://localhost:1522";
 
 const Register = () => {
-  const { register, handleSubmit, formState: { errors, isValid } } = useForm({ mode: 'onChange' });
+  const { register, handleSubmit, formState: { errors, isValid }, reset } = useForm({ mode: 'onChange' });
   const [termsAccepted, setTermsAccepted] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+  reset();
+  }, [reset]);
 
   const onSubmit = async (data) => {
     const body = {
@@ -21,6 +25,8 @@ const Register = () => {
       password: data.password,
       user_type: 'cliente'
     };
+
+
   
     try {
       const response = await fetch(`${PORT}/users/register`, {
@@ -118,12 +124,14 @@ const Register = () => {
         {errors.password && <span className="error">{errors.password.message}</span>}
 
         <div className="terms">
+          <label htmlFor="terms">He leído y acepto los términos y condiciones</label>
           <input
             type="checkbox"
             id="terms"
+            className="checkbox"
             onChange={() => setTermsAccepted(prev => !prev)}
           />
-          <label htmlFor="terms">He leído y acepto los términos y condiciones</label>
+          
         </div>
 
         <button

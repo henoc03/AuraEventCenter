@@ -61,7 +61,7 @@ function MenuAdminCard ({id, menu, onClose, onSuccess}) {
             {menu.AVAILABLE == 1 ? "Disponible" : "No disponible"}
             </p>
           <div className="menu-card-buttons">
-            <a href="#" className="btn btn-primary button" onClick={() => setShowDeleteConfirmation(true)}>Borrar</a>
+            <a href="#" className="btn btn-primary button" onClick={() => setShowDeleteConfirmation(true)}>Eliminar</a>
             <a href="#" className="btn btn-primary button" onClick={() => setIsEditClicked(!isEditClicked)}>Editar</a>
             <a href="#" className="btn btn-primary button" onClick={() => setIsViewClicked(!isViewClicked)}>Visualizar</a>
           </div>
@@ -92,10 +92,10 @@ function MenuAdminCard ({id, menu, onClose, onSuccess}) {
               <img src={menu.IMAGE_PATH && menu.IMAGE_PATH.trim() !== "" ? `${DEFAULT_ROUTE}/${menu.IMAGE_PATH}`: defaultImage} alt={`Foto del menú ${menu.NAME}`}/>
               <div className='menu-info-content'>
                 <h2>{menu.NAME}</h2>
-                <p>{menu.DESCRIPTION}</p>
-                <p>{`Precio: ₡${menu.PRICE.toLocaleString('es-CR')}`}  |  {menu.AVAILABLE ?  "Disponible" : " No disponible"}</p>
+                <p><strong>Descripción: </strong>{menu.DESCRIPTION}</p>
+                <p><strong>Precio: ₡</strong>{parseFloat(menu.PRICE).toLocaleString()}  |  {menu.AVAILABLE ?  "Disponible" : " No disponible"}</p>
 
-                <h3>Productos</h3>
+                <p><strong>Productos:</strong></p>
                 <ul>
                   {menu.PRODUCTS && menu.PRODUCTS.length > 0 ? (
                     menu.PRODUCTS.map((product, idx) => (

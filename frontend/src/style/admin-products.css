@@ -87,6 +87,8 @@
   font-weight: bold;
 }
 .products-section-add-button {
+  font-size: 0.9rem;
+  font-family: 'Merriweather Sans', sans-serif;
   background-color: #2563eb;
   color: white;
   width: 100%;
@@ -96,10 +98,12 @@
   border-radius: 6px;
   margin-top: -10px;
 }
+
 .products-section-add-button:hover {
   transform: scale(1.04);
   color: white;
 }
+
 .products-controls {
   display: flex;
   align-items: center;
@@ -107,6 +111,7 @@
   margin-bottom: 20px;
   padding-left: 4px;
 }
+
 .products-controls label {
   font-weight: bold;
   color: #333;
@@ -167,6 +172,7 @@
 }
 
 .product-card-actions {
+  font-family: 'Merriweather sans', sans-serif;
   margin-top: 12px;
   display: flex;
   justify-content: space-around;
@@ -221,6 +227,12 @@
 .btn-product-card:hover {
   background-color: #2563eb;
   color: white;
+}
+.alert-floating {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 1000;
 }
 
 @media (max-width: 1024px) {

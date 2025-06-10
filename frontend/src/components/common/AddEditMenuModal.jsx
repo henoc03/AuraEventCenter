@@ -258,11 +258,18 @@ function AddEditMenuModal({
           {errors.name && <span className="error">{errors.name.message}</span>}
 
           <label>Descripción <span style={{ color: "red" }}>*</span></label>
-          <input
+          <textarea
             type="text"
             className="input"
             defaultValue={menu && !isAdd ? menu.DESCRIPTION : ""}
-            {...register("description", { required: "Descripción requerida" })}
+            {...register("description", { required: "Descripción requerida" ,validate: {
+                    wordCount: (value) => {
+                    const wordCount = value.trim().split(/\s+/).length;
+                    if (wordCount < 0) return "La descripción debe tener al menos 0 palabras";
+                    if (wordCount > 85) return "La descripción no debe superar las 85 palabras";
+                    return true;
+                  }
+                  } })}
           />
           {errors.description && <span className="error">{errors.description.message}</span>}
 
@@ -321,7 +328,7 @@ function AddEditMenuModal({
           )}
 
           <div className="save-cancel-container">
-            <button type="submit" className={`save-button ${isValid ? "active" : ""}`} disabled={!isValid}>Guardar</button>
+            <button type="submit" className={`save-button ${isValid ? "active" : ""}`} disabled={!isValid}>{isAdd ? "Registrar" : "Guardar"}</button>
             <button type="button" className="cancel-button" onClick={onClose}>Cancelar</button>
           </div>
         </form>

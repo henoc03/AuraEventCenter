@@ -229,7 +229,6 @@ exports.getAllMenuImages = async (req, res) => {
 /** 
  * Crea un nuevo menú.
 */
-console.log("✅ createMenu endpoint alcanzado");
 exports.createMenu = async (req, res) => {
   let conn;
   try {

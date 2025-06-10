@@ -7,6 +7,7 @@ import LoadingPage from "../components/common/LoadingPage";
 import Hero from "../components/sections/ClientDefaultHero";
 import Footer from "../components/common/Footer";
 import heroImage from "../assets/images/rooms_hero.jpg";
+import Pagination from "../components/common/Pagination";
 import "../style/rooms-client.css";
 
 const DEFAULT_ROUTE = "http://localhost:1522";
@@ -19,9 +20,11 @@ function RoomsClient() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("todos");
   const [sortOrder, setSortOrder] = useState("asc");
+  const [currentPage, setCurrentPage] = useState(1);
+  const roomsPerPage = 4;
 
   useEffect(() => {
-    AOS.init(); // ← ¡ESTO FALTABA!
+    AOS.init();
   }, []);
 
   useEffect(() => {
@@ -71,6 +74,12 @@ function RoomsClient() {
       return room.ZONE_ID !== selectedRoom && matchesSearch && matchesType;
     })
     .sort((a, b) => sortOrder === "asc" ? a.PRICE - b.PRICE : b.PRICE - a.PRICE);
+
+  // Paginación
+  const indexOfLastRoom = currentPage * roomsPerPage;
+  const indexOfFirstRoom = indexOfLastRoom - roomsPerPage;
+  const currentRooms = filteredAndSortedRooms.slice(indexOfFirstRoom, indexOfLastRoom);
+  const totalPages = Math.ceil(filteredAndSortedRooms.length / roomsPerPage);
 
   if (loading) return <LoadingPage />;
 
@@ -145,7 +154,7 @@ function RoomsClient() {
 
         {/* Salas compactas */}
         <div className="room-grid">
-          {filteredAndSortedRooms.map((room) => (
+          {currentRooms.map((room) => (
             <div
               key={room.ZONE_ID}
               className="room-client-card"
@@ -155,10 +164,19 @@ function RoomsClient() {
             </div>
           ))}
         </div>
+
+        {/* Paginación */}
+        {totalPages > 1 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        )}
       </div>
-      <Footer/>
+
+      <Footer />
     </div>
-    
   );
 }
 

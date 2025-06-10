@@ -5,9 +5,10 @@ import AlertMessage from "../components/common/AlertMessage";
 import LoadingPage from "../components/common/LoadingPage";
 import ServiceCard from "../components/common/ServiceCard";
 import ServiceModal from "../components/common/ServiceModal";
+import Pagination from "../components/common/Pagination";
+
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from "react-router-dom";
-
 
 import "../style/services-admin.css";
 
@@ -23,8 +24,7 @@ const ServicesAdmin = ({ sections }) => {
   const [loading, setLoading] = useState(true);
 
   const [currentUser, setCurrentUser] = useState(null);
-  
-    // Estados para mensajes
+
   const [showSuccess, setShowSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showError, setShowError] = useState(false);
@@ -33,11 +33,14 @@ const ServicesAdmin = ({ sections }) => {
   const [sortOrder, setSortOrder] = useState("asc");
   const [filterActive, setFilterActive] = useState("todos");
 
+  // Paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const servicesPerPage = 3;
 
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchServices();
-
   }, []);
 
   useEffect(() => {
@@ -58,7 +61,6 @@ const ServicesAdmin = ({ sections }) => {
     fetchUserInfo();
   }, []);
 
-
   const fetchServices = async () => {
     try {
       setLoading(true);
@@ -71,6 +73,7 @@ const ServicesAdmin = ({ sections }) => {
       setLoading(false);
     }
   };
+
   const openModal = (mode, service = null) => {
     setSelectedService(service);
     setModalMode(mode);
@@ -128,23 +131,30 @@ const ServicesAdmin = ({ sections }) => {
         (filterActive === "inactivos" && service.active === 0);
       return matchesSearch && matchesActive;
     })
-    .sort((a, b) => {
-      return sortOrder === "asc" ? a.price - b.price : b.price - a.price;
-    });
+    .sort((a, b) =>
+      sortOrder === "asc"
+        ? a.name.localeCompare(b.name)
+        : b.name.localeCompare(a.name)
+    );
 
+  // Paginación
+  const indexOfLastService = currentPage * servicesPerPage;
+  const indexOfFirstService = indexOfLastService - servicesPerPage;
+  const currentServices = filteredServices.slice(indexOfFirstService, indexOfLastService);
+  const totalPages = Math.ceil(filteredServices.length / servicesPerPage);
 
   if (loading) return <LoadingPage />;
 
   return (
     <div className="services-page">
-    {showSuccess && (
-      <AlertMessage
-        message={successMessage}
-        type="alert-floating"
-        onClose={() => setShowSuccess(false)}
-        className="success"
-      />
-    )}
+      {showSuccess && (
+        <AlertMessage
+          message={message}
+          type="alert-floating"
+          onClose={() => setShowSuccess(false)}
+          className="success"
+        />
+      )}
 
       {showError && (
         <AlertMessage
@@ -154,6 +164,7 @@ const ServicesAdmin = ({ sections }) => {
           className="error"
         />
       )}
+
       <Header
         name={currentUser?.FIRST_NAME}
         lastname={currentUser?.LAST_NAME_1}
@@ -168,7 +179,10 @@ const ServicesAdmin = ({ sections }) => {
             <section className="services-section">
               <div className="services-section-header">
                 <h2 className="services-section-title">Servicios</h2>
-                <button className="btn services-section-add-button" onClick={() => openModal("add")}>
+                <button
+                  className="btn services-section-add-button"
+                  onClick={() => openModal("add")}
+                >
                   Agregar
                 </button>
               </div>
@@ -180,14 +194,21 @@ const ServicesAdmin = ({ sections }) => {
                   type="text"
                   placeholder="Buscar servicio..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setCurrentPage(1);
+                  }}
                   className="services-search-input"
                 />
-                <label htmlFor="filterActive">Estado:</label>
+
+                <label htmlFor="filterActive">Filtrar:</label>
                 <select
                   id="filterActive"
                   value={filterActive}
-                  onChange={(e) => setFilterActive(e.target.value)}
+                  onChange={(e) => {
+                    setFilterActive(e.target.value);
+                    setCurrentPage(1);
+                  }}
                   className="services-filter-select"
                 >
                   <option value="todos">Todos</option>
@@ -199,16 +220,19 @@ const ServicesAdmin = ({ sections }) => {
                 <select
                   id="sort"
                   value={sortOrder}
-                  onChange={(e) => setSortOrder(e.target.value)}
+                  onChange={(e) => {
+                    setSortOrder(e.target.value);
+                    setCurrentPage(1);
+                  }}
                   className="services-sort-select"
                 >
-                  <option value="asc">A-Z</option>
-                  <option value="desc">Z-A</option>
+                  <option value="asc">Precio (mayor a menor)</option>
+                  <option value="desc">Precio (menor a mayor)</option>
                 </select>
               </div>
 
               <div className="services-grid">
-                {filteredServices.map((service) => (
+                {currentServices.map((service) => (
                   <ServiceCard
                     key={service.ID}
                     service={service}
@@ -218,6 +242,14 @@ const ServicesAdmin = ({ sections }) => {
                   />
                 ))}
               </div>
+
+              {totalPages > 1 && (
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                />
+              )}
             </section>
           </div>
         </main>

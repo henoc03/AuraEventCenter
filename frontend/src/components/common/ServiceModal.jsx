@@ -36,6 +36,7 @@ const ServiceModal = ({ isOpen, mode, service, onClose, onDelete, onSave }) => {
   const [imageFile, setImageFile] = useState(null);
   const [imagePath, setImagePath] = useState(null);
   const [imageName, setImageName] = useState("");
+  const [active, setActive] = useState(1);
 
 const [adminType, setAdminType] = useState('');
 const navigation = useNavigate();
@@ -54,7 +55,7 @@ useEffect(() => {
       description: service.description,
       price: service.price,
     });
-
+    setActive(service.active);
     setImagePath(service.imagePath || null);
     setImageFile(null);
     setImageName("");
@@ -113,7 +114,7 @@ useEffect(() => {
         ...data,
         price: parseFloat(data.price),
         imagePath: encryptedImagePath,
-        active: 1,
+        active: active,
       };
       await onSave(parsedData);
       setShowSuccess(true);
@@ -177,6 +178,7 @@ if (
 
           {(isAddMode || isEditMode) && (
             <>
+            <h2>{isAddMode ? "Agregar Servicio" : "Editar Servicio"}</h2>
               <p>
                 Los campos marcados con <span className="required">*</span> son obligatorios
               </p>
@@ -187,6 +189,7 @@ if (
                 <input
                   type="text"
                   className="input"
+                  placeholder= {service && !isAddMode ? service.name : "Ingrese el nombre aquí"}
                   {...register("name", { required: "Nombre requerido" })}
                 />
                 {errors.name && <span className="error">{errors.name.message}</span>}
@@ -196,23 +199,43 @@ if (
                 </label>
                 <textarea
                   className="input"
-                  {...register("description", { required: "Descripción requerida" })}
+                  placeholder= {service && !isAddMode ? service.description : "Ingrese la descripción aquí"}
+                  {...register("description", { required: "Descripción requerida",validate: {
+                    wordCount: (value) => {
+                    const wordCount = value.trim().split(/\s+/).length;
+                    if (wordCount < 0) return "La descripción debe tener al menos 70 palabras";
+                    if (wordCount > 85) return "La descripción no debe superar las 85 palabras";
+                    return true;
+                  }
+                  } })}
                 />
                 {errors.description && <span className="error">{errors.description.message}</span>}
 
                 <label>
-                  Precio (₡) <span className="required">*</span>
+                  Precio <span className="required">*</span>
                 </label>
                 <input
                   type="number"
                   step="0.01"
                   className="input"
+                  placeholder= {service && !isAddMode ? service.price : "Ingrese el precio aquí"}
                   {...register("price", {
                     required: "Precio requerido",
                     min: { value: 0, message: "El precio debe ser mayor o igual a 0" },
                   })}
                 />
                 {errors.price && <span className="error">{errors.price.message}</span>}
+                              <label className="form-label">
+              Estado:
+              <input
+                type="checkbox"
+                checked={active === 1}
+                onChange={(e) => setActive(e.target.checked ? 1 : 0)}
+                className="form-checkbox"
+                
+              />
+              
+            </label>
                 <label htmlFor="service-image" className="upload-image-button"  style={{ marginBottom: "20px" }}>Subir imagen principal</label>
                 <label>Imagen Principal</label>
                 <input
@@ -238,7 +261,7 @@ if (
 
                 <div className="save-cancel-container">
                   <button type="submit" className="btn" disabled={!isValid}>
-                    {isAddMode ? "Registrar Servicio" : "Guardar Cambios"}
+                    {isAddMode ? "Registrar" : "Guardar"}
                   </button>
                   <button type="button" className="cancel-button" onClick={onClose}>
                     Cerrar
@@ -273,7 +296,7 @@ if (
                     <div className='menus-products-buttons'>
                       <button 
                         type='button'
-                        onClick={() => navigation(`/${adminType}/menus`)}
+                        onClick={() => navigation(`/${adminType}/servicios/catering/menus`)}
                         className="service-menus-button"
                       >
                         Ver menús
@@ -301,8 +324,8 @@ if (
               <p>
                 <strong>{service.name}</strong> será eliminado permanentemente.
               </p>
-              <div className="modal-buttons">
-                <button className="btn btn-delete" onClick={handleDelete}>
+              <div className="service-modal-actions">
+                <button className="btn btn-delete" style={{ color: "red" }} onClick={handleDelete}>
                   Eliminar
                 </button>
                 <button className="btn" onClick={onClose}>

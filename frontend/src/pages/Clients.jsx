@@ -5,6 +5,7 @@ import Header from "../components/common/Header";
 import UserModal from "../components/common/UserModal";
 import AlertMessage from '../components/common/AlertMessage';
 import LoadingPage from "../components/common/LoadingPage";
+import Pagination from "../components/common/Pagination";
 import { jwtDecode } from 'jwt-decode';
 
 import "../style/admin-users.css";
@@ -20,6 +21,10 @@ const Clients = ({ sections }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
+
+  // Paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 8;
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -109,6 +114,7 @@ const Clients = ({ sections }) => {
     if (data.password) {
       body.password = data.password;
     }
+
     try {
       if (modalMode === "add") {
         await fetch(`${PORT}/users`, {
@@ -135,7 +141,14 @@ const Clients = ({ sections }) => {
     }
   };
 
+  // Lógica de paginación
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
+  const totalPages = Math.ceil(users.length / usersPerPage);
+
   if (loading) return <LoadingPage />;
+
   return (
     <div className="clients-page">
       <AlertMessage
@@ -156,12 +169,19 @@ const Clients = ({ sections }) => {
           <div className="clients-content-wrapper">
             <UsersPage
               title="Clientes"
-              users={users}
+              users={currentUsers}
               onView={(user) => openModal("view", user)}
               onEdit={(user) => openModal("edit", user)}
               onDelete={(user) => openModal("delete", user)}
               onAdd={() => openModal("add")}
             />
+            {totalPages > 1 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            )}
           </div>
         </main>
       </div>

@@ -6,8 +6,6 @@ const DEFAULT_ROUTE = "http://localhost:1522";
 
 const ServiceCard = ({ service, onView, onEdit, onDelete }) => {
   const isActive = service.active === 1;
-  console.log(service.imagePath && service.imagePath.trim() !== ""
-                    ? `${DEFAULT_ROUTE}/${service.imagePath}`: defaultImage);
   return (
     <div className="service-card">
       <img
@@ -29,7 +27,7 @@ const ServiceCard = ({ service, onView, onEdit, onDelete }) => {
 
         <div className="service-card-buttons">
           <button className="btn btn-primary button" onClick={() => onDelete(service)}>
-            Borrar
+            Eliminar
           </button>
           <button className="btn btn-primary button" onClick={() => onEdit(service)}>
             Editar

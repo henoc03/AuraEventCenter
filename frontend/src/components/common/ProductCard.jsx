@@ -12,8 +12,8 @@ const ProductCard = ({ product, onView, onEdit, onDelete }) => {
       </div>
 
       <p className="product-card-status-text">
-        <span className={`status-indicator ${isActive ? "active" : "inactive"}`}></span>
-        {isActive ? "Activo" : "Inactivo"}
+        <span className={`status-indicator ${product.active ? "active" : "inactive"}`}></span>
+        {product.active ? "Activo" : "Inactivo"}
       </p>
 
       <div className="product-card-actions">

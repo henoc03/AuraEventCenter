@@ -8,8 +8,9 @@ import RoomCard from "../components/common/RoomCard.jsx";
 import AddEditRoomModal from "../components/common/AddEditRoomModal.jsx";
 import AlertMessage from "../components/common/AlertMessage.jsx";
 import LoadingPage from "../components/common/LoadingPage.jsx";
-import DefaultRoom from "../assets/images/salas/default_zone.jpg";
+import Pagination from "../components/common/Pagination.jsx";
 
+import DefaultRoom from "../assets/images/salas/default_zone.jpg";
 import "../style/rooms-admin.css";
 
 const DEFAULT_ROUTE = "http://localhost:1522";
@@ -20,17 +21,28 @@ function RoomsAdmin({ sections }) {
   const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [zones, setZones] = useState([]);
+  const [roomTypes, setRoomTypes] = useState([]);
 
-  // Estados para usuario
+  // Usuario
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [lastname, setLastname] = useState("");
   const [role, setRole] = useState("");
 
-  // Estados para mensajes
+  // Mensajes
   const [showSuccess, setShowSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showError, setShowError] = useState(false);
+
+  // Filtros y orden
+  const [searchTerm, setSearchTerm] = useState("");
+  const [typeFilter, setTypeFilter] = useState("todos");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [priceOrder] = useState("none"); // Declarado pero no usado visualmente
+
+  // Paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const roomsPerPage = 3;
 
   const navigate = useNavigate();
 
@@ -63,12 +75,18 @@ function RoomsAdmin({ sections }) {
       setRole(userData.USER_TYPE);
     } catch (err) {
       showErrorAlert("Ocurrió un error al obtener la información de usuario.");
-      navigate("/login");
+      navigate("/iniciar-sesion");
     }
+  };
+
+  const extractRoomTypes = (zonesData) => {
+    const types = zonesData.map((zone) => zone.TYPE).filter(Boolean);
+    return [...new Set(types)];
   };
 
   const getZones = async () => {
     try {
+      setLoading(true);
       const res = await fetch(`${DEFAULT_ROUTE}/zones/`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
@@ -82,9 +100,10 @@ function RoomsAdmin({ sections }) {
 
       const zonesData = await res.json();
       setZones(zonesData);
+      setRoomTypes(extractRoomTypes(zonesData));
     } catch (err) {
       showErrorAlert("Ocurrió un error al obtener las zonas.");
-      navigate("/login");
+      navigate("/iniciar-sesion");
     } finally {
       setLoading(false);
     }
@@ -108,27 +127,46 @@ function RoomsAdmin({ sections }) {
   };
 
   const handleError = (msg = "Ocurrió un error") => {
-  setErrorMessage(msg);
-  setShowError(true);
-  setTimeout(() => {
-    setShowError(false);
-    setErrorMessage("");
-  }, 4000);
-};
+    setErrorMessage(msg);
+    setShowError(true);
+    setTimeout(() => {
+      setShowError(false);
+      setErrorMessage("");
+    }, 4000);
+  };
 
+  const filteredZones = zones
+    .filter((zone) =>
+      zone.NAME.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      (typeFilter === "todos" || zone.TYPE === typeFilter)
+    )
+    .sort((a, b) => {
+      if (priceOrder !== "none") {
+        return priceOrder === "asc" ? a.PRICE - b.PRICE : b.PRICE - a.PRICE;
+      }
+      const nameA = a.NAME.toLowerCase();
+      const nameB = b.NAME.toLowerCase();
+      return sortOrder === "asc" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+    });
+
+  // Paginación
+  const indexOfLastRoom = currentPage * roomsPerPage;
+  const indexOfFirstRoom = indexOfLastRoom - roomsPerPage;
+  const currentZones = filteredZones.slice(indexOfFirstRoom, indexOfLastRoom);
+  const totalPages = Math.ceil(filteredZones.length / roomsPerPage);
 
   if (loading) return <LoadingPage />;
 
   return (
     <div className="rooms-admin-page">
-    {showSuccess && (
-      <AlertMessage
-        message={successMessage}
-        type="alert-floating"
-        onClose={() => setShowSuccess(false)}
-        className="success"
-      />
-    )}
+      {showSuccess && (
+        <AlertMessage
+          message={successMessage}
+          type="alert-floating"
+          onClose={() => setShowSuccess(false)}
+          className="success"
+        />
+      )}
 
       {showError && (
         <AlertMessage
@@ -147,13 +185,66 @@ function RoomsAdmin({ sections }) {
         <main className="rooms-content">
           <div className="title-button-container">
             <h1>Salas</h1>
-            <button className="add-room-button" onClick={() => {setIsAddEditOpen(true); setIsAddMode(true)}}>
-              Agregar Sala
+            <button
+              className="add-room-button"
+              onClick={() => {
+                setIsAddEditOpen(true);
+                setIsAddMode(true);
+              }}
+            >
+              Agregar
             </button>
           </div>
 
+          <div className="filter-controls">
+            <label htmlFor="search">Buscar: </label>
+            <input
+              id="search"
+              type="text"
+              placeholder="Buscar por nombre..."
+              className="filter-search-input"
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+            />
+
+            <label htmlFor="type">Filtrar: </label>
+            <select
+              id="type"
+              className="sort-select"
+              value={typeFilter}
+              onChange={(e) => {
+                setTypeFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+            >
+              <option value="todos">Todos</option>
+              {roomTypes.map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
+            </select>
+
+            <label htmlFor="order">Orden: </label>
+            <select
+              id="order"
+              className="sort-select"
+              value={sortOrder}
+              onChange={(e) => {
+                setSortOrder(e.target.value);
+                setCurrentPage(1);
+              }}
+            >
+              <option value="asc">A-Z</option>
+              <option value="desc">Z-A</option>
+            </select>
+          </div>
+
           <div className="rooms-container">
-            {zones.map((zone) => (
+            {currentZones.map((zone) => (
               <RoomCard
                 key={zone.ZONE_ID}
                 id={zone.ZONE_ID}
@@ -173,6 +264,14 @@ function RoomsAdmin({ sections }) {
               />
             ))}
           </div>
+
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          )}
         </main>
       </div>
 

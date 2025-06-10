@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import "../../style/product-modal.css";
 
@@ -7,7 +7,7 @@ const ProductModal = ({ isOpen, mode, product, onClose, onDelete, onSubmit: onSu
   const isAddMode = mode === "add";
   const isViewMode = mode === "view";
   const isDeleteMode = mode === "delete";
-
+  const [active, setActive] = useState(1);
   const {
     register,
     handleSubmit,
@@ -31,10 +31,13 @@ const ProductModal = ({ isOpen, mode, product, onClose, onDelete, onSubmit: onSu
       price: "",
       type: "",
     });
+     setActive(1);
   } else if ((isEditMode || isViewMode) && product) {
     reset(product);
+    setActive(product.active ?? 1);
   }
-}, [mode, product, reset]);
+  
+}, [mode, product, reset, , isAddMode, isEditMode, isViewMode]);
 
 
   const onSubmit = async (data) => {
@@ -43,6 +46,7 @@ const ProductModal = ({ isOpen, mode, product, onClose, onDelete, onSubmit: onSu
     unitary_price: parseFloat(data.price),
     description: data.description,
     type: data.type,
+    active: active
     };
     await onSubmitProp(mappedData);
     onClose();
@@ -62,6 +66,7 @@ const ProductModal = ({ isOpen, mode, product, onClose, onDelete, onSubmit: onSu
 
         {(isAddMode || isEditMode) && (
         <>
+        <h2>{isAddMode ? "Agregar Producto" : "Editar Producto"}</h2>
         <p>Los campos marcados con <span style={{ color: "red" }}>*</span> son obligatorios</p>
           <form onSubmit={handleSubmit(onSubmit)} className="product-modal-form">
             <label>Nombre<span style={{ color: "red" }}>*</span></label>
@@ -90,10 +95,19 @@ const ProductModal = ({ isOpen, mode, product, onClose, onDelete, onSubmit: onSu
             className="input"
             {...register("price", { required: "Precio requerido" })} />
             {errors.price && <span>{errors.price.message}</span>}
-
+            <label className="form-label">
+              Estado:
+              <input
+                type="checkbox"
+                checked={active === 1}
+                onChange={(e) => setActive(e.target.checked ? 1 : 0)}
+                className="form-checkbox"
+                
+              />
+              </label>
             <div className="modal-btns">
               <button type="submit" className="btn" disabled={!isValid}>
-                {isAddMode ? "Registrar Producto" : "Guardar Cambios"}
+                {isAddMode ? "Registrar" : "Guardar"}
               </button>
               <button type="button" className="btn-text-close" onClick={onClose}>Cerrar</button>
             </div>
@@ -104,7 +118,7 @@ const ProductModal = ({ isOpen, mode, product, onClose, onDelete, onSubmit: onSu
         {isViewMode && product && (
           <div className="info-container">
             <h3><strong> {product.name}</strong></h3>
-            <p><strong>Tipo: </strong> {product.type} || <strong>Precio: </strong> ₡{product.price}</p>
+            <p><strong>Tipo: </strong> {product.type} | <strong>Precio: </strong> ₡{parseFloat(product.price).toLocaleString()}</p>
              <p><strong>Descripción: </strong> {product.description}</p>
           </div>
         )}

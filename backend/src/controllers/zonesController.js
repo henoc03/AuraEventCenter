@@ -34,7 +34,7 @@ exports.getAllZones = async (req, res) => {
   try {
     conn = await getConnection();
   const result = await conn.execute(
-    `SELECT ZONE_ID, NAME, DESCRIPTION, CAPACITY, TYPE, EVENT_CENTER_ID, PRICE, IMAGE_PATH
+    `SELECT ZONE_ID, NAME, DESCRIPTION, CAPACITY, TYPE, EVENT_CENTER_ID, PRICE, IMAGE_PATH, ACTIVE
     FROM ADMIN_SCHEMA.ZONES`,
     [],
     { outFormat: oracledb.OUT_FORMAT_OBJECT }
@@ -67,7 +67,7 @@ exports.getZoneById = async (req, res) => {
   try {
     conn = await getConnection();
     const result = await conn.execute(
-  `SELECT ZONE_ID, NAME, DESCRIPTION, CAPACITY, TYPE, EVENT_CENTER_ID, PRICE, IMAGE_PATH
+  `SELECT ZONE_ID, NAME, DESCRIPTION, CAPACITY, TYPE, EVENT_CENTER_ID, PRICE, IMAGE_PATH, ACTIVE
    FROM ADMIN_SCHEMA.ZONES WHERE ZONE_ID = :id`,
   [req.params.id],
   { outFormat: oracledb.OUT_FORMAT_OBJECT }
@@ -89,27 +89,29 @@ res.json(zone || {});
  * Crea una nueva zona con los datos proporcionados en el body.
  */
 exports.createZone = async (req, res) => {
-  const { name, description, capacity, type, event_center_id, price, imagePath } = req.body;
+  const { name, description, capacity, type, event_center_id, price, imagePath, active } = req.body;
   let conn;
   try {
     conn = await getConnection();
 
     const result = await conn.execute(
-      `INSERT INTO ADMIN_SCHEMA.ZONES (NAME, DESCRIPTION, CAPACITY, TYPE, EVENT_CENTER_ID, PRICE, IMAGE_PATH)
-       VALUES (:name, :description, :capacity, :type, :event_center_id, :price, :image_path)
-       RETURNING ZONE_ID INTO :zone_id`,
-      {
-        name,
-        description,
-        capacity,
-        type,
-        event_center_id,
-        price,
-        image_path: imagePath || null,
-        zone_id: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER }
-      },
-      { autoCommit: true }
-    );
+    `INSERT INTO ADMIN_SCHEMA.ZONES 
+    (NAME, DESCRIPTION, CAPACITY, TYPE, EVENT_CENTER_ID, PRICE, IMAGE_PATH, ACTIVE)
+    VALUES (:name, :description, :capacity, :type, :event_center_id, :price, :image_path, :active)
+    RETURNING ZONE_ID INTO :zone_id`,
+    {
+      name,
+      description,
+      capacity,
+      type,
+      event_center_id,
+      price,
+      image_path: imagePath || null,
+      active: active ?? 1,
+      zone_id: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER }
+    },
+    { autoCommit: true }
+  );
     res.status(201).json({ zone_id: result.outBinds.zone_id[0] });
   } catch (err) {
     console.error('Error al crear zona:', err);
@@ -120,7 +122,7 @@ exports.createZone = async (req, res) => {
 };
 
 exports.updateZone = async (req, res) => {
-  const { name, description, capacity, type, event_center_id, price, imagePath } = req.body;
+  const { name, description, capacity, type, event_center_id, price, imagePath, active } = req.body;
   const zoneId = req.params.id;
   let conn;
 
@@ -145,7 +147,8 @@ exports.updateZone = async (req, res) => {
         TYPE = :type,
         EVENT_CENTER_ID = :event_center_id,
         PRICE = :price,
-        IMAGE_PATH = :image_path
+        IMAGE_PATH = :image_path,
+        ACTIVE = :active
        WHERE ZONE_ID = :zone_id`,
       {
         name,
@@ -155,6 +158,7 @@ exports.updateZone = async (req, res) => {
         event_center_id,
         price,
         image_path: finalImagePath,
+        active,
         zone_id: zoneId
       },
       { autoCommit: true }
