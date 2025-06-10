@@ -8,28 +8,32 @@ import MenuAdminCard from "../components/common/MenuAdminCard.jsx";
 import AddEditMenuModal from "../components/common/AddEditMenuModal.jsx";
 import AlertMessage from "../components/common/AlertMessage.jsx";
 import LoadingPage from "../components/common/LoadingPage.jsx";
+import Pagination from "../components/common/Pagination.jsx";
 
 import "../style/menus-admin.css";
 
 const DEFAULT_ROUTE = "http://localhost:1522";
 
-// Componente para la página de servicios del administrador
 function MenusAdmin({ sections }) {
   const [isAddEditOpen, setIsAddEditOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [menus, setMenus] = useState([]);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  // Estados para información de usuario
+  // Usuario
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [lastname, setLastname] = useState("");
   const [role, setRole] = useState("");
 
-  // Estados para los filtros y búsqueda
+  // Filtros
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("todos");
   const [sortOrder, setSortOrder] = useState("asc");
+
+  // Paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const menusPerPage = 3;
 
   const navigate = useNavigate();
 
@@ -38,13 +42,11 @@ function MenusAdmin({ sections }) {
     getMenus();
   }, []);
 
-  // Obtener información de usuario para el header
   const getSetUserInfo = async () => {
     const token = localStorage.getItem("token");
     if (!token) return;
 
     try {
-      // Obtener token de sesión
       const sessionUserData = jwtDecode(token);
       const res = await fetch(`${DEFAULT_ROUTE}/users/${sessionUserData.id}`, {
         method: "GET",
@@ -57,7 +59,6 @@ function MenusAdmin({ sections }) {
         return;
       }
 
-      // Almacenar datos de usuario
       const userData = await res.json();
       setName(userData.FIRST_NAME);
       setEmail(userData.EMAIL);
@@ -70,7 +71,6 @@ function MenusAdmin({ sections }) {
     }
   };
 
-  // Obtener información de menús
   const getMenus = async () => {
     try {
       const res = await fetch(`${DEFAULT_ROUTE}/menus/`, {
@@ -87,7 +87,7 @@ function MenusAdmin({ sections }) {
       const menusData = await res.json();
       setMenus(menusData);
     } catch {
-      alert("Ocurrió un error al obtener los servicios menús.");
+      alert("Ocurrió un error al obtener los menús.");
       navigate("/login");
     } finally {
       setLoading(false);
@@ -99,14 +99,18 @@ function MenusAdmin({ sections }) {
   const uniqueTypes = [...new Set(menus.map((menu) => menu.TYPE))];
 
   const filteredAndSortedMenus = menus
-  .filter((menu) => {
-    const matchesSearch = menu.NAME.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = filterType === "todos" || menu.TYPE.toLowerCase() === filterType.toLowerCase();
-    return matchesSearch && matchesType;
-  })
-  .sort((a, b) => {
-    return sortOrder === "asc" ? a.PRICE - b.PRICE : b.PRICE - a.PRICE;
-  });
+    .filter((menu) => {
+      const matchesSearch = menu.NAME.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesType = filterType === "todos" || menu.TYPE.toLowerCase() === filterType.toLowerCase();
+      return matchesSearch && matchesType;
+    })
+    .sort((a, b) => sortOrder === "asc" ? a.PRICE - b.PRICE : b.PRICE - a.PRICE);
+
+  // Paginación
+  const indexOfLastMenu = currentPage * menusPerPage;
+  const indexOfFirstMenu = indexOfLastMenu - menusPerPage;
+  const currentMenus = filteredAndSortedMenus.slice(indexOfFirstMenu, indexOfLastMenu);
+  const totalPages = Math.ceil(filteredAndSortedMenus.length / menusPerPage);
 
   return (
     <div className="menus-admin-page">
@@ -127,10 +131,13 @@ function MenusAdmin({ sections }) {
       />
 
       <div className={`menus-admin-container ${isAddEditOpen ? "modal-open" : ""}`}>
-        <SideNav className= "menus-admin-nav" sections={sections} />
+        <SideNav className="menus-admin-nav" sections={sections} />
 
         <main className="menus-admin-main">
-          <button type='button' className= "back-btn" onClick={() => window.history.back()}><i class="bi bi-arrow-left"></i> Regresar</button>
+          <button type='button' className="back-btn" onClick={() => window.history.back()}>
+            <i className="bi bi-arrow-left"></i> Regresar
+          </button>
+
           <div className="title-add-menu-cont">
             <h1>Menús</h1>
             <button
@@ -150,7 +157,10 @@ function MenusAdmin({ sections }) {
                 type="text"
                 placeholder="Buscar por nombre..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1);
+                }}
                 className="filter-input"
               />
             </div>
@@ -160,14 +170,17 @@ function MenusAdmin({ sections }) {
               <select
                 id="active"
                 value={filterType}
-                onChange={(e) => setFilterType(e.target.value)}
+                onChange={(e) => {
+                  setFilterType(e.target.value);
+                  setCurrentPage(1);
+                }}
                 className="filter-select"
               >
                 <option value="todos">Todos</option>
                 {uniqueTypes.map((type) => (
-                <option key={type} value={type}>
+                  <option key={type} value={type}>
                     {type.charAt(0).toUpperCase() + type.slice(1)}
-                </option>
+                  </option>
                 ))}
               </select>
             </div>
@@ -177,7 +190,10 @@ function MenusAdmin({ sections }) {
               <select
                 id="sort"
                 value={sortOrder}
-                onChange={(e) => setSortOrder(e.target.value)}
+                onChange={(e) => {
+                  setSortOrder(e.target.value);
+                  setCurrentPage(1);
+                }}
                 className="filter-select"
               >
                 <option value="asc">Precio (menor a mayor)</option>
@@ -186,9 +202,10 @@ function MenusAdmin({ sections }) {
             </div>
           </div>
 
+          {/* Menús */}
           <div className="menus-admin-cards">
-            {filteredAndSortedMenus.map((menu) => (
-              <MenuAdminCard 
+            {currentMenus.map((menu) => (
+              <MenuAdminCard
                 key={menu.MENU_ID}
                 className="menu-admin-card"
                 menu={menu}
@@ -203,6 +220,15 @@ function MenusAdmin({ sections }) {
               />
             ))}
           </div>
+
+          {/* Paginación */}
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          )}
         </main>
       </div>
 

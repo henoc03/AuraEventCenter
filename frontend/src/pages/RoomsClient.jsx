@@ -6,6 +6,7 @@ import ExpandedRoom from "../components/common/ExpandedRoom";
 import LoadingPage from "../components/common/LoadingPage";
 import Hero from "../components/sections/ClientDefaultHero";
 import Footer from "../components/common/Footer";
+import Pagination from "../components/common/Pagination";
 import heroImage from "../assets/images/clienthero.png";
 import "../style/rooms-client.css";
 
@@ -19,6 +20,8 @@ function RoomsClient() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("todos");
   const [sortOrder, setSortOrder] = useState("asc");
+  const [currentPage, setCurrentPage] = useState(1);
+  const roomsPerPage = 3;
 
   useEffect(() => {
     AOS.init();
@@ -72,6 +75,12 @@ function RoomsClient() {
     })
     .sort((a, b) => sortOrder === "asc" ? a.PRICE - b.PRICE : b.PRICE - a.PRICE);
 
+  // Paginación
+  const indexOfLastRoom = currentPage * roomsPerPage;
+  const indexOfFirstRoom = indexOfLastRoom - roomsPerPage;
+  const currentRooms = filteredAndSortedRooms.slice(indexOfFirstRoom, indexOfLastRoom);
+  const totalPages = Math.ceil(filteredAndSortedRooms.length / roomsPerPage);
+
   if (loading) return <LoadingPage />;
 
   return (
@@ -96,14 +105,20 @@ function RoomsClient() {
             type="text"
             placeholder="Buscar por nombre..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1); // Reinicia a la primera página
+            }}
             className="filter-input"
           />
           <label htmlFor="status">Filtrar: </label>
           <select
             id="status"
             value={filterType}
-            onChange={(e) => setFilterType(e.target.value)}
+            onChange={(e) => {
+              setFilterType(e.target.value);
+              setCurrentPage(1); // Reinicia a la primera página
+            }}
             className="filter-select"
           >
             <option value="todos">Todos los tipos</option>
@@ -117,7 +132,10 @@ function RoomsClient() {
           <select
             id="sort"
             value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
+            onChange={(e) => {
+              setSortOrder(e.target.value);
+              setCurrentPage(1); // Reinicia a la primera página
+            }}
             className="filter-select"
           >
             <option value="asc">Precio: menor a mayor</option>
@@ -127,7 +145,7 @@ function RoomsClient() {
 
         {/* Sala expandida */}
         {selectedRoom && (
-          <div className="room-card expanded" ref={expandedRoomRef}> {/* Se pone un ref en la sala expandida para que al abrirse en arriba se lleve a esta automaticamente */}
+          <div className="room-card expanded" ref={expandedRoomRef}>
             <ExpandedRoom
               room={zones.find((room) => room.ZONE_ID === selectedRoom)}
               onClose={() => setSelectedRoom(null)}
@@ -137,7 +155,7 @@ function RoomsClient() {
 
         {/* Salas compactas */}
         <div className="room-grid">
-          {filteredAndSortedRooms.map((room) => (
+          {currentRooms.map((room) => (
             <div
               key={room.ZONE_ID}
               className="room-card"
@@ -147,10 +165,19 @@ function RoomsClient() {
             </div>
           ))}
         </div>
+
+        {/* Paginación */}
+        {totalPages > 1 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        )}
       </div>
-      <Footer/>
+
+      <Footer />
     </div>
-    
   );
 }
 
