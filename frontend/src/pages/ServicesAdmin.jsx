@@ -197,15 +197,15 @@ const ServicesAdmin = ({ sections }) => {
                   <option value="inactivos">Inactivos</option>
                 </select>
 
-                <label htmlFor="sort">Ordenar:</label>
+                <label htmlFor="sort">Orden:</label>
                 <select
                   id="sort"
                   value={sortOrder}
                   onChange={(e) => setSortOrder(e.target.value)}
                   className="services-sort-select"
                 >
-                  <option value="asc">A-Z</option>
-                  <option value="desc">Z-A</option>
+                  <option value="asc">Precio (mayor a menor)</option>
+                  <option value="desc">Precio (menor a mayor)</option>
                 </select>
               </div>
 

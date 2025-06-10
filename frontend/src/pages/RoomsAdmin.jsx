@@ -194,7 +194,7 @@ const extractRoomTypes = (zonesData) => {
             <input
               id="search"
               type="text"
-              placeholder="Buscar..."
+              placeholder="Buscar por nombre..."
               className="filter-search-input"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -214,7 +214,7 @@ const extractRoomTypes = (zonesData) => {
             ))}
           </select>
 
-            <label htmlFor="order">Ordenar: </label>
+            <label htmlFor="order">Orden: </label>
             <select
               id="order"
               className="sort-select"

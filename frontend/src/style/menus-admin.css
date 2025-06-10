@@ -1,4 +1,5 @@
 .filters {
+    font-weight: bold;
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -95,9 +96,9 @@
 }
 
 .title-add-menu-cont h1 {
-    font-family: 'Merriweather Sans', sans-serif;
+  font-family: "Merriweather", serif;
     font-weight: bold;
-    font-size: 1.6rem;
+  font-size: 2rem;
     margin: 0;
 }
 

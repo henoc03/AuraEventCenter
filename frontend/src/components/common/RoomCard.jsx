@@ -51,9 +51,10 @@ console.log(image);
         {console.log(image)}
         <div className="card-body">
           <h3 className="card-title">{name}</h3>
-          <h2>
-            <FontAwesomeIcon icon={faSquare} className={state == 1 ? "status-indicator active" : "status-indicator inactive"} /> {state ?  "Publicada" : " No publicada"}
-          </h2>
+          <p className="menu-card-status-text">
+            <span className={`status-indicator ${state == 1 ? "active" : "inactive"}`}></span>
+            {state == 1 ? "Publicada" : "No publicada"}
+            </p>
           <div className="buttons">
             <a href="#" className="btn btn-primary button" onClick={(e) => { e.preventDefault(); setShowDeleteConfirmation(true); }}>Borrar</a>
             <a href="#" className="btn btn-primary button" onClick={() => setIsEditClicked(!isEditClicked)}>Editar</a>

@@ -47,7 +47,7 @@
   }
   
   .title-button-container h1 {
-    font-family: 'Merriweather Sans', sans-serif;
+    font-family: "Merriweather", serif;
     font-weight: bold;
     font-size: 2rem;
     margin: 0;
@@ -91,6 +91,10 @@
   gap: 12px;
   margin-bottom: 1rem;
   align-items: center;
+}
+
+.filter-controls label {
+  font-weight: bold;
 }
 
 .filter-search-input {
