@@ -5,6 +5,7 @@ import AlertMessage from "../components/common/AlertMessage";
 import LoadingPage from "../components/common/LoadingPage";
 import ProductCard from "../components/common/ProductCard";
 import ProductModal from "../components/common/ProductModal";
+import Pagination from "../components/common/Pagination";
 import { jwtDecode } from 'jwt-decode';
 import "../style/admin-products.css";
 
@@ -18,15 +19,16 @@ const Products = ({ sections }) => {
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
   const [loading, setLoading] = useState(true);
-
-  
   const [currentUser, setCurrentUser] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("todos");
   const [sortOrder, setSortOrder] = useState("asc");
-  const uniqueTypes = Array.from(new Set(products.map(p => p.type).filter(Boolean)));
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 8;
+
+  const uniqueTypes = Array.from(new Set(products.map(p => p.type).filter(Boolean)));
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -111,20 +113,20 @@ const Products = ({ sections }) => {
 
   const filteredProducts = products
     .filter((product) => {
-      const matchesSearch =
-        product.name.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesType =
-      typeFilter === "todos" || product.type?.toLowerCase() === typeFilter;
-
-    return matchesSearch && matchesType;
-
+      const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesType = typeFilter === "todos" || product.type?.toLowerCase() === typeFilter;
+      return matchesSearch && matchesType;
     })
     .sort((a, b) => {
       const nameA = a.name.toLowerCase();
       const nameB = b.name.toLowerCase();
       return sortOrder === "asc" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
     });
+
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
 
   if (loading) return <LoadingPage />;
 
@@ -145,61 +147,82 @@ const Products = ({ sections }) => {
       <div className="products-dashboard">
         <SideNav sections={sections} />
         <main className="products-dashboard-content">
-          <button type='button' className= "back-btn" onClick={() => window.history.back()}><i class="bi bi-arrow-left"></i> Regresar</button>
+          <button type='button' className="back-btn" onClick={() => window.history.back()}>
+            <i className="bi bi-arrow-left"></i> Regresar
+          </button>
           <div className="products-content-wrapper">
             <section className="products-section">
-            <div className="products-section-header">
-            <h2 className="products-section-title">Productos</h2>
-            <button className="btn products-section-add-button" onClick={() => openModal("add")}>Agregar</button>
-            </div>
-            <div className="products-controls">
-              <label htmlFor="search">Buscar: </label>
-              <input
-                id="search"
-                type="text"
-                placeholder="Buscar producto..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="products-search-input"
-              />
+              <div className="products-section-header">
+                <h2 className="products-section-title">Productos</h2>
+                <button className="btn products-section-add-button" onClick={() => openModal("add")}>
+                  Agregar
+                </button>
+              </div>
 
-              <label htmlFor="type">Filtrar:</label>
-              <select
-                id="type"
-                value={typeFilter}
-                onChange={(e) => setTypeFilter(e.target.value)}
-                className="products-status-select"
-              >
-                <option value="todos">Todos</option>
-                {uniqueTypes.map(type => (
-                  <option key={type} value={type.toLowerCase()}>{type}</option>
-                ))}
-              </select>
-
-
-              <label htmlFor="sort">Orden:</label>
-              <select
-                id="sort"
-                value={sortOrder}
-                onChange={(e) => setSortOrder(e.target.value)}
-                className="products-sort-select"
-              >
-                <option value="asc">A-Z</option>
-                <option value="desc">Z-A</option>
-              </select>
-            </div>
-
-            <div className="products-grid">
-              {filteredProducts.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  onView={() => openModal("view", product)}
-                  onEdit={() => openModal("edit", product)}
-                  onDelete={() => openModal("delete", product)}
+              <div className="products-controls">
+                <label htmlFor="search">Buscar: </label>
+                <input
+                  id="search"
+                  type="text"
+                  placeholder="Buscar producto..."
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="products-search-input"
                 />
-              ))}
-            </div>
+
+                <label htmlFor="type">Filtrar:</label>
+                <select
+                  id="type"
+                  value={typeFilter}
+                  onChange={(e) => {
+                    setTypeFilter(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="products-status-select"
+                >
+                  <option value="todos">Todos</option>
+                  {uniqueTypes.map(type => (
+                    <option key={type} value={type.toLowerCase()}>{type}</option>
+                  ))}
+                </select>
+
+                <label htmlFor="sort">Orden:</label>
+                <select
+                  id="sort"
+                  value={sortOrder}
+                  onChange={(e) => {
+                    setSortOrder(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="products-sort-select"
+                >
+                  <option value="asc">A-Z</option>
+                  <option value="desc">Z-A</option>
+                </select>
+              </div>
+
+              <div className="products-grid">
+                {currentProducts.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    onView={() => openModal("view", product)}
+                    onEdit={() => openModal("edit", product)}
+                    onDelete={() => openModal("delete", product)}
+                  />
+                ))}
+              </div>
+
+              {totalPages > 1 && (
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                />
+              )}
             </section>
           </div>
         </main>
