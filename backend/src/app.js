@@ -8,6 +8,7 @@ const zonesRoutes = require('./routes/zones');
 const dashboardRoutes = require('./routes/dashboard');
 const servicesRoutes = require('./routes/services');
 const menusRoutes = require('./routes/menus');
+// eslint-disable-next-line no-unused-vars
 const verifyToken = require('./middleware/verifyToken');
 const productsRoutes = require('./routes/products');
 

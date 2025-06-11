@@ -16,6 +16,7 @@ const fs = require('fs'); // Módulo para interacción con sistema de archivos
 function isWindows() {
   return process.platform === 'win32';
 }
+// eslint-disable-next-line no-unused-vars
 function isLinux() {
   return process.platform === 'linux';
 }
