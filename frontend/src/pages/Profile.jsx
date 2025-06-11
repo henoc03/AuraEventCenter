@@ -21,6 +21,7 @@ function Profile({sections}) {
   const [lastname, setLastname] = useState("");
   const [role, setRole] = useState("");
   const [imageFile, setImageFile] = useState(null);
+  // eslint-disable-next-line no-unused-vars
   const [imageName, setImageName] = useState("");
   const [imagePath, setImagePath] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
@@ -28,6 +29,7 @@ function Profile({sections}) {
 
   useEffect(() => {
     getSetUserInfo();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Función para obtener información del usuario

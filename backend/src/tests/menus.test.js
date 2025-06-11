@@ -1,5 +1,8 @@
-const { encrypt, decrypt } = require('../utils/encryption');
-const mockFs = require('mock-fs');
+/**
+ * @jest-environment node
+ */
+/* global jest, describe, test, expect, beforeEach */
+
 const db = require('../config/db');
 const request = require('supertest');
 const app = require('../app');

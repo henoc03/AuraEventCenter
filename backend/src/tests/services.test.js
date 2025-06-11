@@ -1,4 +1,5 @@
-const { encrypt, decrypt } = require('../utils/encryption');
+/* global jest, describe, it, expect, beforeEach */
+require('../utils/encryption');
 const db = require('../config/db');
 const request = require('supertest');
 const app = require('../app');

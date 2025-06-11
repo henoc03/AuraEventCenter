@@ -215,7 +215,7 @@ exports.verifyCode = async (req, res) => {
     } else {
       res.status(400).json({ message: 'Código incorrecto' });
     }
-  } catch (err) {
+  } catch {
     // Si el token es inválido o expiró, responde con error
     res.status(400).json({ message: 'Token inválido o expirado' });
   }

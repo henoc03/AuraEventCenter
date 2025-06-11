@@ -1,4 +1,5 @@
-const { encrypt, decrypt } = require('../utils/encryption');
+/* global jest, describe, it, expect, afterEach, beforeAll, afterAll, beforeEach, test */
+const { encrypt } = require('../utils/encryption');
 const mockFs = require('mock-fs');
 
 jest.mock('../utils/encryption', () => ({
@@ -19,7 +20,7 @@ jest.mock('../config/db', () => {
   return {
     getConnection: jest.fn(() => {
       return {
-        execute: jest.fn((query, params, options) => {
+        execute: jest.fn((query) => {
           if (query.includes("SELECT i.IMAGE_ADDRESS, i.IMAGE_ID")) {
             return Promise.resolve({
               rows: [
@@ -188,7 +189,7 @@ describe('DELETE /zones/:id', () => {
   });
   it('debería eliminar una zona con sus imágenes y archivos físicos', async () => {
     const fakeConn = {
-      execute: jest.fn((query, params, options) => {
+      execute: jest.fn((query) => {
         if (typeof query === 'string') {
           if (query.includes("SELECT i.IMAGE_ADDRESS, i.IMAGE_ID")) {
             return Promise.resolve({

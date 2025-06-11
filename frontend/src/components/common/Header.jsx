@@ -8,7 +8,6 @@ const DEFAULT_ROUTE = 'http://localhost:1522'
 
 function Header({name, lastname, role, email, sections = []}) {
   const [isMobile, setIsMobile] = useState(false);
-  const [hamburgerMenuIsOpen, setHamburguerMenuIsOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleClick = (href) => navigate(href);

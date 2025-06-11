@@ -76,7 +76,7 @@ const AccountSettings = ({ sections }) => {
       let data;
       try {
         data = await res.json();
-      } catch (jsonErr) {
+      } catch {
         setError('Respuesta inesperada del servidor.');
         return;
       }
@@ -90,7 +90,7 @@ const AccountSettings = ({ sections }) => {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       navigate('/');
-    } catch (err) {
+    } catch {
       setError('Error de conexión con el servidor.');
     }
   };

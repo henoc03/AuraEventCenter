@@ -1,8 +1,9 @@
+/* global jest, describe, test, expect, beforeEach */
 const request = require('supertest');
 const app = require('../app');
 const jwt = require('jsonwebtoken');
 
-const { encrypt, decrypt } = require('../utils/encryption');
+require('../utils/encryption');
 jest.mock('../utils/encryption', () => ({
   encrypt: (text) => `encrypted_${text}`,
   decrypt: (text) => text.replace('encrypted_', ''),

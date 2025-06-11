@@ -19,7 +19,7 @@ function AddEditMenuModal({
   const [products, setProducts] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [imageFile, setImageFile] = useState(null);
-  const [secondaryFiles, setSecondaryFiles] = useState([]);
+  const [secondaryFiles] = useState([]);
   const [primaryImageName, setPrimaryImageName] = useState("");
   const [primaryImageExists, setPrimaryImageExist] = useState(false);
   const [showImageUploadSuccess, setShowImageUploadSuccess] = useState(false);
@@ -45,7 +45,7 @@ function AddEditMenuModal({
         })
       .catch(err => console.error("Error cargando imágenes", err));
     }
-  }, [menu?.MENU_ID, isAdd]);
+  }, [menu.MENU_ID, isAdd, menu]);
 
   // Obtener todos los productos existentes
   useEffect(() => {

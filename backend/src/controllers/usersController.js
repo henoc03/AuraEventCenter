@@ -16,8 +16,6 @@ const jwt = require('jsonwebtoken');
 const secretKey = process.env.JWT_SECRET || 'defaultSecret';
 const bcrypt = require('bcrypt');
 const { encrypt, decrypt } = require('../utils/encryption');
-const path = require('path');
-const fs = require('fs').promises;
 
 exports.deactivateUser = async (req, res) => {
   const { password } = req.body;
@@ -187,7 +185,7 @@ exports.createUser = async (req, res) => {
  * Actualiza los datos de un usuario existente.
  */
 exports.updateUser = async (req, res) => {
-  const { email, first_name, last_name_1, last_name_2, phone, password, user_type } = req.body;
+  const { email, first_name, last_name_1, last_name_2, phone, user_type } = req.body;
   let conn;
   try {
     conn = await getConnection();

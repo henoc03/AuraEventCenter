@@ -1,9 +1,9 @@
-const { encrypt, decrypt } = require('../utils/encryption');
+/* global jest, describe, it, expect, beforeEach */
+require('../utils/encryption');
 const db = require('../config/db');
 const request = require('supertest');
 const app = require('../app');
 const jwt = require('jsonwebtoken');
-const mockFs = require('mock-fs');
 
 jest.mock('../utils/encryption', () => ({
   encrypt: (text) => `encrypted_${text}`,
@@ -37,7 +37,6 @@ jest.mock('../controllers/emailController', () => ({
 }));
 
 const validToken = jwt.sign({ userId: 1 }, process.env.JWT_SECRET || 'defaultSecret');
-let userId;
 
 describe('Users Controller', () => {
   beforeEach(() => {
@@ -141,7 +140,6 @@ describe('Users Controller', () => {
 
     expect(res.statusCode).toBe(201);
     expect(res.body).toEqual({ user_id: 2 });
-    userId = res.body.user_id;
   });
 
   it('PUT /users/:id - debería actualizar un usuario', async () => {

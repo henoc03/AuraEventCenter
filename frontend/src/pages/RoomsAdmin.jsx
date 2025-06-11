@@ -17,6 +17,7 @@ const DEFAULT_ROUTE = "http://localhost:1522";
 
 function RoomsAdmin({ sections }) {
   const [isAddEditOpen, setIsAddEditOpen] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [isAddMode, setIsAddMode] = useState(true);
   const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(true);
@@ -49,6 +50,7 @@ function RoomsAdmin({ sections }) {
   useEffect(() => {
     getSetUserInfo();
     getZones();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getSetUserInfo = async () => {
@@ -73,7 +75,7 @@ function RoomsAdmin({ sections }) {
       setEmail(userData.EMAIL);
       setLastname(userData.LAST_NAME_1);
       setRole(userData.USER_TYPE);
-    } catch (err) {
+    } catch {
       showErrorAlert("Ocurrió un error al obtener la información de usuario.");
       navigate("/iniciar-sesion");
     }
@@ -101,7 +103,7 @@ function RoomsAdmin({ sections }) {
       const zonesData = await res.json();
       setZones(zonesData);
       setRoomTypes(extractRoomTypes(zonesData));
-    } catch (err) {
+    } catch {
       showErrorAlert("Ocurrió un error al obtener las zonas.");
       navigate("/iniciar-sesion");
     } finally {

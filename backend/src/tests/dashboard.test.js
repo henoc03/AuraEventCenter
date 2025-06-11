@@ -1,3 +1,4 @@
+/* global jest, describe, it, expect, afterEach */
 const httpMocks = require('node-mocks-http');
 
 // Mocks para db y oracledb

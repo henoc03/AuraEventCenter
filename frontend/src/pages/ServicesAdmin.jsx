@@ -8,7 +8,6 @@ import ServiceModal from "../components/common/ServiceModal";
 import Pagination from "../components/common/Pagination";
 
 import { jwtDecode } from 'jwt-decode';
-import { useNavigate } from "react-router-dom";
 
 import "../style/services-admin.css";
 
@@ -20,12 +19,14 @@ const ServicesAdmin = ({ sections }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState("");
   const [message, setMessage] = useState('');
+  // eslint-disable-next-line no-unused-vars
   const [messageType, setMessageType] = useState('');
   const [loading, setLoading] = useState(true);
 
   const [currentUser, setCurrentUser] = useState(null);
 
   const [showSuccess, setShowSuccess] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [errorMessage, setErrorMessage] = useState("");
   const [showError, setShowError] = useState(false);
 
@@ -36,8 +37,6 @@ const ServicesAdmin = ({ sections }) => {
   // Paginación
   const [currentPage, setCurrentPage] = useState(1);
   const servicesPerPage = 3;
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     fetchServices();

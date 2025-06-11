@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import OTPInput from '../components/sections/OTPInput';
 import AlertMessage from '../components/common/AlertMessage';
 import DefaultProfilePhoto from '../assets/images/default-profile-photo.png'
@@ -13,7 +13,6 @@ const VerifyAccountCode = ({ sections }) => {
   const [messageType, setMessageType] = useState('');
 
   const navigate = useNavigate();
-  const location = useLocation();
   const isCodeValid = code.length === 6;
 
   const handleVerify = (e) => {
