@@ -30,7 +30,7 @@ const ServicesAdmin = ({ sections }) => {
   const [showError, setShowError] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortOrder, setSortOrder] = useState("asc");
+  const [sortOrder, setSortOrder] = useState("min");
   const [filterActive, setFilterActive] = useState("todos");
 
   // Paginación
@@ -132,9 +132,9 @@ const ServicesAdmin = ({ sections }) => {
       return matchesSearch && matchesActive;
     })
     .sort((a, b) =>
-      sortOrder === "asc"
-        ? a.name.localeCompare(b.name)
-        : b.name.localeCompare(a.name)
+      sortOrder === "min"
+      ? a.price - b.price
+      : b.price - a.price
     );
 
   // Paginación
@@ -226,8 +226,8 @@ const ServicesAdmin = ({ sections }) => {
                   }}
                   className="services-sort-select"
                 >
-                  <option value="asc">Precio (mayor a menor)</option>
-                  <option value="desc">Precio (menor a mayor)</option>
+                  <option value="max">Precio: mayor a menor</option>
+                  <option value="min">Precio: menor a mayor</option>
                 </select>
               </div>
 
