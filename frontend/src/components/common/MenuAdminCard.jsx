@@ -18,7 +18,7 @@ function MenuAdminCard ({id, menu, onClose, onSuccess}) {
   // Maneja el cerrar la vista de un servicio
   const handleClose = () => {
     setIsViewClicked(false);
-    if (onClose) {
+    if (onClose && !isViewClicked) {
       onClose();
     }
   };
@@ -42,6 +42,7 @@ function MenuAdminCard ({id, menu, onClose, onSuccess}) {
       alert('Ocurrió un error al eliminar el menú.');
     }
     setIsDeleted(true);
+    onSuccess();
   }
 
   console.log(menu.IMAGE_PATH && menu.IMAGE_PATH.trim() !== "" ? '${DEFAULT_ROUTE}/${menu.IMAGE_PATH}': defaultImage);

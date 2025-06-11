@@ -243,7 +243,7 @@ function AddEditMenuModal({
         )}
 
         <button className="room-modal-close" onClick={onClose}>×</button>
-        <h2>Agregar Menú</h2>
+        <h2>{isAdd ? "Agregar Menú" : "Editar Menú"}</h2>
 
         <p>Los campos marcados con <span style={{ color: "red" }}>*</span> son obligatorios</p>
 
