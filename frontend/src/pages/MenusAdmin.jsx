@@ -129,6 +129,7 @@ function MenusAdmin({ sections }) {
         lastname={lastname}
         role={role}
         email={email}
+        sections={sections}
       />
 
       <div className={`menus-admin-container ${isAddEditOpen ? "modal-open" : ""}`}>

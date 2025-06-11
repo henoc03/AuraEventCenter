@@ -1,0 +1,118 @@
+.nav {
+  display: flex;
+  width: 100%;
+  background-color: transparent;
+  z-index: 7;
+  justify-content: space-between;
+  align-items: center;
+  margin: auto;
+  padding: 1.8rem 5%;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.client-nav-container .navIndex{
+  text-decoration: none;
+}
+
+.navIndex.active {
+  font-weight: bold;
+  border-bottom: 3px solid #fff;
+}
+
+.client-nav-container {
+  list-style-type: none;
+  margin-bottom: 0;
+  padding: 0;
+}
+
+.client-nav-container li {
+  display: inline-block;
+  margin-right: 1.5rem;
+  margin: 5px 10px 0px 10px;
+}
+
+.client-nav-container li a{
+  color: #ffff;
+  font-size: 1.2rem;
+  font-weight: 400;
+  transition: var(--blue-logo) 0.3s ease, border-bottom 0.3s ease;
+}
+
+.client-nav-container li a:hover {
+  color: var(--blue-logo);
+  border-bottom: 3px solid var(--blue-logo);
+}
+
+.nav .signInBtn {
+  padding: 10px;
+  border: none;
+  background-color: var(--blue-logo);
+  color:#ffff;
+  border-radius: 10px;
+  transition: background-color 0.3s ease;
+  letter-spacing: 1px;
+  font-size: 1.0rem;
+  font-weight: 400;
+
+}
+
+.nav .signInBtn:hover {
+  background-color: #0074d9;
+  transform: scale(110%);
+}
+
+.dropdown-toggle::after {
+  display: none !important;
+}
+
+@media (max-width: 800px) {
+  .nav{
+    width: 100vw;
+    padding: 0.8rem 30px;
+  }
+
+  .nav-links{
+    display: none;
+  }
+
+  .client-nav-container button{
+    background: none;
+    font-size: 1.5rem;
+    margin-top: 8px;
+  }
+
+  .client-nav-container ul{
+    background-color: #6E92B2;
+    padding-bottom: 20px;
+    margin-top: 20px !important;
+    height: fit-content;
+
+  }
+
+  .client-nav-container ul li{
+    width: 100%;
+    text-align: center;
+    margin: 7px 0 7px 0 !important;
+  }
+
+  .client-nav-container li a{
+    font-size: 1rem;
+  }
+
+  .logo{
+    transform: scale(0.80);
+    justify-self: center;
+  }
+
+  .nav .signInBtn {
+    display: block;
+    margin-top: 0.6rem;
+    font-size: 0.8rem;
+  }
+}
+

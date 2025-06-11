@@ -3,12 +3,15 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import Logo from '../icons/Logo';
 import navigationLinks from '../utils/content';
 import DropDownMenu from '../common/DropDownMenu';
+import "../../style/navigation.css"
 
 
 function Navigation() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [width, setWidth] = useState(window.innerWidth);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -16,8 +19,6 @@ function Navigation() {
   const handleScroll = () => {
     setScrolled(window.scrollY > window.innerHeight);
   };
-
-  const toggleMenu = () => setMenuOpen(!menuOpen);
 
   const handleLinkClick = () => {
     setMenuOpen(false);
@@ -35,9 +36,21 @@ function Navigation() {
   };
 
   useEffect(() => {
+    const handleResize = () => {
+      setWidth(window.innerWidth);
+      if (window.innerWidth <= 800) setIsMobile(true);
+      else setIsMobile(false);
+    }
+    window.addEventListener('resize', handleResize);
+    handleResize();
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
   useEffect(() => {
     const updateUser = () => {
       const token = localStorage.getItem('token');
@@ -80,13 +93,34 @@ function Navigation() {
 
   return (
     <nav className={`nav ${scrolled ? 'scrolled' : ''}`}>
+      {isMobile && (
+        <div className="dropdown client-nav-container">
+          <button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i className="bi bi-list"></i>
+          </button>
+          <ul className="dropdown-menu">
+            {navigationLinks.map(link => (
+              <li key={link.id}>
+                <a
+                  className={`drop-down-item navIndex${location.pathname === link.href ? 'active' : ''}`}
+                  href={link.href}
+                  onClick={() => handleLinkClick()}
+                >
+                  {link.link}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <a data-aos="fade-down" data-aos-duration="1500" className="logo" href="/">
         <Logo className="logo-img" />
       </a>
 
       <div data-aos="fade-down" data-aos-duration="1500" className={menuOpen ? 'nav-links open' : 'nav-links'}>
-        <ul>
-          {navigationLinks.map(link => (
+        <ul className = "client-nav-container">
+          {width >= 768 && navigationLinks.map(link => (
             <li key={link.id}>
               <a 
                 data-aos="fade-down"
@@ -116,13 +150,6 @@ function Navigation() {
         ) : (
           <button data-aos="fade-down" data-aos-duration="1500" className="signInBtn" onClick={handleSignInClick}>Iniciar Sesión</button>
         )}
-      </div>
-
-      {/* Menú hamburguesa */}
-      <div className="hamburger" onClick={toggleMenu}>
-        <span className={menuOpen ? 'line open' : 'line'}></span>
-        <span className={menuOpen ? 'line open' : 'line'}></span>
-        <span className={menuOpen ? 'line open' : 'line'}></span>
       </div>
     </nav>
   );

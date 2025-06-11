@@ -166,6 +166,7 @@ const handleDeletePrimaryImage = async () => {
       const responseData = await res.json();
       const zoneID = responseData.zoneId || id;
 
+      // Subir imágenes secundarias
       if (secondaryFiles.length > 0 && zoneID) {
         for (const file of secondaryFiles) {
           const formData = new FormData();
