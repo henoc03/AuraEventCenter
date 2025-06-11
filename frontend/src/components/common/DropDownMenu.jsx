@@ -1,41 +1,22 @@
 import ProfilePhoto from '../icons/ProfilePhoto.jsx'
-import '../../style/dropDownMenu.css'
+import '../../style/drop-down-menu.css'
 
 function DropDownMenu({ name, email, onLogout }) {
   return (
-    <div className='drop-down-menu'>
-      <button 
-        id="collapse-button" 
-        type="button"
-        className="btn btn-primary"
-        data-bs-toggle="collapse"
-        data-bs-target="#collapseMenu" 
-        aria-expanded="false" 
-        aria-controls="collapseMenu"
-        style={{ marginBottom: 0 }}
-      >
-        <ProfilePhoto/>
+    <div className="dropdown profile-dropdown">
+      <button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <ProfilePhoto width={55} height={55}/>
       </button>
-
-      <div 
-        className="collapse submenu" 
-        id="collapseMenu" 
-        style={{ position: 'absolute', zIndex: 1000, top: '110%' }}
-      >
-        <div className='card card-body'>
-          <div className='dropdown-user-info'>
-            <p className='user-email'>{email}</p>
-            <ProfilePhoto width={100} height={100} className="drop-down-photo"/>
-            <p>{`¡Hola, ${name}!`}</p>
-
-            <div className='options'>
-              <a href="/perfil">Inicio</a>
-              <a href="/" onClick={onLogout}>Cerrar sesión</a>
-            </div>
-          </div>
-        </div>
-      </div>
+      <ul className="dropdown-menu">
+        <p>{`¡Hola, ${name}!`}</p>
+        <p>{email}</p>
+        <ProfilePhoto width={80} height={80}/>
+        <li><a class="dropdown-item" href="/">Inicio</a></li>
+        <li><a class="dropdown-item" href="/perfil">Perfil</a></li>
+        <li><a class="dropdown-item" href="/" onClick={onLogout}>Cerrar sesion</a></li>
+      </ul>
     </div>
+
   )
 }
 

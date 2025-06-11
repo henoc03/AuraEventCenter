@@ -1,0 +1,48 @@
+.profile-dropdown button{
+    background: none;
+}
+
+.profile-dropdown button:hover,
+.profile-dropdown button:active,
+.profile-dropdown button:focus .profile-dropdown button[aria-expanded="true"] {
+    background: none !important;
+    box-shadow: none !important;
+}
+
+.profile-dropdown ul{
+    padding: 25px;
+    margin-top: 4vh !important;
+}
+
+.profile-dropdown ul p,
+.profile-dropdown ul li{
+    text-align: center;
+    font-family: "Merriweather sans";
+}
+
+.profile-dropdown ul li a{
+    text-align: center;
+    font-family: "Merriweather sans";
+}
+
+.profile-dropdown ul li a:active,
+.profile-dropdown ul li a:focus .profile-dropdown ul li a[aria-expanded="true"] {
+    background: none !important;
+    box-shadow: none !important;
+    color: black;
+}
+
+.profile-dropdown ul li:nth-of-type(1){
+    margin-top: 15px;
+    font-family: 'Merriweather sans';
+}
+
+.profile-dropdown ul li:nth-of-type(3) a{
+    color: rgb(255, 62, 62);
+}
+
+@media(max-width: 768px) {
+    .profile-dropdown ul{
+        margin-top: 2vh !important;
+    }
+}
