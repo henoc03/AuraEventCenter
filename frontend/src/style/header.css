@@ -2,6 +2,43 @@
     --font-family: 'Merriweather Sans', sans-serif;
 }
 
+.admin-dropdown button{
+    background: none;
+    font-size: 2rem;
+}
+
+.admin-dropdown button:hover,
+.admin-dropdown button:active,
+.admin-dropdown button:focus .admin-dropdown button[aria-expanded="true"] {
+    background: none !important;
+    box-shadow: none !important;
+}
+
+.admin-dropdown ul{
+    padding: 25px;
+    margin-top: 15px !important;
+}
+
+.admin-dropdown ul p,
+.admin-dropdown ul li{
+    text-align: center;
+    font-family: "Merriweather sans";
+}
+
+.admin-dropdown ul li a{
+    text-align: center;
+    font-family: "Merriweather sans";
+}
+
+.admin-dropdown ul li:nth-of-type(1){
+    margin-top: 15px;
+    font-family: 'Merriweather sans';
+}
+
+.admin-dropdown ul li:nth-of-type(2) a{
+    color: rgb(255, 62, 62);
+}
+
 .header-container {
    width: 100%; 
    width: 100%; 

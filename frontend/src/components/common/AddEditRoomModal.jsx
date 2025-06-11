@@ -166,11 +166,11 @@ const handleDeletePrimaryImage = async () => {
       const responseData = await res.json();
 
       // Subir imágenes secundarias
-      if (secondaryFiles.length > 0 && responseData.zone_id) {
+      if (secondaryFiles.length > 0 && zoneID) {
         for (const file of secondaryFiles) {
           const formData = new FormData();
           formData.append('image', file);
-          formData.append('zoneId', responseData.zone_id);
+          formData.append('zoneId', zoneID);
 
           try {
             await fetch(`${DEFAULT_ROUTE}/zones/upload-secondary-image`, {
@@ -182,6 +182,8 @@ const handleDeletePrimaryImage = async () => {
           }
         }
       }
+
+      const zoneID = responseData.zoneId || id;
 
       if (typeof onSuccess === 'function') onSuccess();
 

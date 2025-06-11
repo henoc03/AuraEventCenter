@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import Logo from '../icons/Logo.jsx';
 import DropDownMenu from './DropDownMenu.jsx'; 
+import { useNavigate} from 'react-router-dom';
 import '../../style/header.css'
 
 const DEFAULT_ROUTE = 'http://localhost:1522'
 
-function Header({name, lastname, role, email, children}) {
+function Header({name, lastname, role, email, sections = []}) {
   const [isMobile, setIsMobile] = useState(false);
   const [hamburgerMenuIsOpen, setHamburguerMenuIsOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleClick = (href) => navigate(href);
 
   useEffect(() => {
     const handleResize = () => {
@@ -42,29 +46,29 @@ function Header({name, lastname, role, email, children}) {
       <div className='drop-down-menus-container'>
         {/*Menu de hamburguesa*/}
         {isMobile && (
-          <div className="hamburger" onClick={() => setHamburguerMenuIsOpen(!hamburgerMenuIsOpen)}>
-            <div className='drop-down-menu' style={{top: '0%'}}>
-              <button 
-                id="hamburger-button" 
-                type="button"
-                className="btn btn-primary"
-                data-bs-toggle="collapse"
-                data-bs-target="#hamburger-menu" 
-                aria-expanded="false" 
-                aria-controls="hamburger-menu" // Corregido para que coincida con el id del menú
-                style={{ marginBottom: 0 }}>
-                <i className="bi bi-list"></i> {/* Asegurarse de que los íconos de Bootstrap estén disponibles */}
-              </button>
-
-              <div className="collapse submenu" id="hamburger-menu" 
-              style={{ position: 'absolute', zIndex: 1000, left: '0%'}}>
-                <div className='card card-body'>
-                  <div className='dropdown-hamburger-menu'>
-                    {children}
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div className="dropdown admin-dropdown">
+            <button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i className="bi bi-list"></i>
+            </button>
+            <ul className="dropdown-menu">
+              {sections.map(({ title, links }, index) => (
+                <React.Fragment key={title || index}>
+                  {index !== 0 && <li><hr className="sidenav-divider" /></li>}
+                  {title && <li className="sidenav-title">{title}</li>}
+                  {links.map(({ id, label, href, icon }) => {
+                    const isActive = location.pathname.startsWith(href);
+                    return (
+                      <li key={id} className={isActive ? 'active' : ''}>
+                        <button onClick={() => handleClick(href)} className="sidenav-button dropdown-item">
+                          <span className="sidenav-icon">{icon}</span>
+                          <span>{label}</span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </React.Fragment>
+              ))}
+            </ul>
           </div>
         )}
 
