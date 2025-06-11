@@ -67,7 +67,7 @@ function MenusAdmin({ sections }) {
 
     } catch {
       alert("Ocurrió un error al obtener la información de usuario.");
-      navigate("/login");
+      navigate("/iniciar-sesion");
     }
   };
 
@@ -89,7 +89,7 @@ function MenusAdmin({ sections }) {
       setMenus(menusData);
     } catch {
       alert("Ocurrió un error al obtener los menús.");
-      navigate("/login");
+      navigate("/iniciar-sesion");
     } finally {
       setLoading(false);
     }
