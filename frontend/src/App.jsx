@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation  } from 'react-router-dom';
 
 // Páginas públicas
 import Home from './pages/Home';
@@ -37,11 +37,28 @@ import SectionAdmin from '../src/components/utils/admin-nav';
 import SectionRoot from '../src/components/utils/root-nav';
 import SectionProfile from '../src/components/utils/profile-nav';
 
+function ChatBotConditionalWrapper() {
+  const location = useLocation();
+
+  // Define rutas donde el chatbot SÍ se debe mostrar
+  const allowedPaths = [
+    '/', '/inicio', '/salas', '/servicios', '/servicios/menus',
+    '/servicios/equipos', '/contacto', '/acerca', '/perfil',
+    '/cuenta', '/cuenta/cambiar-contraseña', '/cuenta/verificar-codigo'
+  ];
+
+  const shouldShowChatbot = allowedPaths.some(path =>
+    location.pathname === path || location.pathname.startsWith(path + '/')
+  );
+
+  return shouldShowChatbot ? <ChatBotWrapper /> : null;
+}
+
 function App() {
   return (
     <AuthProvider>
-      <ChatBotWrapper/>
       <Router>
+        <ChatBotConditionalWrapper />
         <Routes>
       
           {/* Páginas públicas */}
