@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Footer from "../components/common/Footer";
 import Navigation from '../components/common/Navigation';
 import AOS from "aos";
@@ -8,6 +8,10 @@ import headerImage from '../assets/images/contact-header.jpg';
 import aboutImage from '../assets/images/about-image.jpg';
 
 const AboutPage = () => {
+  useEffect(() => {
+  AOS.init({ });
+   window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+}, []);
 const timelineData = [
   {
     year: "2018",
@@ -101,7 +105,7 @@ const timelineData = [
                 <div className="timeline-line"></div>
                 {timelineData.map((item, index) => (
                     <div className="timeline-data"data-aos="fade-down"
-                        data-aos-duration="1500">
+                        data-aos-duration="1300">
                     <div className={`timeline-item ${index % 2 === 0 ? "top" : "bottom"}`} key={index}>
                     <div className="circle" style={{ borderColor: item.color }}>
                         {item.year}

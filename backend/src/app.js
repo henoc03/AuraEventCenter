@@ -11,6 +11,8 @@ const menusRoutes = require('./routes/menus');
 const verifyToken = require('./middleware/verifyToken');
 const productsRoutes = require('./routes/products');
 const equipmentsRoutes = require('./routes/equipment');
+const chatbotRoutes = require('./routes/chatbot');
+
 
 const app = express();
 app.use(cors());
@@ -23,6 +25,7 @@ app.use('/services', servicesRoutes);
 app.use('/menus', menusRoutes);
 app.use('/products', productsRoutes);
 app.use('/equipments', equipmentsRoutes);
+app.use('/chatbot', chatbotRoutes);
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

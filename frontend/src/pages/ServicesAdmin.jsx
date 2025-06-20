@@ -40,27 +40,25 @@ const ServicesAdmin = ({ sections }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    fetchUserInfo();
     fetchServices();
   }, []);
 
-  useEffect(() => {
+
+
     const fetchUserInfo = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) return;
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
-      try {
-        const { id } = jwtDecode(token);
-        const res = await fetch(`${PORT}/users/${id}`);
-        const user = await res.json();
-        setCurrentUser(user);
-      } catch (err) {
-        console.error("Error al obtener usuario:", err);
-      }
-    };
-
-    fetchUserInfo();
-  }, []);
-
+    try {
+      const { id } = jwtDecode(token);
+      const res = await fetch(`${PORT}/users/${id}`);
+      const user = await res.json();
+      setCurrentUser(user);
+    } catch (err) {
+      console.error("Error al obtener usuario:", err);
+    }
+  };
   const fetchServices = async () => {
     try {
       setLoading(true);

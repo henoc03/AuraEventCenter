@@ -442,6 +442,83 @@ Esto lanzará el backend, y podrás acceder a la aplicación web abriendo tu nav
 Si tienes dudas de cómo instalar Node.js, visita [este video tutorial](https://www.youtube.com/watch?v=29mihvA_zEA&ab_channel=CarlosMasterWeb).
 
 ---
+### ChatBot
+Lista de cosas que puedes preguntar a nuestro chatbot
+1. Consultas generales (intents básicos):
+Zonas / Salones / Espacios
+
+¿Qué zonas tienen?
+
+¿Cuáles son los salones disponibles?
+
+Muéstrame los espacios para eventos.
+
+¿Qué tipos de zonas ofrecen?
+
+¿Cuáles son las capacidades y precios de las zonas?
+
+Servicios / Servicios adicionales / Extras
+
+¿Qué servicios ofrecen?
+
+Muéstrame los servicios adicionales.
+
+¿Qué extras puedo contratar?
+
+¿Cuáles son los precios de los servicios?
+
+Equipos / Electrónicos / Audio / Luces / Pantallas
+
+¿Qué equipos tienen disponibles?
+
+Muéstrame los equipos de audio.
+
+¿Tienen pantallas y luces para eventos?
+
+¿Cuánto cuestan los equipos?
+
+¿Qué tipo de equipos ofrecen?
+
+Saludos
+
+Hola
+
+Buenas
+
+Hey
+
+Saludos
+
+2. Consultas avanzadas (intents específicos con extracción de entidad):
+2.1. Consultar precio de zona, servicio o equipo
+
+¿Cuánto cuesta alquilar la Sala Cahuita?
+
+¿Cuál es el precio de la Sala Bajamar?
+
+¿Cuánto cuesta alquilar el servicio de Transporte?
+
+¿Cuánto cuesta alquilar el equipo de sonido?
+
+
+2.2. Consultar detalles o descripción de un servicio
+
+¿Qué incluye el servicio de catering?
+
+¿Qué incluye el servicio de equipos?
+
+¿En qué consiste el servicio de entretenimiento?
+
+¿Me puedes contar qué incluye el servicio de transporte?
+
+3. Mensajes de fallback / ayuda
+Cuando el chatbot no entiende, puede responder con ejemplos como:
+
+¿Cuánto cuesta alquilar  la Sala Cahuita?
+
+¿Qué incluye el servicio de catering?
+
+¿Tienen luces disponibles?
 
 ## 8. Colaboradores
 

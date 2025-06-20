@@ -166,7 +166,7 @@ textarea {
   display: flex;
   flex-direction: column;
   height: 100%;
-  min-width: 330px;
+  min-width: 370px;
   max-height: fit-content;
   background-color: #ffffff;
   border-radius: 12px;
@@ -361,11 +361,6 @@ textarea {
   }
 }
 
-@media (min-width: 1440px) {
-  .compact-equipment {
-    height: 75%;
-  }
-}
 
 @media (max-width: 1440px) {
   .expanded-equipment >.expanded-equipment-details h2 {

@@ -19,7 +19,7 @@ import MenusClient from './pages/MenusClient';
 import ContactForm from './pages/ContactForm';
 import EquipmentsClient from './pages/EquipmentsClient';
 import AboutPage from './pages/About';
-
+import ChatBotWrapper from './components/utils/ChatBotWrapper';
 // Páginas protegidas
 import AdminDashboard from "./pages/AdminDashBoard";
 import Clients from './pages/Clients';
@@ -40,8 +40,10 @@ import SectionProfile from '../src/components/utils/profile-nav';
 function App() {
   return (
     <AuthProvider>
+      <ChatBotWrapper/>
       <Router>
         <Routes>
+      
           {/* Páginas públicas */}
           <Route path="/" element={<Home />} />
           <Route path="/inicio" element={<Home />} />

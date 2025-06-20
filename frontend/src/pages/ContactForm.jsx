@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { jwtDecode } from 'jwt-decode';
 import '../style/contact.css';
 import RoomsServicesHero  from "../components/sections/ClientDefaultHero";
 import heroImage from "../assets/images/services-hero.jpg";
@@ -7,7 +8,12 @@ import Navigation from '../components/common/Navigation';
 import AOS from "aos";
 import "aos/dist/aos.css";
 
+
+const PORT = "http://localhost:1522";
+
 const ContactForm = () => {
+  
+  const [currentUser, setCurrentUser] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -16,27 +22,32 @@ const ContactForm = () => {
   });
     useEffect(() => {
       AOS.init();
+        fetchUserInfo();
     }, []);
   
 
   const [responseMessage, setResponseMessage] = useState('');
   const [messageColor, setMessageColor] = useState('black');
 
-  useEffect(() => {
-    const sessionData = sessionStorage.getItem("user");
-    if (sessionData) {
+
+    const fetchUserInfo = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
       try {
-        const user = JSON.parse(sessionData);
+        const { id } = jwtDecode(token);
+        const res = await fetch(`${PORT}/users/${id}`);
+        const user = await res.json();
         setFormData((prev) => ({
-          ...prev,
-          name: user.name || '',
-          email: user.email || ''
+        ...prev,
+        name: user.FIRST_NAME+' ' +user.LAST_NAME_1+' ' +user.LAST_NAME_2|| '',
+        email: user.EMAIL || ''
         }));
       } catch (err) {
-        console.warn("No se pudo parsear la sesión:", err);
+        console.error("Error al obtener usuario:", err);
       }
-    }
-  }, []);
+    };
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -93,7 +104,7 @@ const ContactForm = () => {
         <input
           type="text"
           name="name"
-          placeholder="Tu nombre"
+          placeholder={"Tu nombre"}
           value={formData.name}
           onChange={handleChange}
           required
