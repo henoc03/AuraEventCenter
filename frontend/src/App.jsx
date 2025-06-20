@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation  } from 'react-router-dom';
 
 // Páginas públicas
 import Home from './pages/Home';
@@ -16,7 +16,10 @@ import AccountSettings from './pages/AccountSettings';
 import VerifyAccountCode from './pages/VerifyAccountCode';
 import ServicesClient from './pages/ServicesClient';
 import MenusClient from './pages/MenusClient';
-
+import ContactForm from './pages/ContactForm';
+import EquipmentsClient from './pages/EquipmentsClient';
+import AboutPage from './pages/About';
+import ChatBotWrapper from './components/utils/ChatBotWrapper';
 // Páginas protegidas
 import AdminDashboard from "./pages/AdminDashBoard";
 import Clients from './pages/Clients';
@@ -25,6 +28,7 @@ import RoomsAdmin from './pages/RoomsAdmin';
 import ServicesAdmin from './pages/ServicesAdmin';
 import MenusAdmin from './pages/MenusAdmin';
 import Products from './pages/Products';
+import EquipmentAdmin from './pages/EquipmentAdmin';
 
 // Contexto y utilidades
 import { AuthProvider } from './context/AuthContext';
@@ -33,11 +37,30 @@ import SectionAdmin from '../src/components/utils/admin-nav';
 import SectionRoot from '../src/components/utils/root-nav';
 import SectionProfile from '../src/components/utils/profile-nav';
 
+function ChatBotConditionalWrapper() {
+  const location = useLocation();
+
+  // Define rutas donde el chatbot SÍ se debe mostrar
+  const allowedPaths = [
+    '/', '/inicio', '/salas', '/servicios', '/servicios/menus',
+    '/servicios/equipos', '/contacto', '/acerca', '/perfil',
+    '/cuenta', '/cuenta/cambiar-contraseña', '/cuenta/verificar-codigo'
+  ];
+
+  const shouldShowChatbot = allowedPaths.some(path =>
+    location.pathname === path || location.pathname.startsWith(path + '/')
+  );
+
+  return shouldShowChatbot ? <ChatBotWrapper /> : null;
+}
+
 function App() {
   return (
     <AuthProvider>
       <Router>
+        <ChatBotConditionalWrapper />
         <Routes>
+      
           {/* Páginas públicas */}
           <Route path="/" element={<Home />} />
           <Route path="/inicio" element={<Home />} />
@@ -52,8 +75,12 @@ function App() {
           <Route path="/cuenta/cambiar-contraseña" element={<ChangePassword sections={SectionProfile}/>} />
           <Route path="/cuenta/verificar-codigo" element={<VerifyAccountCode sections={SectionProfile}/>} />
           <Route path="/servicios" element={<ServicesClient />} />
-          <Route path="/menus" element={<MenusClient />} />
+          <Route path="/servicios/menus" element={<MenusClient />} />
+          <Route path="/servicios/equipos" element={<EquipmentsClient />} />
+          <Route path="/contacto" element={<ContactForm />} />
+          <Route path="/acerca" element={<AboutPage />} />
 
+          
           {/* Rutas protegidas para administradores comunes */}
           <Route element={<PrivateRoute allowedRoles={['admin']} />}>
             <Route path="/admin/salas" element={<RoomsAdmin sections={SectionAdmin}/>} />
@@ -62,6 +89,7 @@ function App() {
             <Route path="/admin/servicios" element={<ServicesAdmin sections={SectionAdmin} />} />
             <Route path="/admin/servicios/catering/menus" element={<MenusAdmin sections={SectionAdmin} />} />
             <Route path="/admin/servicios/catering/productos" element={<Products sections={SectionAdmin} />} />
+            <Route path="/admin/servicios/equipos" element={<EquipmentAdmin sections={SectionAdmin} />} />
           </Route>
 
           {/* Rutas protegidas para root-admin */}
@@ -73,6 +101,7 @@ function App() {
             <Route path="/root-admin/servicios" element={<ServicesAdmin sections={SectionRoot} />} />
             <Route path="/root-admin/servicios/catering/menus" element={<MenusAdmin sections={SectionRoot} />} />
             <Route path="/root-admin/servicios/catering/productos" element={<Products sections={SectionRoot} />} />
+            <Route path="/root-admin/servicios/equipos" element={<EquipmentAdmin sections={SectionRoot} />} />
           </Route>
 
           {/* Página 404 */}

@@ -1,0 +1,125 @@
+.equipments-client-page {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+}
+
+
+.equipments-client-main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-self: center;
+    width: 90%;
+    max-width: 1800px;
+    margin: 0;
+    padding: 2rem 1.5rem;
+}
+
+.equipments-client-main h2{
+    display: flex;
+    justify-content: center;
+    font-family: 'Merriweather', serif;
+    font-weight: bold;
+    font-size: 2.2rem;
+    margin-bottom: 60px;
+}
+
+.equipments-client-main button{
+    text-align: left;
+    width: fit-content;
+    margin-bottom: 20px;
+    font-family: 'Merriweather sans', sans-serif;
+    font-size: 1.05rem;
+    transition: font-weight 0.2s;
+    background: none;
+    border: none;
+    margin-top: 30px;
+}
+
+.equipments-client-main button:hover {
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.equipments-client-filters {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.equipments-search-input,
+.equipments-sort-input,
+.equipments-filter-input {
+    display: flex;
+    align-items: center;
+}
+
+.filter-input{
+    padding: 0.5rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    max-width: 400px;
+}
+
+.filter-select {
+    padding: 0.5rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+}
+
+#search {
+    font-family: 'Merriweather', sans-serif;
+    width: 270px;
+    margin-left: 15px;
+}
+
+#sort, #status {
+    margin-left: 15px;
+}
+
+.client-equipments-container >.equipment-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 3rem;
+  margin-bottom: 60px;
+}
+
+.equipment-client-card {
+  transition: all 0.3s ease;
+  height: fit-content;
+}
+
+.equipment-client-card.expanded {
+  grid-column: 1 / -1;
+  z-index: 2;
+  width: 100%;
+  height: fit-content;
+}
+
+.client-equipments-container {
+    min-height: 60vh;
+}
+
+@media (max-width: 1440px) {
+    .equipment-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .equipments-client-main h2{
+        font-size: 1.6rem;
+        text-align: center;
+        margin: 30px 0;
+    }
+
+    .equipments-client-main button{
+        font-size: 0.95rem;
+        margin: 0;
+    }
+}

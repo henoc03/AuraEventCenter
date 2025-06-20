@@ -1,0 +1,464 @@
+.equipment-card {
+    display: flex;
+    flex-direction: column;
+    align-self: left;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    border-radius: 16px;
+    width: 35vw;
+    width: 380px;
+    height: 320px;
+    margin: 15px 30px 30px 0px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  
+}
+  
+.equipment-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+  
+.equipment-card-body h2{
+    color: #868585;
+    text-align: center;
+    margin: 15px;
+    height: 25px;
+    font-family: "Merriweather Sans", sans-serif;
+    font-size: 1rem;
+    font-weight: bold;
+}
+  
+.equipment-card img {
+    width: 100%;
+    height: 160px;
+    border-radius: 0;
+    object-fit: cover;
+    border-radius: 16px 16px 0 0 ;
+}
+  
+.equipment-card-body .equipment-card-title{
+    text-align: center;
+    font-family: "Merriweather", sans-serif;
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    margin-top: 20px;
+}
+  
+
+.equipment-card-body .equipment-card-buttons {
+    display: flex;
+    justify-content: space-evenly;
+    height: 38px;
+}
+
+.equipment-card-buttons .button {
+    font-family: "Merriweather Sans", sans-serif;
+    font-size: 0.8rem;
+    background-color: #F0F4F8;
+    color: #007AFF;
+    width: 30%;
+    max-width: 110px;
+    border-radius: 4px;
+    padding: 9px 0;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: none;
+}
+
+.equipment-card-buttons .button:hover {
+    background-color: #2563eb;
+    color: white;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    border: solid 1px white;
+}
+
+.equipment-deleted {
+    display: none;
+}
+
+.equipment-info-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 4000;
+    overflow-y: scroll;
+}
+
+.modal-equipment-info-content {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    background-color: #fff;
+    padding: 1.5rem 1.5rem;
+    border-radius: 10px;
+    max-width: 1000px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    position: relative;
+    margin: 0 30px;
+}
+
+.modal-equipment-info-content button {
+    align-self: flex-end;
+    background: none;
+    border: none;
+    color: black; margin-bottom: 30px;
+    width: 30px;
+}
+
+.equipment-info-photo-container img{
+    display: flex;
+    flex-direction: row;
+    width: 400px;
+    height: 300px;
+    border-radius: 0;
+    object-fit: cover;
+    margin-bottom: 30px;
+}
+
+.equipment-info-photo-container{
+    display: flex;
+    flex-direction: row;
+    width: 360px;
+    height: 300px;
+    border-radius: 0;
+    object-fit: cover;
+    margin-bottom: 30px;
+    font-family: "Merriweather Sans", sans-serif;
+    font-size: 0.8rem;
+
+}
+
+.equipment-info-content{
+    margin-left: 20px;
+    width: 60%;
+}
+
+.equipment-info-content h2 {
+    font-family: "Merriweather", sans-serif;
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+
+.equipment-info-content p{
+    font-family: "Merriweather Sans", sans-serif;
+    font-size: 1rem;
+    margin: 15px 0;
+}
+
+
+.equipment-products-button button{
+    background-color: #F0F4F8;
+    color: #007AFF;
+}
+
+textarea {
+    font-family: "Merriweather Sans", sans-serif;
+}
+
+.compact-equipment {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 370px;
+  max-height: fit-content;
+  background-color: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  cursor: pointer;
+}
+
+.compact-equipment:hover {
+  transform: translateY(-3px) scale(1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.compact-equipment >.compact-equipment-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.compact-equipment-info {
+  padding: 1rem;
+  text-align: center;
+  font-family: 'Merriweather sans', sans-serif;
+}
+
+.compact-equipment-info h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #333;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-top: 10px;
+  font-family: 'Merriweather', sans-serif;
+}
+
+.compact-equipment-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+  color: #007bff;
+  font-weight: 500;
+  text-decoration: underline;
+  font-family: 'Merriweather sans', sans-serif;
+  font-size: 0.95rem;
+  margin-bottom: 10px;
+}
+
+.expanded-equipment {
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  background-color: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  animation: fadeIn 1.7s ease;
+  width: 100%;
+  height: fit-content;
+  min-height: 250px;
+  margin-bottom: 30px;
+}
+
+.expanded-equipment > .expanded-equipment-image {
+  width: 35%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 0px;
+}
+
+.expanded-equipment-details {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 60%;
+  height: fit-content;
+  padding: 2rem;
+  font-family: 'Merriweather sans', sans-serif;
+}
+
+.expanded-equipment >.expanded-equipment-details h2 {
+  text-align: left;
+  margin: 0 0 1.5rem 0;
+  font-size: 1.7rem;
+  color: #000000;
+}
+
+.expanded-equipment-details p {
+  text-align: left;
+  color: #222;
+  font-size: 1rem;
+  margin: 10px 0;
+}
+
+.expanded-equipment-details span {
+  font-family: 'Merriweather sans', sans-serif;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.expanded-equipment-details h3 {
+  margin: 0.25rem 0;
+  color: #222;
+  font-size: 1.1rem;
+  font-family: 'Merriweather sans', sans-serif;
+  font-weight: bold;
+  margin-top: 25px;
+}
+
+.expanded-equipment-details li {
+  color: #222;
+  font-size: 0.95rem;
+  font-family: 'Merriweather sans', sans-serif;
+  list-style: none;
+  margin-bottom: 5px;
+}
+
+.expanded-equipment-details ul {
+  padding: 0;
+}
+
+.close-expanded-equipment {
+  position: absolute;
+  top: 10px;
+  right: 28px;
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  color: #888;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  z-index: 10;
+  margin: 0;
+  top: -12px;
+}
+
+.close-expanded-equipment:hover {
+  color: #dc3545;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 768px) {
+  .expanded-equipment {
+    flex-direction: column;
+    height: fit-content;
+  }
+
+  .expanded-equipment > .expanded-equipment-image {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 0px;
+  }
+
+  .expanded-equipment-details {
+    width: 100%;
+    padding: 1rem;
+    min-height: 0;
+  }
+
+  .expanded-equipment >.expanded-equipment-details h2 {
+    font-size: 1rem;
+  }
+
+  .expanded-equipment-details p {
+    font-size: 0.85rem;
+  }
+
+  .expanded-equipment-details h3 {
+    font-size: 0.95rem;
+  }
+
+  .close-expanded-equipment {
+    right: 20px;
+    top: 10px;
+  }
+
+  .compact-equipment-info h3 {
+    margin-top: 0;
+    margin-bottom: 5px;
+    font-size: 1rem;
+  }
+
+  .compact-equipment-info p, .compact-equipment-link {
+    margin-top: 0;
+    font-size: 0.9rem;
+  }
+}
+
+
+@media (max-width: 1440px) {
+  .expanded-equipment >.expanded-equipment-details h2 {
+    font-size: 1.2rem;
+  }
+
+  .expanded-equipment-details p, .expanded-equipment-details li {
+    font-size: 0.9rem;
+  }
+
+  .expanded-equipment-details h3 {
+    font-size: 0.95rem;
+  }
+
+  .expanded-equipment > .expanded-equipment-image {
+    width: 40%;
+    object-fit: cover;
+    border-radius: 0px;
+  }
+}
+
+
+
+
+
+@media (max-width: 1440px) {
+    .equipment-card {
+        margin-right: 0; 
+    }
+}
+
+@media (max-width: 1300px) {
+    .equipment-card {
+        width: 45%;
+        max-width: 450px;
+        margin-right: 0; 
+    }
+
+    .equipment-card-buttons .button {
+        width: 28%;
+        font-size: 0.7rem;
+    }
+}
+
+@media (max-width: 800px) {
+    .equipment-card {
+        width: 90%;
+        max-width: 450px;
+        margin-right: 0; 
+    }
+}
+
+@media(max-width: 768px) {
+    .equipment-card {
+        width: 47%;
+    }
+
+    .equipment-card-buttons .button {
+        width: 30%
+    }
+
+    .equipment-info-photo-container{
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .equipment-info-photo-container img{
+        max-width: 620px;
+        max-height: 400px;
+        width: 100%;
+        height: 70%;
+    }
+
+    .equipment-info-content{
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .modal-equipment-info-content {
+        margin-top: 25vw;
+        margin-bottom: 5vw;
+    }
+
+    .modal-equipment-info-content button {
+        margin-bottom: 10px;
+    }
+    .equipment-info-photo-container img {
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 550px) {
+    .equipment-card {
+        width: 90%;
+        justify-self: center;
+    }
+
+    .equipment-card-buttons .button {
+        width: 28%
+    }
+}

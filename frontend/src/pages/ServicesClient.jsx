@@ -121,10 +121,19 @@ function ServicesClient() {
             >
               <h3>{service.name}</h3>
               <p>{service.description}</p>
+
+              {service.price > 0 && (
               <p><span>Precio: </span>{`₡${service.price.toLocaleString('es-CR')}`}</p>
+              )}
+
               {service.name.toLowerCase().includes("catering") && (
-                <a href="/menus" className="service-menu-link">
+                <a href="/servicios/menus" className="service-menu-link">
                   <button type='button'>Ver menús</button>
+                </a>
+              )}
+              {service.name.toLowerCase().includes("equipo") && (
+                <a href="/servicios/equipos" className="service-menu-link">
+                  <button type='button'>Ver equipos</button>
                 </a>
               )}
             </div>
