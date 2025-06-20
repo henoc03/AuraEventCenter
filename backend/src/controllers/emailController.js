@@ -253,3 +253,31 @@ exports.resetPassword = async (req, res) => {
     if (conn) await conn.close();
   }
 };
+
+exports.contact = async (req, res) => {
+const { name, email, subject, message } = req.body;
+
+  if (!name || !email || !subject || !message) {
+    return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
+  }
+
+  try {
+    await transporter.sendMail({
+      from: process.env.MAIL_USER,
+      to: process.env.MAIL_USER,
+      subject: `Consulta desde Sitio Web - ${subject}`,
+      html: `
+        <h3>Nuevo mensaje de contacto</h3>
+        <p><strong>Nombre:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Asunto:</strong> ${subject}</p>
+        <p><strong>Mensaje:</strong><br>${message}</p>
+      `
+    });
+
+    res.json({ success: true, message: 'Mensaje enviado correctamente.' });
+  } catch (error) {
+    console.error('Error al enviar correo:', error);
+    res.status(500).json({ error: 'Error al enviar el correo.' });
+  }
+};

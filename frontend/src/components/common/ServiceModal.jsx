@@ -204,7 +204,7 @@ if (
                     wordCount: (value) => {
                     const wordCount = value.trim().split(/\s+/).length;
                     if (wordCount < 0) return "La descripción debe tener al menos 70 palabras";
-                    if (wordCount > 85) return "La descripción no debe superar las 85 palabras";
+                    if (wordCount > 100) return "La descripción no debe superar las 85 palabras";
                     return true;
                   }
                   } })}
@@ -307,6 +307,18 @@ if (
                         className="service-products-button"
                       >
                         Ver productos
+                      </button>
+                    </div>
+                  )}
+
+                  {service.name.toLowerCase().includes("equipos") && (
+                    <div className='menus-products-buttons'>
+                      <button 
+                        type='button'
+                        onClick={() => navigation(`/${adminType}/servicios/equipos`)}
+                        className="service-menus-button"
+                      >
+                        Ver equipos
                       </button>
                     </div>
                   )}

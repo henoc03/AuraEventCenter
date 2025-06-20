@@ -16,6 +16,9 @@ import AccountSettings from './pages/AccountSettings';
 import VerifyAccountCode from './pages/VerifyAccountCode';
 import ServicesClient from './pages/ServicesClient';
 import MenusClient from './pages/MenusClient';
+import ContactForm from './pages/ContactForm';
+import EquipmentsClient from './pages/EquipmentsClient';
+import AboutPage from './pages/About';
 
 // Páginas protegidas
 import AdminDashboard from "./pages/AdminDashBoard";
@@ -25,6 +28,7 @@ import RoomsAdmin from './pages/RoomsAdmin';
 import ServicesAdmin from './pages/ServicesAdmin';
 import MenusAdmin from './pages/MenusAdmin';
 import Products from './pages/Products';
+import EquipmentAdmin from './pages/EquipmentAdmin';
 
 // Contexto y utilidades
 import { AuthProvider } from './context/AuthContext';
@@ -52,8 +56,12 @@ function App() {
           <Route path="/cuenta/cambiar-contraseña" element={<ChangePassword sections={SectionProfile}/>} />
           <Route path="/cuenta/verificar-codigo" element={<VerifyAccountCode sections={SectionProfile}/>} />
           <Route path="/servicios" element={<ServicesClient />} />
-          <Route path="/menus" element={<MenusClient />} />
+          <Route path="/servicios/menus" element={<MenusClient />} />
+          <Route path="/servicios/equipos" element={<EquipmentsClient />} />
+          <Route path="/contacto" element={<ContactForm />} />
+          <Route path="/acerca" element={<AboutPage />} />
 
+          
           {/* Rutas protegidas para administradores comunes */}
           <Route element={<PrivateRoute allowedRoles={['admin']} />}>
             <Route path="/admin/salas" element={<RoomsAdmin sections={SectionAdmin}/>} />
@@ -62,6 +70,7 @@ function App() {
             <Route path="/admin/servicios" element={<ServicesAdmin sections={SectionAdmin} />} />
             <Route path="/admin/servicios/catering/menus" element={<MenusAdmin sections={SectionAdmin} />} />
             <Route path="/admin/servicios/catering/productos" element={<Products sections={SectionAdmin} />} />
+            <Route path="/admin/servicios/equipos" element={<EquipmentAdmin sections={SectionAdmin} />} />
           </Route>
 
           {/* Rutas protegidas para root-admin */}
@@ -73,6 +82,7 @@ function App() {
             <Route path="/root-admin/servicios" element={<ServicesAdmin sections={SectionRoot} />} />
             <Route path="/root-admin/servicios/catering/menus" element={<MenusAdmin sections={SectionRoot} />} />
             <Route path="/root-admin/servicios/catering/productos" element={<Products sections={SectionRoot} />} />
+            <Route path="/root-admin/servicios/equipos" element={<EquipmentAdmin sections={SectionRoot} />} />
           </Route>
 
           {/* Página 404 */}

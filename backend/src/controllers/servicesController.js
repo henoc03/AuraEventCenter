@@ -179,17 +179,16 @@ exports.updateService = async (req, res) => {
   try {
     conn = await getConnection();
 
-    let previousImagePath = null;
-    if (imagePath) {
-      const result = await conn.execute(
-        `SELECT IMAGE_PATH FROM ADMIN_SCHEMA.ADDITIONAL_SERVICES WHERE ADDITIONAL_SERVICE_ID = :id`,
-        [id],
-        { outFormat: oracledb.OUT_FORMAT_OBJECT }
-      );
-      previousImagePath = result.rows[0]?.IMAGE_PATH;
-    }
+    const result = await conn.execute(
+      `SELECT IMAGE_PATH FROM ADMIN_SCHEMA.ADDITIONAL_SERVICES WHERE ADDITIONAL_SERVICE_ID = :id`,
+      [id],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
 
-    const encryptedPath = imagePath || null;
+    const currentEncryptedImagePath = result.rows[0]?.IMAGE_PATH;
+
+
+    const encryptedPath = imagePath ? imagePath : currentEncryptedImagePath;
 
     await conn.execute(
       `UPDATE ADMIN_SCHEMA.ADDITIONAL_SERVICES
