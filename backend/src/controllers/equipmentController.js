@@ -199,25 +199,11 @@ exports.deleteEquipment = async (req, res) => {
 
     conn = await getConnection();
 
-    // Obtener imagen para eliminar archivo físico
-    const result = await conn.execute(
-      `SELECT IMAGE_PATH FROM ADMIN_SCHEMA.EQUIPMENTS WHERE ID = :id`,
-      [id],
-      { outFormat: oracledb.OUT_FORMAT_OBJECT }
-    );
-
-    const encryptedPath = result.rows[0]?.IMAGE_PATH;
-    const decryptedPath = encryptedPath ? decrypt(encryptedPath) : null;
-
     await conn.execute(
-      `DELETE FROM ADMIN_SCHEMA.EQUIPMENTS WHERE ID = :id`,
+      `UPDATE ADMIN_SCHEMA.EQUIPMENTS SET ACTIVE = 0 WHERE ID = :id`,
       [id],
       { autoCommit: true }
     );
-
-    if (decryptedPath) {
-      deleteImageFile(decryptedPath);
-    }
 
     res.sendStatus(204);
   } catch (err) {

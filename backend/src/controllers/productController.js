@@ -141,7 +141,7 @@ exports.deleteProduct = async (req, res) => {
   try {
     conn = await getConnection();
     await conn.execute(
-      `DELETE FROM ADMIN_SCHEMA.PRODUCTS WHERE PRODUCT_ID = :id`,
+      `UPDATE ADMIN_SCHEMA.PRODUCTS SET ACTIVE = 0 WHERE PRODUCT_ID = :id`,
       [req.params.id],
       { autoCommit: true }
     );
