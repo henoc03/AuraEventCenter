@@ -276,7 +276,7 @@ exports.deleteUser = async (req, res) => {
   try {
     conn = await getConnection();
     await conn.execute(
-      `DELETE FROM CLIENT_SCHEMA.USERS WHERE USER_ID = :id`,
+      `UPDATE CLIENT_SCHEMA.USERS SET ACTIVE = 0 WHERE USER_ID = :id`,
       [req.params.id],
       { autoCommit: true }
     );

@@ -174,9 +174,6 @@ exports.updateZone = async (req, res) => {
   }
 };
 
-
-
-
 /**
  * Elimina una zona identificada por su ID.
  */
@@ -186,60 +183,10 @@ exports.deleteZone = async (req, res) => {
     conn = await getConnection();
     const zoneId = req.params.id;
 
-    // 1. Obtener las rutas de imágenes secundarias (para eliminar los archivos)
-    const secImages = await conn.execute(
-      `SELECT i.IMAGE_ADDRESS, i.IMAGE_ID
-       FROM ADMIN_SCHEMA.IMAGES i
-       JOIN ADMIN_SCHEMA.ZONE_IMAGES zi ON zi.IMAGE_ID = i.IMAGE_ID
-       WHERE zi.ZONE_ID = :id`,
-      [zoneId],
-      { outFormat: oracledb.OUT_FORMAT_OBJECT }
-    );
+    // Eliminar la zona
+    await conn.execute(`UPDATE ADMIN_SCHEMA.ZONES SET ACTIVE = 0 WHERE ZONE_ID = :id`, [zoneId], { autoCommit: false });
 
-    // 2. Obtener imagen principal (IMAGE_PATH)
-    const mainImageResult = await conn.execute(
-      `SELECT IMAGE_PATH FROM ADMIN_SCHEMA.ZONES WHERE ZONE_ID = :id`,
-      [zoneId],
-      { outFormat: oracledb.OUT_FORMAT_OBJECT }
-    );
-
-    const mainImagePathEncrypted = mainImageResult.rows[0]?.IMAGE_PATH;
-    const mainImagePath = mainImagePathEncrypted ? decrypt(mainImagePathEncrypted) : null;
-
-    // 3. Construir lista de rutas de imágenes físicas a eliminar
-    const imagePathsSet = new Set();
-    const imageIds = [];
-
-    if (mainImagePath) imagePathsSet.add(mainImagePath);
-    secImages.rows.forEach(img => {
-      imagePathsSet.add(decrypt(img.IMAGE_ADDRESS));
-      imageIds.push(img.IMAGE_ID);
-    });
-
-    // 4. Eliminar archivos físicos
-    await Promise.allSettled(
-      Array.from(imagePathsSet).map(deletePhysicalFile)
-    );
-
-    // 5. Eliminar datos relacionados respetando el orden correcto
-    await conn.execute(`DELETE FROM ADMIN_SCHEMA.ZONE_EQUIPMENTS WHERE ZONE_ID = :id`, [zoneId], { autoCommit: false });
-    await conn.execute(`DELETE FROM RELATIONS_SCHEMA.BOOKINGS_ZONES WHERE ZONE_ID = :id`, [zoneId], { autoCommit: false });
-    await conn.execute(`DELETE FROM ADMIN_SCHEMA.ZONE_IMAGES WHERE ZONE_ID = :id`, [zoneId], { autoCommit: false });
-
-    // 6. Eliminar imágenes si hay
-    if (imageIds.length > 0) {
-      const placeholders = imageIds.map((_, i) => `:${i + 1}`).join(', ');
-      await conn.execute(
-        `DELETE FROM ADMIN_SCHEMA.IMAGES WHERE IMAGE_ID IN (${placeholders})`,
-        imageIds,
-        { autoCommit: false }
-      );
-    }
-
-    // 7. Finalmente eliminar la zona
-    await conn.execute(`DELETE FROM ADMIN_SCHEMA.ZONES WHERE ZONE_ID = :id`, [zoneId], { autoCommit: false });
-
-    // 8. Confirmar todos los cambios
+    // Confirmar todos los cambios
     await conn.commit();
 
     res.sendStatus(204);

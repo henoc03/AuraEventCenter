@@ -397,22 +397,8 @@ exports.deleteMenu = async (req, res) => {
     conn = await getConnection();
     const menuId = req.params.id;
 
-    // Obtener imagen principal (IMAGE_PATH)
-    const mainImageResult = await conn.execute(
-      `SELECT IMAGE_PATH FROM ADMIN_SCHEMA.CATERING_MENUS WHERE MENU_ID = :id`,
-      [menuId],
-      { outFormat: oracledb.OUT_FORMAT_OBJECT }
-    );
-
-    const mainImagePathEncrypted = mainImageResult.rows[0]?.IMAGE_PATH;
-    const mainImagePath = mainImagePathEncrypted ? decrypt(mainImagePathEncrypted) : null;
-
-    // Eliminar archivo físico
-    if(mainImagePath != null ) await deletePhysicalFile(mainImagePath);
-
     // Eliminar datos relacionados respetando el orden correcto
-    await conn.execute(`DELETE FROM ADMIN_SCHEMA.PRODUCTS_MENUS WHERE MENU_ID = :id`, [menuId], { autoCommit: false });
-    await conn.execute(`DELETE FROM ADMIN_SCHEMA.CATERING_MENUS WHERE MENU_ID = :id`, [menuId], { autoCommit: false });
+    await conn.execute(`UPDATE ADMIN_SCHEMA.CATERING_MENUS SET AVAILABLE = 0 WHERE MENU_ID = :id`, [menuId], { autoCommit: false });
     await conn.commit();
 
     res.sendStatus(204);
