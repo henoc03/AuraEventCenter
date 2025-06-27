@@ -1,0 +1,32 @@
+.booking-client-sidenav-main {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+}
+
+.booking-client-sidenav-main h1 {
+    width: 100%;
+    text-align: left;
+    font-family: 'Merriweather Sans', sans-serif;
+    font-size: 1.6rem;
+    font-weight: bold;
+}
+
+.booking-client-content {
+    width: 100%;
+    height: 100vh;
+    padding-top: 40px;
+    padding-left: 40px;
+}
+
+.back-btn-bookings-client{
+  text-align: left;
+  width: fit-content;
+  font-family: 'Merriweather sans', sans-serif;
+  font-size: 1.05rem;
+  transition: font-weight 0.2s;
+  background: none;
+  border: none;
+  margin: 0px 0px 20px 0px;
+}
