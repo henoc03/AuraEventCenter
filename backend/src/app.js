@@ -12,7 +12,7 @@ const verifyToken = require('./middleware/verifyToken');
 const productsRoutes = require('./routes/products');
 const equipmentsRoutes = require('./routes/equipment');
 const chatbotRoutes = require('./routes/chatbot');
-
+const bookingRoutes = require("./routes/bookingRoutes");
 
 const app = express();
 app.use(cors());
@@ -26,6 +26,7 @@ app.use('/menus', menusRoutes);
 app.use('/products', productsRoutes);
 app.use('/equipments', equipmentsRoutes);
 app.use('/chatbot', chatbotRoutes);
+app.use("/bookings", bookingRoutes);
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

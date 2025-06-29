@@ -21,6 +21,8 @@ import EquipmentsClient from './pages/EquipmentsClient';
 import AboutPage from './pages/About';
 import EditBookingClient from './pages/EditBookingClient';
 import ChatBotWrapper from './components/utils/ChatBotWrapper';
+import Payments from './pages/Payment';
+
 // Páginas protegidas
 import AdminDashboard from "./pages/AdminDashBoard";
 import Clients from './pages/Clients';
@@ -81,6 +83,7 @@ function App() {
           <Route path="/servicios/equipos" element={<EquipmentsClient />} />
           <Route path="/contacto" element={<ContactForm />} />
           <Route path="/acerca" element={<AboutPage />} />
+          <Route path="/pagos" element={<Payments />} />
 
 
           
