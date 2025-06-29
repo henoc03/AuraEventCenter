@@ -35,7 +35,106 @@
     flex-direction: column;
 }
 
-.booking-client-step1 {
+.booking-client-step1{
     margin-top: 35px;
     padding: 0 250px;
+}
+
+.booking-client-step2 {
+    margin-top: 35px;
+    padding: 0 50px;
+}
+
+.edit-booking-filters {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.edit-booking-search-input,
+.edit-booking-filter-input,
+.edit-booking-sort-input {
+  display: flex;
+  align-items: center;
+}
+
+.filter-input{
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  max-width: 400px;
+}
+
+.filter-select {
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+#search {
+  font-family: 'Merriweather', sans-serif;
+  width: 270px;
+  margin-left: 15px;
+}
+
+#sort {
+  margin-left: 15px;
+}
+
+#status {
+  margin-left: 15px;
+}
+
+.edit-booking-room-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 3rem;
+  margin-bottom: 60px;
+}
+
+.edit-booking-room-card {
+  transition: all 0.3s ease;
+  height: fit-content;
+}
+
+.rooms-counter {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.rooms-counter p{
+    font-weight: bold;
+}
+
+.booking-step2-next-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0;
+  width: 15%;
+  min-height: 40px;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  user-select: none;
+  opacity: 0.6;
+}
+
+.booking-step2-next-button.active {
+  opacity: 1;
+  cursor: pointer;
+}
+
+.booking-step2-next-button.active:hover {
+  background-color: #0056b3;
 }

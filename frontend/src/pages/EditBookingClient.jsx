@@ -7,6 +7,8 @@ import Header from "../components/common/Header.jsx";
 import SideNav from "../components/common/SideNav.jsx"
 import StepBar from "../components/common/StepBar.jsx";
 import BookingForm from "../components/common/BookingForm.jsx";
+import CompactRoom from "../components/common/CompactRoom";
+import Pagination from "../components/common/Pagination";
 import '../style/edit-booking-client.css'
 
 
@@ -21,6 +23,13 @@ function EditBookingClient({ sections }) {
   const [role, setRole] = useState("");
   const [step, setStep] = useState(0);
   const [step1Data, setStep1Data] = useState({});
+  const [allZones, setAllZones] = useState([]);
+  const [selectedRooms, setSelectedRooms] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterType, setFilterType] = useState("todos");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [currentPage, setCurrentPage] = useState(1);
+  const roomsPerPage = 4;
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -90,10 +99,69 @@ function EditBookingClient({ sections }) {
     getBookingInfo();
   }, [navigate]);
 
+  useEffect(() => {
+    const getAllZones = async () => {
+      try {
+        const res = await fetch(`${DEFAULT_ROUTE}/zones/`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          alert(errorData.message || "Error al obtener las salas");
+          return;
+        }
+
+        const zonesData = await res.json();
+        setAllZones(zonesData);
+      } catch (error) {
+        console.error("Error al obtener salas:", error);
+        alert("Ocurrió un error al obtener las salas.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getAllZones();
+  }, []);
+
+  const uniqueTypes = [...new Set(allZones.map((room) => room.TYPE))];
+
+  const filteredAndSortedRooms = allZones
+    .filter((room) => {
+      const matchesSearch = room.NAME.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesType = filterType === "todos" || room.TYPE.toLowerCase() === filterType.toLowerCase();
+      return room.ZONE_ID && matchesSearch && matchesType;
+    })
+    .sort((a, b) => sortOrder === "asc" ? a.PRICE - b.PRICE : b.PRICE - a.PRICE);
+
+  // Paginación
+  const indexOfLastRoom = currentPage * roomsPerPage;
+  const indexOfFirstRoom = indexOfLastRoom - roomsPerPage;
+  const currentRooms = filteredAndSortedRooms.slice(indexOfFirstRoom, indexOfLastRoom);
+  const totalPages = Math.ceil(filteredAndSortedRooms.length / roomsPerPage);
+
   const handleNextStep = (data) => {
     setStep1Data(data);
     setStep(prev => prev + 1);
   };
+
+  const handleRoomClicked = (roomID) => {
+    setSelectedRooms(prevSelected => {
+      const prev = prevSelected || [];
+      if (prev.includes(roomID)) return prev.filter(id => id !== roomID);
+      return [...prev, roomID];
+    });
+  };
+
+  const handleReturn = () => {
+    if (step > 0) {
+      setStep(prev => prev - 1);
+    } else {
+      window.history.back()
+    }
+  }
 
   if (loading) return <LoadingPage />;
 
@@ -120,7 +188,7 @@ function EditBookingClient({ sections }) {
         </div>
 
         <div className="booking-client-content">
-          <button type='button' className="back-btn-bookings-client" onClick={() => window.history.back()}>
+          <button type='button' className="back-btn-bookings-client" onClick={() => handleReturn()}>
             <i className="bi bi-arrow-left"></i> Regresar
           </button>
 
@@ -143,8 +211,80 @@ function EditBookingClient({ sections }) {
                 </div>
               }
               {step === 1 &&
-                <div>
-                  
+                <div className="booking-client-step2">
+                  {/* Filtros */}
+                  <div className="edit-booking-filters">
+                    <div className="edit-booking-search-input">
+                      <label htmlFor="search">Buscar: </label>
+                      <input
+                        id="search"
+                        type="text"
+                        placeholder="Buscar por nombre..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="filter-input"
+                      />
+                    </div>
+
+                    <div className="edit-booking-filter-input">
+                      <label htmlFor="status">Filtrar: </label>
+                      <select
+                        id="status"
+                        value={filterType}
+                        onChange={(e) => setFilterType(e.target.value)}
+                        className="filter-select"
+                      >
+                        <option value="todos">Todos los tipos</option>
+                        {uniqueTypes.map((type) => (
+                          <option key={type} value={type}>
+                            {type.charAt(0).toUpperCase() + type.slice(1)}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    
+                    <div className="edit-booking-sort-input">
+                      <label htmlFor="sort">Ordenar: </label>
+                      <select
+                        id="sort"
+                        value={sortOrder}
+                        onChange={(e) => setSortOrder(e.target.value)}
+                        className="filter-select"
+                      >
+                        <option value="asc">Precio: menor a mayor</option>
+                        <option value="desc">Precio: mayor a menor</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="rooms-counter">
+                    <p>Selecciona las salas</p>
+                    <p>Salas seleccionadas: {selectedRooms.length}</p>
+                  </div>
+
+                  {/* Salas compactas */}
+                  <div className="edit-booking-room-grid">
+                    {currentRooms.map((room) => (
+                      <div
+                        key={room.ZONE_ID}
+                        className="edit-booking-room-card"
+                        onClick={() => handleRoomClicked(room.ZONE_ID)}
+                      >
+                        <CompactRoom room={room} isBooking={true}/>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Paginación */}
+                  {totalPages > 1 && (
+                    <Pagination
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      onPageChange={setCurrentPage}
+                    />
+                  )}
+
+                  <button type="button" className={`booking-step2-next-button ${selectedRooms.length != 0 ? "active" : ""}`}>Siguiente</button>
                 </div>
               }
               {step === 2 && <div>Confirmar datos</div>}

@@ -1,8 +1,9 @@
 import React from "react";
+import PropTypes from "prop-types";
 import "../../style/compact-room.css";
 import DefaultRoom from "../../assets/images/salas/default_zone.jpg";
 
-const CompactRoom = ({ room }) => {
+const CompactRoom = ({ room, isBooking = false}) => {
   const DEFAULT_ROUTE = "http://localhost:1522";
   return (
     <div className="compact-room">
@@ -13,10 +14,19 @@ const CompactRoom = ({ room }) => {
       />
       <div className="compact-room-info">
         <h3><strong>{room.NAME}</strong></h3>
-        <span className="compact-room-link">Ver más &gt; </span>
+        {!isBooking ? (
+          <span className="compact-room-link">Ver más &gt; </span>
+        ) : (
+          <button className="add-room-booking-button" type="button">Agregar</button>
+        )}
       </div>
     </div>
   );
+};
+
+CompactRoom.propTypes = {
+  room: PropTypes.object.isRequired,
+  isBooking: PropTypes.bool
 };
 
 export default CompactRoom;

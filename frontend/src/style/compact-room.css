@@ -30,7 +30,6 @@
 
 .compact-room-info h3 {
   margin: 0;
-  font-size: 1.1rem;
   color: #333;
   font-size: 1.2rem;
   font-weight: bold;
@@ -41,7 +40,6 @@
 .compact-room-link {
   display: inline-block;
   margin-top: 0.5rem;
-  font-size: 0.95rem;
   color: #007bff;
   font-weight: 500;
   text-decoration: underline;
@@ -49,6 +47,28 @@
   font-size: 0.95rem;
   margin-bottom: 10px;
 }
+
+.add-room-booking-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: center;
+  margin-top: 15px;
+  width: 40%;
+  min-height: 35px;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-family: "Merriweather sans", sans-serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.add-room-booking-button:hover {
+  background-color: #1d4ed8;
+}
+
 
 @media (min-width: 1440px) {
   .compact-room {
