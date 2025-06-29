@@ -113,3 +113,27 @@ exports.getBookingZones= async (req, res) => {
     if (conn) await conn.close();
   }
 };
+
+/**
+ * Obtiene todos los servicios de una reserva.
+ */
+exports.getBookingServices = async (req, res) => {
+  let conn;
+  try {
+    const { bookingId, roomId } = req.body;
+    conn = await getConnection();
+
+    const services_result = await conn.execute(
+      `SELECT ADDITIONAL_SERVICE_ID FROM CLIENT_SCHEMA.BOOKINGS_ZONES_SERVICES WHERE BOOKING_ID = :bookingId AND ZONE_ID = :roomId`,
+      [bookingId, roomId],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    res.json(services_result.rows || []);
+  } catch (err) {
+    console.error("Error al obtener los servicios de la reserva:", err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
