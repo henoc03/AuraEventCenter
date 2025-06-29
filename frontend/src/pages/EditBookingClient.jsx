@@ -62,6 +62,34 @@ function EditBookingClient({ sections }) {
     getSetUserInfo();
   }, [navigate]);
 
+  useEffect(() => {
+    const getBookingInfo = async () => {
+      try {
+        const res = await fetch(`${DEFAULT_ROUTE}/bookings/1`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          alert(errorData.message || 'Error traer la información de la reserva');
+          return;
+        }
+
+        const bookingData = await res.json();
+
+        setStep1Data(bookingData);
+      } catch {
+        alert('Ocurrió un error al obtener la información de la reserva.');
+        navigate('/login');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getBookingInfo();
+  }, [navigate]);
+
   const handleNextStep = (data) => {
     setStep1Data(data);
     setStep(prev => prev + 1);
@@ -107,10 +135,18 @@ function EditBookingClient({ sections }) {
               {step === 0 && 
                 <div className="booking-client-step1">
                   <p>Los campos marcados con <span style={{ color: 'red' }}>*</span> son obligatorios</p>
-                  <BookingForm onNextStep={handleNextStep}/>
+                  <BookingForm
+                    onNextStep={handleNextStep}
+                    isEditMode={true}
+                    bookingInfo={step1Data}
+                  />
                 </div>
               }
-              {step === 1 && <div>Detalles de reserva</div>}
+              {step === 1 &&
+                <div>
+                  
+                </div>
+              }
               {step === 2 && <div>Confirmar datos</div>}
               {step === 3 && <div>Finalizar</div>}
 
