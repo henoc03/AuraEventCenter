@@ -66,13 +66,9 @@ exports.getBookingById = async (req, res) => {
       status: booking.STATUS,
       additionalNote: booking.ADDITIONAL_NOTE,
       startTime: booking.START_TIME ? 
-      `${booking.START_TIME.getHours().toString().padStart(2, '0')}:
-       ${booking.START_TIME.getMinutes().toString().padStart(2, '0')}:
-       ${booking.START_TIME.getSeconds().toString().padStart(2, '0')}` : null,
+      `${booking.START_TIME.getHours().toString().padStart(2, '0')}:${booking.START_TIME.getMinutes().toString().padStart(2, '0')}:${booking.START_TIME.getSeconds().toString().padStart(2, '0')}` : null,
       endTime: booking.END_TIME ? 
-      `${booking.END_TIME.getHours().toString().padStart(2, '0')}:
-       ${booking.END_TIME.getMinutes().toString().padStart(2, '0')}:
-       ${booking.END_TIME.getSeconds().toString().padStart(2, '0')}` : null,
+      `${booking.END_TIME.getHours().toString().padStart(2, '0')}:${booking.END_TIME.getMinutes().toString().padStart(2, '0')}:${booking.END_TIME.getSeconds().toString().padStart(2, '0')}` : null,
       date: booking.EVENT_DATE ? booking.EVENT_DATE.toISOString().split('T')[0] : null,
       idCard: booking.ID_CARD,
       eventType: booking.EVENT_TYPE,
@@ -81,9 +77,35 @@ exports.getBookingById = async (req, res) => {
       phone: user.PHONE
     }
 
-    console.log(booking_info);
-
     res.json(booking_info || {});
+  } catch (err) {
+    console.error("Error al obtener reserva:", err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
+/**
+ * Obtiene todas las salas de una reserva.
+ */
+exports.getBookingZones= async (req, res) => {
+  let conn;
+  try {
+    const id = req.params.id;
+    conn = await getConnection();
+
+    const zones_result = await conn.execute(
+      `SELECT ZONE_ID FROM CLIENT_SCHEMA.BOOKINGS_ZONES WHERE BOOKING_ID = :id`,
+      [id],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    if (zones_result.rows.length === 0) {
+      return res.status(404).json({ message: 'Reserva no encontrada.' });
+    }
+
+    res.json(zones_result.rows || []);
   } catch (err) {
     console.error("Error al obtener reserva:", err);
     res.status(500).json({ error: err.message });

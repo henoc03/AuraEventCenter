@@ -69,6 +69,14 @@
   background-color: #1d4ed8;
 }
 
+.add-room-booking-button.room-is-selected {
+  background-color: #de4a4a;
+}
+
+.add-room-booking-button.room-is-selected:hover {
+  background-color: #b91c1c;
+}
+
 
 @media (min-width: 1440px) {
   .compact-room {

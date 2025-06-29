@@ -90,7 +90,6 @@ function EditBookingClient({ sections }) {
         setStep1Data(bookingData);
       } catch {
         alert('Ocurrió un error al obtener la información de la reserva.');
-        navigate('/login');
       } finally {
         setLoading(false);
       }
@@ -126,6 +125,33 @@ function EditBookingClient({ sections }) {
     getAllZones();
   }, []);
 
+  useEffect(() => {
+    const getSelectedZones = async () => {
+      try {
+        const res = await fetch(`${DEFAULT_ROUTE}/bookings/zones/1`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          alert(errorData.message || 'Error traer la información de las salas seleccionadas');
+          return;
+        }
+
+        const selectedRooms = await res.json();
+
+        setSelectedRooms(selectedRooms.map(room => room.ZONE_ID));
+      } catch {
+        alert('Ocurrió un error al obtener la información de la reserva.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getSelectedZones();
+  }, [navigate]);
+
   const uniqueTypes = [...new Set(allZones.map((room) => room.TYPE))];
 
   const filteredAndSortedRooms = allZones
@@ -136,10 +162,17 @@ function EditBookingClient({ sections }) {
     })
     .sort((a, b) => sortOrder === "asc" ? a.PRICE - b.PRICE : b.PRICE - a.PRICE);
 
+  // Ordenar para que las salas seleccionadas aparezcan primero
+  const prioritizedRooms = [...filteredAndSortedRooms].sort((a, b) => {
+    const aSelected = selectedRooms.includes(a.ZONE_ID) ? 0 : 1;
+    const bSelected = selectedRooms.includes(b.ZONE_ID) ? 0 : 1;
+    return aSelected - bSelected;
+  });
+
   // Paginación
   const indexOfLastRoom = currentPage * roomsPerPage;
   const indexOfFirstRoom = indexOfLastRoom - roomsPerPage;
-  const currentRooms = filteredAndSortedRooms.slice(indexOfFirstRoom, indexOfLastRoom);
+  const currentRooms = prioritizedRooms.slice(indexOfFirstRoom, indexOfLastRoom);
   const totalPages = Math.ceil(filteredAndSortedRooms.length / roomsPerPage);
 
   const handleNextStep = (data) => {
@@ -264,15 +297,19 @@ function EditBookingClient({ sections }) {
 
                   {/* Salas compactas */}
                   <div className="edit-booking-room-grid">
-                    {currentRooms.map((room) => (
-                      <div
-                        key={room.ZONE_ID}
-                        className="edit-booking-room-card"
-                        onClick={() => handleRoomClicked(room.ZONE_ID)}
-                      >
-                        <CompactRoom room={room} isBooking={true}/>
-                      </div>
-                    ))}
+                    {currentRooms.map((room) => {
+                      const isSelected = selectedRooms.includes(room.ZONE_ID);
+                      return (
+                        <div
+                          key={room.ZONE_ID}
+                          className={`edit-booking-room-card${isSelected ? " selected-room" : ""}`}
+                          onClick={() => handleRoomClicked(room.ZONE_ID)}
+                          style={isSelected ? { opacity: "50%" } : {}}
+                        >
+                          <CompactRoom room={room} isBooking={true} isSelected={isSelected}/>
+                        </div>
+                      );
+                    })}
                   </div>
 
                   {/* Paginación */}
@@ -284,7 +321,13 @@ function EditBookingClient({ sections }) {
                     />
                   )}
 
-                  <button type="button" className={`booking-step2-next-button ${selectedRooms.length != 0 ? "active" : ""}`}>Siguiente</button>
+                  <button
+                    type="button"
+                    className={`booking-step2-next-button ${selectedRooms.length != 0 ? "active" : ""}`}
+                    onClick={() => setStep(prev => prev + 1)}
+                  >
+                    Siguiente
+                  </button>
                 </div>
               }
               {step === 2 && <div>Confirmar datos</div>}
