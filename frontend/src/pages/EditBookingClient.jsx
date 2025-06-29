@@ -352,7 +352,107 @@ function EditBookingClient({ sections }) {
                   </button>
                 </div>
               }
-              {step === 2 && <div>Confirmar datos</div>}
+
+              {step === 2 && 
+                <div className="booking-client-step3">
+                  {/* Filtros */}
+                  <div className="edit-booking-filters">
+                    <div className="edit-booking-search-input">
+                      <label htmlFor="search">Buscar: </label>
+                      <input
+                        id="search"
+                        type="text"
+                        placeholder="Buscar por nombre..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="filter-input"
+                      />
+                    </div>
+
+                    <div className="edit-booking-filter-input">
+                      <label htmlFor="status">Filtrar: </label>
+                      <select
+                        id="status"
+                        value={filterType}
+                        onChange={(e) => setFilterType(e.target.value)}
+                        className="filter-select"
+                      >
+                        <option value="todos">Todos los tipos</option>
+                        {uniqueTypes.map((type) => (
+                          <option key={type} value={type}>
+                            {type.charAt(0).toUpperCase() + type.slice(1)}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    
+                    <div className="edit-booking-sort-input">
+                      <label htmlFor="sort">Ordenar: </label>
+                      <select
+                        id="sort"
+                        value={sortOrder}
+                        onChange={(e) => setSortOrder(e.target.value)}
+                        className="filter-select"
+                      >
+                        <option value="asc">Precio: menor a mayor</option>
+                        <option value="desc">Precio: mayor a menor</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="rooms-counter">
+                    <p>Selecciona las salas</p>
+                    <p>Salas seleccionadas: {selectedRooms.length}</p>
+                  </div>
+
+                  {/* Salas compactas */}
+                  <div className="edit-booking-room-grid">
+                    {currentRooms.map((room) => {
+                      const isSelected = selectedRooms.includes(room.ZONE_ID);
+                      const isNew = newRooms.includes(room.ZONE_ID);
+                      let cardStyle = {};
+                      if (isNew && !isSelected) {
+                        cardStyle = { opacity: "100%" };
+                      } else if (isSelected) {
+                        cardStyle = { opacity: "50%" };
+                      }
+                      return (
+                        <div
+                          key={room.ZONE_ID}
+                          className={`edit-booking-room-card${isSelected ? " selected-room" : "" }`}
+                          onClick={() => handleRoomClicked(room.ZONE_ID)}
+                          style={cardStyle}
+                        >
+                          <CompactRoom
+                            room={room}
+                            isBooking={true}
+                            isSelected={isSelected}
+                            isNew={isNew}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Paginación */}
+                  {totalPages > 1 && (
+                    <Pagination
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      onPageChange={setCurrentPage}
+                    />
+                  )}
+
+                  <button
+                    type="button"
+                    className={`booking-step2-next-button ${selectedRooms.length != 0 ? "active" : ""}`}
+                    onClick={() => setStep(prev => prev + 1)}
+                  >
+                    Siguiente
+                  </button>
+                </div>
+              }
+
               {step === 3 && <div>Finalizar</div>}
 
             </div>
