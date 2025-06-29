@@ -19,6 +19,7 @@ import MenusClient from './pages/MenusClient';
 import ContactForm from './pages/ContactForm';
 import EquipmentsClient from './pages/EquipmentsClient';
 import AboutPage from './pages/About';
+import EditBookingClient from './pages/EditBookingClient';
 import ChatBotWrapper from './components/utils/ChatBotWrapper';
 // Páginas protegidas
 import AdminDashboard from "./pages/AdminDashBoard";
@@ -74,11 +75,13 @@ function App() {
           <Route path="/cuenta" element={<AccountSettings sections={SectionProfile}/>} />
           <Route path="/cuenta/cambiar-contraseña" element={<ChangePassword sections={SectionProfile}/>} />
           <Route path="/cuenta/verificar-codigo" element={<VerifyAccountCode sections={SectionProfile}/>} />
+          <Route path="/reserva/editar" element={<EditBookingClient sections={SectionProfile}/>} />
           <Route path="/servicios" element={<ServicesClient />} />
           <Route path="/servicios/menus" element={<MenusClient />} />
           <Route path="/servicios/equipos" element={<EquipmentsClient />} />
           <Route path="/contacto" element={<ContactForm />} />
           <Route path="/acerca" element={<AboutPage />} />
+
 
           
           {/* Rutas protegidas para administradores comunes */}

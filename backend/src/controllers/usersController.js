@@ -94,6 +94,8 @@ exports.getUserById = async (req, res) => {
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
 
+    console.log(result);
+
     let user = result.rows[0] || {};
     if (user.PROFILE_IMAGE_PATH) {
       user.PROFILE_IMAGE_PATH = decrypt(user.PROFILE_IMAGE_PATH);
@@ -301,7 +303,7 @@ exports.login = async (req, res) => {
     conn = await getConnection();
 
     const result = await conn.execute(
-      `SELECT * FROM CLIENT_SCHEMA.USERS WHERE EMAIL = :email`,
+      `SELECT * FROM CLIENT_SCHEMA.USERS WHERE EMAIL = :email AND ACTIVE = 1`,
       [email],
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
