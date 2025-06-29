@@ -233,24 +233,11 @@ exports.deleteService = async (req, res) => {
   try {
     conn = await getConnection();
 
-    const result = await conn.execute(
-      `SELECT IMAGE_PATH FROM ADMIN_SCHEMA.ADDITIONAL_SERVICES WHERE ADDITIONAL_SERVICE_ID = :id`,
-      [req.params.id],
-      { outFormat: oracledb.OUT_FORMAT_OBJECT }
-    );
-
-    const encryptedPath = result.rows[0]?.IMAGE_PATH;
-    const decryptedPath = encryptedPath ? decrypt(encryptedPath) : null;
-
     await conn.execute(
-      `DELETE FROM ADMIN_SCHEMA.ADDITIONAL_SERVICES WHERE ADDITIONAL_SERVICE_ID = :id`,
+      `UPDATE ADMIN_SCHEMA.ADDITIONAL_SERVICES SET ACTIVE = 0 WHERE ADDITIONAL_SERVICE_ID = :id`,
       [req.params.id],
       { autoCommit: true }
     );
-
-    if (decryptedPath) {
-      deleteImageFile(decryptedPath);
-    }
 
     res.sendStatus(204);
   } catch (err) {
