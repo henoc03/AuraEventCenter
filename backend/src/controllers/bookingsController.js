@@ -129,7 +129,14 @@ exports.getBookingServices = async (req, res) => {
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
 
-    res.json(services_result.rows || []);
+
+    const services = services_result.rows.map(service => {
+      return {
+        ID: service.ADDITIONAL_SERVICE_ID,
+      };
+    });
+
+    res.json(services || []);
   } catch (err) {
     console.error("Error al obtener los servicios de la reserva:", err);
     res.status(500).json({ error: err.message });

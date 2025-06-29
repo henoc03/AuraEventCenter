@@ -40,7 +40,7 @@
     padding: 0 250px;
 }
 
-.booking-client-step2 {
+.booking-client-step2, .booking-client-step3 {
     margin-top: 35px;
     padding: 0 50px;
 }
@@ -89,19 +89,19 @@
   margin-left: 15px;
 }
 
-.edit-booking-room-grid {
+.edit-booking-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 3rem;
   margin-bottom: 60px;
 }
 
-.edit-booking-room-card {
+.edit-booking-card {
   transition: all 0.3s ease;
   height: fit-content;
 }
 
-.rooms-counter {
+.elements-counter {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -111,7 +111,7 @@
     font-weight: bold;
 }
 
-.booking-step2-next-button {
+.booking-next-step-button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -130,11 +130,11 @@
   opacity: 0.6;
 }
 
-.booking-step2-next-button.active {
+.booking-next-step-button.active {
   opacity: 1;
   cursor: pointer;
 }
 
-.booking-step2-next-button.active:hover {
+.booking-next-step-button.active:hover {
   background-color: #0056b3;
 }

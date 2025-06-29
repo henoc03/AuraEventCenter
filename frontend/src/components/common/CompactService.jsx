@@ -18,12 +18,12 @@ const Compactservice = ({ service, isBooking = false, isSelected = false, isNew 
   return (
     <div className={`compact-service ${isSelected ? "service-is-selected" : ""} ${isNew ? " service-is-new" : ""}`}>
       <img
-        src={service.IMAGE_PATH && service.IMAGE_PATH.trim() !== "" ? `${DEFAULT_ROUTE}/${service.IMAGE_PATH}` : DefaultService}
+        src={service.imagePath && service.imagePath.trim() !== "" ? `${DEFAULT_ROUTE}/${service.imagePath}` : DefaultService}
         alt={`Imagen de ${service.NAME}`}
         className="compact-service-image"
       />
       <div className="compact-service-info">
-        <h3><strong>{service.NAME}</strong></h3>
+        <h3><strong>{service.name}</strong></h3>
         {!isBooking ? (
           <span className="compact-service-link">Ver más &gt; </span>
         ) : (

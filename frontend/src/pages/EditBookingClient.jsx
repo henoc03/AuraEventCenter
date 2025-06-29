@@ -8,6 +8,7 @@ import SideNav from "../components/common/SideNav.jsx"
 import StepBar from "../components/common/StepBar.jsx";
 import BookingForm from "../components/common/BookingForm.jsx";
 import CompactRoom from "../components/common/CompactRoom";
+import CompactService from "../components/common/CompactService.jsx";
 import Pagination from "../components/common/Pagination";
 import '../style/edit-booking-client.css'
 
@@ -26,11 +27,14 @@ function EditBookingClient({ sections }) {
   const [allZones, setAllZones] = useState([]);
   const [selectedRooms, setSelectedRooms] = useState([]);
   const [newRooms, setNewRooms] = useState([]);
+  const [allServices, setAllServices] = useState([]);
+  const [selectedServices, setSelectedServices] = useState([]);
+  const [newServices, setNewServices] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("todos");
   const [sortOrder, setSortOrder] = useState("asc");
   const [currentPage, setCurrentPage] = useState(1);
-  const roomsPerPage = 4;
+  const elementsPerPage = 4;
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -64,8 +68,6 @@ function EditBookingClient({ sections }) {
       } catch {
         alert('Ocurrió un error al obtener la información de usuario.');
         navigate('/login');
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -118,8 +120,6 @@ function EditBookingClient({ sections }) {
       } catch (error) {
         console.error("Error al obtener salas:", error);
         alert("Ocurrió un error al obtener las salas.");
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -145,15 +145,82 @@ function EditBookingClient({ sections }) {
         setSelectedRooms(selectedRooms.map(room => room.ZONE_ID));
       } catch {
         alert('Ocurrió un error al obtener la información de la reserva.');
-      } finally {
-        setLoading(false);
       }
     };
 
     getSelectedZones();
   }, [navigate]);
 
-  const uniqueTypes = [...new Set(allZones.map((room) => room.TYPE))];
+  useEffect(() => {
+    const getAllServices = async () => {
+      try {
+        const res = await fetch(`${DEFAULT_ROUTE}/services/`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          alert(errorData.message || "Error al obtener los servicios");
+          return;
+        }
+
+        const servicesData = await res.json();
+        setAllServices(servicesData);
+      } catch (error) {
+        console.error("Error al obtener salas:", error);
+        alert("Ocurrió un error al obtener los servicios.");
+      }
+    };
+
+    getAllServices();
+  }, []);
+
+  useEffect(() => {
+    const getSelectedServices = async () => {
+      try {
+        const bookingId = 1;
+        const roomId = 349;
+
+        const res = await fetch(`${DEFAULT_ROUTE}/bookings/services`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ bookingId, roomId }),
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          alert(errorData.message || "Error al obtener los servicios");
+          return;
+        }
+
+        const servicesData = await res.json();
+
+        let ids = [];
+        if (servicesData.length > 0 && typeof servicesData[0] === 'object') {
+          const key = Object.keys(servicesData[0]).find(k => k.toLowerCase().includes('id'));
+          ids = servicesData.map(s => s[key]);
+        } else {
+          ids = servicesData;
+        }
+        setSelectedServices(ids);
+      } catch (error) {
+        console.error("Error al obtener los servicios de la sala:", error);
+        alert("Ocurrió un error al obtener los servicios.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getSelectedServices();
+  }, []);
+
+  useEffect(() => {
+    console.log("Servicios seleccionados:", selectedServices);
+  }, [selectedServices]);
+
+  // Filtros para las salas
+  const uniqueRoomTypes = [...new Set(allZones.map((room) => room.TYPE))];
 
   const filteredAndSortedRooms = allZones
     .filter((room) => {
@@ -170,11 +237,27 @@ function EditBookingClient({ sections }) {
     return aSelected - bSelected;
   });
 
+  // Filtros para los servicios
+  const filteredAndSortedServices = allServices
+    .filter((service) => {
+      const matchesSearch = service.name.toLowerCase().includes(searchTerm.toLowerCase());
+      return service.ID && matchesSearch;
+    })
+    .sort((a, b) => sortOrder === "asc" ? a.price - b.price : b.price - a.price);
+
+  // Ordenar para que las salas seleccionadas aparezcan primero
+  const prioritizedServices = [...filteredAndSortedServices].sort((a, b) => {
+    const aSelected = selectedServices.includes(a.ID) ? 0 : 1;
+    const bSelected = selectedServices.includes(b.ID) ? 0 : 1;
+    return aSelected - bSelected;
+  });
+
   // Paginación
-  const indexOfLastRoom = currentPage * roomsPerPage;
-  const indexOfFirstRoom = indexOfLastRoom - roomsPerPage;
-  const currentRooms = prioritizedRooms.slice(indexOfFirstRoom, indexOfLastRoom);
-  const totalPages = Math.ceil(filteredAndSortedRooms.length / roomsPerPage);
+  const indexOfLastElement = currentPage * elementsPerPage;
+  const indexOfFirstElement = indexOfLastElement - elementsPerPage;
+  const currentRooms = prioritizedRooms.slice(indexOfFirstElement, indexOfLastElement);
+  const currentServices = prioritizedServices.slice(indexOfFirstElement, indexOfLastElement);
+  const totalPages = Math.ceil(filteredAndSortedRooms.length / elementsPerPage);
 
   const handleNextStep = (data) => {
     setStep1Data(data);
@@ -195,6 +278,23 @@ function EditBookingClient({ sections }) {
       // Si la sala no estaba seleccionada, agregarla como nueva
       setNewRooms(prev => [...prev, roomID]);
       setSelectedRooms(prev => [...prev, roomID]);
+    }
+  };
+
+  const handleServiceClicked = (serviceID) => {
+    // Si el servicio ya estaba seleccionado desde el inicio, no se puede quitar
+    if (selectedServices.includes(serviceID) && !newServices.includes(serviceID)) {
+      return;
+    }
+
+    // Si el servicio es nuevo (agregado en esta edición)
+    if (newServices.includes(serviceID)) {
+      setNewServices(prev => prev.filter(id => id !== serviceID));
+      setSelectedServices(prev => prev.filter(id => id !== serviceID));
+    } else {
+      // Si el servicio no estaba seleccionado, agregarlo como nuevo
+      setNewServices(prev => [...prev, serviceID]);
+      setSelectedServices(prev => [...prev, serviceID]);
     }
   };
 
@@ -278,7 +378,7 @@ function EditBookingClient({ sections }) {
                         className="filter-select"
                       >
                         <option value="todos">Todos los tipos</option>
-                        {uniqueTypes.map((type) => (
+                        {uniqueRoomTypes.map((type) => (
                           <option key={type} value={type}>
                             {type.charAt(0).toUpperCase() + type.slice(1)}
                           </option>
@@ -300,13 +400,13 @@ function EditBookingClient({ sections }) {
                     </div>
                   </div>
 
-                  <div className="rooms-counter">
+                  <div className="elements-counter">
                     <p>Selecciona las salas</p>
                     <p>Salas seleccionadas: {selectedRooms.length}</p>
                   </div>
 
                   {/* Salas compactas */}
-                  <div className="edit-booking-room-grid">
+                  <div className="edit-booking-grid">
                     {currentRooms.map((room) => {
                       const isSelected = selectedRooms.includes(room.ZONE_ID);
                       const isNew = newRooms.includes(room.ZONE_ID);
@@ -319,7 +419,7 @@ function EditBookingClient({ sections }) {
                       return (
                         <div
                           key={room.ZONE_ID}
-                          className={`edit-booking-room-card${isSelected ? " selected-room" : "" }`}
+                          className={`edit-booking-card${isSelected ? " edit-booking-selected-card" : "" }`}
                           onClick={() => handleRoomClicked(room.ZONE_ID)}
                           style={cardStyle}
                         >
@@ -345,7 +445,7 @@ function EditBookingClient({ sections }) {
 
                   <button
                     type="button"
-                    className={`booking-step2-next-button ${selectedRooms.length != 0 ? "active" : ""}`}
+                    className={`booking-next-step-button ${selectedRooms.length != 0 ? "active" : ""}`}
                     onClick={() => setStep(prev => prev + 1)}
                   >
                     Siguiente
@@ -368,23 +468,6 @@ function EditBookingClient({ sections }) {
                         className="filter-input"
                       />
                     </div>
-
-                    <div className="edit-booking-filter-input">
-                      <label htmlFor="status">Filtrar: </label>
-                      <select
-                        id="status"
-                        value={filterType}
-                        onChange={(e) => setFilterType(e.target.value)}
-                        className="filter-select"
-                      >
-                        <option value="todos">Todos los tipos</option>
-                        {uniqueTypes.map((type) => (
-                          <option key={type} value={type}>
-                            {type.charAt(0).toUpperCase() + type.slice(1)}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
                     
                     <div className="edit-booking-sort-input">
                       <label htmlFor="sort">Ordenar: </label>
@@ -400,16 +483,16 @@ function EditBookingClient({ sections }) {
                     </div>
                   </div>
 
-                  <div className="rooms-counter">
-                    <p>Selecciona las salas</p>
-                    <p>Salas seleccionadas: {selectedRooms.length}</p>
+                  <div className="elements-counter">
+                    <p>Selecciona los servicios</p>
+                    <p>Servicios seleccionados: {selectedServices.length}</p>
                   </div>
 
-                  {/* Salas compactas */}
-                  <div className="edit-booking-room-grid">
-                    {currentRooms.map((room) => {
-                      const isSelected = selectedRooms.includes(room.ZONE_ID);
-                      const isNew = newRooms.includes(room.ZONE_ID);
+                  {/* Servicios compactos */}
+                  <div className="edit-booking-grid">
+                    {currentServices.map((service) => {
+                      const isSelected = selectedServices.includes(service.ID);
+                      const isNew = newServices.includes(service.ID);
                       let cardStyle = {};
                       if (isNew && !isSelected) {
                         cardStyle = { opacity: "100%" };
@@ -418,13 +501,13 @@ function EditBookingClient({ sections }) {
                       }
                       return (
                         <div
-                          key={room.ZONE_ID}
-                          className={`edit-booking-room-card${isSelected ? " selected-room" : "" }`}
-                          onClick={() => handleRoomClicked(room.ZONE_ID)}
+                          key={service.ID}
+                          className={`edit-booking-card${isSelected ? " edit-booking-selected-card" : "" }`}
+                          onClick={() => handleServiceClicked(service.ID)}
                           style={cardStyle}
                         >
-                          <CompactRoom
-                            room={room}
+                          <CompactService
+                            service={service}
                             isBooking={true}
                             isSelected={isSelected}
                             isNew={isNew}
@@ -445,7 +528,7 @@ function EditBookingClient({ sections }) {
 
                   <button
                     type="button"
-                    className={`booking-step2-next-button ${selectedRooms.length != 0 ? "active" : ""}`}
+                    className={`booking-next-step-button active`}
                     onClick={() => setStep(prev => prev + 1)}
                   >
                     Siguiente
