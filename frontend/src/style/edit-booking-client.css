@@ -138,3 +138,9 @@
 .booking-next-step-button.active:hover {
   background-color: #0056b3;
 }
+
+.elements-counter p b {
+  font-weight: bold;
+  font-family: 'Merriweather Sans', sans-serif;
+  font-size: 1.2rem;
+}
