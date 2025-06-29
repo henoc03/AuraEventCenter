@@ -25,6 +25,7 @@ function EditBookingClient({ sections }) {
   const [step1Data, setStep1Data] = useState({});
   const [allZones, setAllZones] = useState([]);
   const [selectedRooms, setSelectedRooms] = useState([]);
+  const [newRooms, setNewRooms] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("todos");
   const [sortOrder, setSortOrder] = useState("asc");
@@ -181,11 +182,20 @@ function EditBookingClient({ sections }) {
   };
 
   const handleRoomClicked = (roomID) => {
-    setSelectedRooms(prevSelected => {
-      const prev = prevSelected || [];
-      if (prev.includes(roomID)) return prev.filter(id => id !== roomID);
-      return [...prev, roomID];
-    });
+    // Si la sala ya estaba seleccionada desde el inicio, no se puede quitar
+    if (selectedRooms.includes(roomID) && !newRooms.includes(roomID)) {
+      return;
+    }
+
+    // Si la sala es nueva (agregada en esta edición)
+    if (newRooms.includes(roomID)) {
+      setNewRooms(prev => prev.filter(id => id !== roomID));
+      setSelectedRooms(prev => prev.filter(id => id !== roomID));
+    } else {
+      // Si la sala no estaba seleccionada, agregarla como nueva
+      setNewRooms(prev => [...prev, roomID]);
+      setSelectedRooms(prev => [...prev, roomID]);
+    }
   };
 
   const handleReturn = () => {
@@ -299,14 +309,26 @@ function EditBookingClient({ sections }) {
                   <div className="edit-booking-room-grid">
                     {currentRooms.map((room) => {
                       const isSelected = selectedRooms.includes(room.ZONE_ID);
+                      const isNew = newRooms.includes(room.ZONE_ID);
+                      let cardStyle = {};
+                      if (isNew && !isSelected) {
+                        cardStyle = { opacity: "100%" };
+                      } else if (isSelected) {
+                        cardStyle = { opacity: "50%" };
+                      }
                       return (
                         <div
                           key={room.ZONE_ID}
-                          className={`edit-booking-room-card${isSelected ? " selected-room" : ""}`}
+                          className={`edit-booking-room-card${isSelected ? " selected-room" : "" }`}
                           onClick={() => handleRoomClicked(room.ZONE_ID)}
-                          style={isSelected ? { opacity: "50%" } : {}}
+                          style={cardStyle}
                         >
-                          <CompactRoom room={room} isBooking={true} isSelected={isSelected}/>
+                          <CompactRoom
+                            room={room}
+                            isBooking={true}
+                            isSelected={isSelected}
+                            isNew={isNew}
+                          />
                         </div>
                       );
                     })}

@@ -11,6 +11,14 @@
   cursor: pointer;
 }
 
+.compact-room.room-is-selected {
+  cursor: not-allowed;
+}
+
+.compact-room.room-is-new {
+  cursor: pointer;
+}
+
 .compact-room:hover {
   transform: translateY(-3px) scale(1);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
@@ -70,11 +78,16 @@
 }
 
 .add-room-booking-button.room-is-selected {
-  background-color: #de4a4a;
+  cursor: not-allowed;
 }
 
-.add-room-booking-button.room-is-selected:hover {
-  background-color: #b91c1c;
+.add-room-booking-button.room-is-new {
+  cursor: pointer;
+  background-color: rgb(252, 68, 68);
+}
+
+.add-room-booking-button.room-is-new:hover {
+  background-color: #f50000;
 }
 
 
