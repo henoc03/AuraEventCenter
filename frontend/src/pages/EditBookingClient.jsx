@@ -3,9 +3,10 @@ import PropTypes from 'prop-types';
 import {jwtDecode} from 'jwt-decode';
 import { useNavigate } from "react-router-dom";
 import LoadingPage from "../components/common/LoadingPage.jsx";
-import Header from "../components/common/Header";
+import Header from "../components/common/Header.jsx";
 import SideNav from "../components/common/SideNav.jsx"
-import StepBar from "../components/common/StepBar";
+import StepBar from "../components/common/StepBar.jsx";
+import BookingForm from "../components/common/BookingForm.jsx";
 import '../style/edit-booking-client.css'
 
 
@@ -19,6 +20,7 @@ function EditBookingClient({ sections }) {
   const [lastname, setLastname] = useState("");
   const [role, setRole] = useState("");
   const [step, setStep] = useState(0);
+  const [step1Data, setStep1Data] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -60,6 +62,11 @@ function EditBookingClient({ sections }) {
     getSetUserInfo();
   }, [navigate]);
 
+  const handleNextStep = (data) => {
+    setStep1Data(data);
+    setStep(prev => prev + 1);
+  };
+
   if (loading) return <LoadingPage />;
 
   // Nombres de los pasos
@@ -91,8 +98,24 @@ function EditBookingClient({ sections }) {
 
           <h1>Editar reserva</h1>
 
-          {/* Barra de pasos */}
-          <StepBar steps={steps} currentStep={step} /> 
+          <div className="booking-client-steps">
+            {/* Barra de pasos */}
+            <StepBar steps={steps} currentStep={step} />
+
+            <div className="booking-client-step-content">
+              {/* Contenido del paso actual */}
+              {step === 0 && 
+                <div className="booking-client-step1">
+                  <p>Los campos marcados con <span style={{ color: 'red' }}>*</span> son obligatorios</p>
+                  <BookingForm onNextStep={handleNextStep}/>
+                </div>
+              }
+              {step === 1 && <div>Detalles de reserva</div>}
+              {step === 2 && <div>Confirmar datos</div>}
+              {step === 3 && <div>Finalizar</div>}
+
+            </div>
+          </div> 
         </div>   
       </div>  
     </>

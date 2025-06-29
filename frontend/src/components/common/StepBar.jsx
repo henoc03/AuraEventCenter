@@ -6,7 +6,7 @@ const steps = ['Datos de reserva', 'Salas', 'Servicios', 'Pago'];
 
 export default function StepBar({ currentStep }) {
   return (
-    <Box sx={{ width: '100%', padding: '5px 250px', marginTop: '40px' }}>
+    <Box sx={{ width: '100%', padding: '0px 250px', marginTop: '45px' }}>
       <Stepper activeStep={currentStep}>
         {steps.map((label) => (
           <Step key={label}>
