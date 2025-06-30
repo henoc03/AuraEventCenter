@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import PropTypes from "prop-types";
 
 function Filters({
@@ -21,43 +21,47 @@ function Filters({
   // Tipos únicos
   const uniqueTypes = [...new Set(allElements.map(getType).filter(Boolean))];
 
-  // Filtrado y ordenamiento
-  const filteredAndSortedElements = allElements
-    .filter((element) => {
-      const matchesSearch = getName(element)?.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesType = filterType === "todos" || getType(element)?.toLowerCase() === filterType.toLowerCase();
-      return getId(element) && matchesSearch && matchesType;
-    })
-    .sort((a, b) => sortOrder === "asc" ? getPrice(a) - getPrice(b) : getPrice(b) - getPrice(a));
+  const filteredAndSortedElements = useMemo(() => {
+    return allElements
+      .filter((element) => {
+        const matchesSearch = getName(element)?.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesType =
+          filterType === "todos" || getType(element)?.toLowerCase() === filterType.toLowerCase();
+        return getId(element) && matchesSearch && matchesType;
+      })
+      .sort((a, b) =>
+        sortOrder === "asc" ? getPrice(a) - getPrice(b) : getPrice(b) - getPrice(a)
+      );
+  }, [allElements, searchTerm, filterType, getName, getType, getId, getPrice, sortOrder]);
 
-  // Priorizar seleccionados
-  const prioritizedElements = [...filteredAndSortedElements].sort((a, b) => {
-    const aSelected = selectedElements.includes(getId(a)) ? 0 : 1;
-    const bSelected = selectedElements.includes(getId(b)) ? 0 : 1;
-    return aSelected - bSelected;
-  });
+  const prioritizedElements = useMemo(() => {
+    return [...filteredAndSortedElements].sort((a, b) => {
+      const aSelected = selectedElements.includes(getId(a)) ? 0 : 1;
+      const bSelected = selectedElements.includes(getId(b)) ? 0 : 1;
+      return aSelected - bSelected;
+    });
+  }, [filteredAndSortedElements, selectedElements, getId]);
 
-  // Paginación
-  const insideCurrentPage = currentPage;
-  const indexOfLastElement = insideCurrentPage * elementsPerPage;
-  const indexOfFirstElement = indexOfLastElement - elementsPerPage;
-  const currentElements = prioritizedElements.slice(indexOfFirstElement, indexOfLastElement);
-  const totalPages = Math.ceil(filteredAndSortedElements.length / elementsPerPage);
-
-  // Actualizar elementos actuales
   useEffect(() => {
-    setCurrentElements(currentElements);
-  }, [currentElements, setCurrentElements]);
+    const indexOfLastElement = currentPage * elementsPerPage;
+    const indexOfFirstElement = indexOfLastElement - elementsPerPage;
+    const newCurrentElements = prioritizedElements.slice(indexOfFirstElement, indexOfLastElement);
+    const newTotalPages = Math.ceil(filteredAndSortedElements.length / elementsPerPage);
 
-  // Actualizar el numero de paginas
-  useEffect(() => {
-    setTotalPages(totalPages);
-  }, [totalPages, setTotalPages]);
+    setCurrentElements((prev) => {
+      const same = JSON.stringify(prev) === JSON.stringify(newCurrentElements);
+      return same ? prev : newCurrentElements;
+    });
 
-  // Actualizar el numero de paginas
-  useEffect(() => {
-    setCurrentPage(insideCurrentPage);
-  }, [insideCurrentPage, setCurrentPage]);
+    setTotalPages((prev) => (prev === newTotalPages ? prev : newTotalPages));
+  }, [
+    currentPage,
+    elementsPerPage,
+    prioritizedElements,
+    filteredAndSortedElements.length,
+    setCurrentElements,
+    setTotalPages
+  ]);
 
   return (
     <div className="edit-booking-filters">

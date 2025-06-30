@@ -15,22 +15,20 @@ import Pagination from "../components/common/Pagination.jsx";
 import Filters from "../components/common/Filters.jsx";
 import '../style/edit-booking-client.css'
 
-
 const DEFAULT_ROUTE = "http://localhost:1522";
 
 // Componente para la página de edición de reservas para el cliente
 function EditBookingClient({ sections }) {
-  const [loading, setLoading] = useState(true);
+  // Estados para información del header
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [lastname, setLastname] = useState("");
   const [role, setRole] = useState("");
-  const [step, setStep] = useState(0);
-  const [step1Data, setStep1Data] = useState({});
+
+  // Estados para guardar toda la informacion de la reserva
   const [allZones, setAllZones] = useState([]);
   const [selectedRooms, setSelectedRooms] = useState([]);
   const [newRooms, setNewRooms] = useState([]);
-  const [currentRoomIndex, setCurrentRoomIndex] = useState(0);
   const [allServices, setAllServices] = useState([]);
   const [selectedServices, setSelectedServices] = useState({});
   const [newServices, setNewServices] = useState({});
@@ -40,13 +38,22 @@ function EditBookingClient({ sections }) {
   const [allEquipments, setAllEquipments] = useState([]);
   const [selectedEquipments, setSelectedEquipments] = useState({});
   const [newEquipments, setNewEquipments] = useState({});
-  const [showMenusModal, setShowMenusModal] = useState(false);
-  const [showEquipmentsModal, setShowEquipmentsModal] = useState(false);
+
+  // Estados para manejar la indexación de las páginas
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [modalCurrentPage, setModalCurrentPage] = useState(1);
   const [modalTotalPages, setModalTotalPages] = useState(1);
   const [currentElements, setCurrentElements] = useState([]);
+  const [modalCurrentElementes, setModalCurrentElements] = useState([])
+
+  // Otros estados
+  const [showMenusModal, setShowMenusModal] = useState(false);
+  const [showEquipmentsModal, setShowEquipmentsModal] = useState(false);
+  const [currentRoomIndex, setCurrentRoomIndex] = useState(0);
+  const [loading, setLoading] = useState(true)
+  const [step, setStep] = useState(0);
+  const [step1Data, setStep1Data] = useState({});
   const navigate = useNavigate();
 
   // Obtener informacion de usuario para el header
@@ -393,17 +400,18 @@ function EditBookingClient({ sections }) {
       return;
     }
 
-    // Si la sala es nueva (agregada en esta edición)
+    // Si la sala es nueva
     if (newRooms.includes(roomID)) {
       setNewRooms(prev => prev.filter(id => id !== roomID));
       setSelectedRooms(prev => prev.filter(id => id !== roomID));
     } else {
-      // Si la sala no estaba seleccionada, agregarla como nueva
+      // Si la sala no estaba seleccionada
       setNewRooms(prev => [...prev, roomID]);
       setSelectedRooms(prev => [...prev, roomID]);
     }
   };
 
+  // Manejar la selección
   const handleServiceClicked = (service) => {
     const isCatering = service.name.toLowerCase().includes("catering");
     const isEquipos = service.name.toLowerCase().includes("equipos");
@@ -750,7 +758,7 @@ function EditBookingClient({ sections }) {
                         <Filters
                           allElements={allMenus}
                           selectedElements={selectedMenusForRoom}
-                          setCurrentElements={setCurrentElements}
+                          setCurrentElements={setModalCurrentElements}
                           setTotalPages={setModalTotalPages}
                           currentPage={modalCurrentPage}
                           setCurrentPage={setModalCurrentPage}
@@ -767,7 +775,7 @@ function EditBookingClient({ sections }) {
 
                         {/* menus compactos */}
                         <div className="edit-booking-grid">
-                          {currentElements.map((menu) => {
+                          {modalCurrentElementes.map((menu) => {
                             const isSelected = selectedMenusForRoom.includes(menu.MENU_ID);
                             const isNew = (newMenus[selectedRooms[currentRoomIndex]] || []).includes(menu.MENU_ID);
                             let cardStyle = {};
@@ -817,7 +825,7 @@ function EditBookingClient({ sections }) {
                         <Filters
                           allElements={allEquipments}
                           selectedElements={selectedEquipmentsForRoom}
-                          setCurrentElements={setCurrentElements}
+                          setCurrentElements={setModalCurrentElements}
                           setTotalPages={setModalTotalPages}
                           currentPage={modalCurrentPage}
                           setCurrentPage={setModalCurrentPage}
@@ -834,7 +842,7 @@ function EditBookingClient({ sections }) {
 
                         {/* equipos compactos */}
                         <div className="edit-booking-grid">
-                          {currentElements.map((equipment) => {
+                          {modalCurrentElementes.map((equipment) => {
                               const isSelected = selectedEquipmentsForRoom.includes(equipment.ID);
                               const isNew = (newEquipments[selectedRooms[currentRoomIndex]] || []).includes(equipment.ID);
                               let cardStyle = {};
@@ -909,7 +917,6 @@ function EditBookingClient({ sections }) {
               )}
 
               {step === 3 && <div>Finalizar</div>}
-
             </div>
           </div> 
         </div>   
