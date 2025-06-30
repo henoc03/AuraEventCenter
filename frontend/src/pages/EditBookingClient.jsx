@@ -11,7 +11,8 @@ import CompactRoom from "../components/common/CompactRoom";
 import CompactService from "../components/common/CompactService.jsx";
 import CompactMenu from "../components/common/CompactMenu.jsx";
 import CompactEquipment from "../components/common/CompactEquipment.jsx";
-import Pagination from "../components/common/Pagination";
+import Pagination from "../components/common/Pagination.jsx";
+import Filters from "../components/common/Filters.jsx";
 import '../style/edit-booking-client.css'
 
 
@@ -42,17 +43,12 @@ function EditBookingClient({ sections }) {
   const [showMenusModal, setShowMenusModal] = useState(false);
   const [showEquipmentsModal, setShowEquipmentsModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterType, setFilterType] = useState("todos");
   const [sortOrder, setSortOrder] = useState("asc");
   const [currentPage, setCurrentPage] = useState(1);
-  const [menuSearchTerm, setMenuSearchTerm] = useState("");
-  const [menuFilterType, setMenuFilterType] = useState("todos");
-  const [menuSortOrder, setMenuSortOrder] = useState("asc");
-  const [equipmentSearchTerm, setEquipmentSearchTerm] = useState("");
-  const [equipmentFilterType, setEquipmentFilterType] = useState("todos");
-  const [equipmentSortOrder, setEquipmentSortOrder] = useState("asc");
-  const [equipmentCurrentPage, setEquipmentCurrentPage] = useState(1);
-  const [menuCurrentPage, setMenuCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [modalCurrentPage, setModalCurrentPage] = useState(1);
+  const [modalTotalPages, setModalTotalPages] = useState(1);
+  const [currentElements, setCurrentElements] = useState([]);
   const elementsPerPage = 4;
   const navigate = useNavigate();
 
@@ -388,24 +384,6 @@ function EditBookingClient({ sections }) {
     }
   }, [selectedRooms]);
 
-  // Filtros para las salas
-  const uniqueRoomTypes = [...new Set(allZones.map((room) => room.TYPE))];
-
-  const filteredAndSortedRooms = allZones
-    .filter((room) => {
-      const matchesSearch = room.NAME.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesType = filterType === "todos" || room.TYPE.toLowerCase() === filterType.toLowerCase();
-      return room.ZONE_ID && matchesSearch && matchesType;
-    })
-    .sort((a, b) => sortOrder === "asc" ? a.PRICE - b.PRICE : b.PRICE - a.PRICE);
-
-  // Ordenar para que las salas seleccionadas aparezcan primero
-  const prioritizedRooms = [...filteredAndSortedRooms].sort((a, b) => {
-    const aSelected = selectedRooms.includes(a.ZONE_ID) ? 0 : 1;
-    const bSelected = selectedRooms.includes(b.ZONE_ID) ? 0 : 1;
-    return aSelected - bSelected;
-  });
-
   // Filtros para los servicios
   const filteredAndSortedServices = allServices
     .filter((service) => {
@@ -423,57 +401,12 @@ function EditBookingClient({ sections }) {
     return aSelected - bSelected;
   });
 
-  // Filtros para los menus
-  const uniqueMenuTypes = [...new Set(allMenus.map((menu) =>  menu.TYPE))];
-
-  const filteredAndSortedMenus = allMenus
-  .filter((menu) => {
-    const matchesSearch = menu.NAME.toLowerCase().includes(menuSearchTerm.toLowerCase());
-    const matchesType = menuFilterType === "todos" || menu.TYPE.toLowerCase() === menuFilterType.toLowerCase();
-    return menu.MENU_ID && matchesSearch && matchesType;
-  })
-  .sort((a, b) => menuSortOrder === "asc" ? a.PRICE - b.PRICE : b.PRICE - a.PRICE);
-
-  const selectedMenusForRoom = selectedMenus[selectedRooms[currentRoomIndex]] || [];
-  const prioritizedMenus = [...filteredAndSortedMenus].sort((a, b) => {
-    const aSelected = selectedMenusForRoom.includes(a.MENU_ID) ? 0 : 1;
-    const bSelected = selectedMenusForRoom.includes(b.MENU_ID) ? 0 : 1;
-    return aSelected - bSelected;
-  });
-
-  const uniqueEquipmentTypes = [...new Set(allEquipments.map((eq) => eq.type))];
-
-  const filteredAndSortedEquipments = allEquipments
-    .filter((eq) => {
-      const matchesSearch = eq.name?.toLowerCase().includes(equipmentSearchTerm.toLowerCase());
-      const matchesType = equipmentFilterType === "todos" || eq.type?.toLowerCase() === equipmentFilterType.toLowerCase();
-      return eq.ID && matchesSearch && matchesType;
-    })
-    .sort((a, b) => equipmentSortOrder === "asc" ? a.price - b.price : b.price - a.price);
-
-  const selectedEquipmentsForRoom = selectedEquipments[selectedRooms[currentRoomIndex]] || [];
-  const prioritizedEquipments = [...filteredAndSortedEquipments].sort((a, b) => {
-    const aSelected = selectedEquipmentsForRoom.includes(a.ID) ? 0 : 1;
-    const bSelected = selectedEquipmentsForRoom.includes(b.ID) ? 0 : 1;
-    return aSelected - bSelected;
-  });
-
-  const equipmentIndexOfLastElement = equipmentCurrentPage * elementsPerPage;
-  const equipmentIndexOfFirstElement = equipmentIndexOfLastElement - elementsPerPage;
-  const currentEquipments = prioritizedEquipments.slice(equipmentIndexOfFirstElement, equipmentIndexOfLastElement);
-  const equipmentsTotalPages = Math.ceil(filteredAndSortedEquipments.length / elementsPerPage);
-
-
   // Paginación
   const indexOfLastElement = currentPage * elementsPerPage;
   const indexOfFirstElement = indexOfLastElement - elementsPerPage;
-  const modalIndexOfLastElement = menuCurrentPage * elementsPerPage;
-  const modalIndexOfFirstElement = modalIndexOfLastElement - elementsPerPage;
-  const currentMenus = prioritizedMenus.slice(modalIndexOfFirstElement, modalIndexOfLastElement);
-  const menusTotalPages = Math.ceil(filteredAndSortedMenus.length / elementsPerPage);
-  const currentRooms = prioritizedRooms.slice(indexOfFirstElement, indexOfLastElement);
+  // const currentElements = prioritizedRooms.slice(indexOfFirstElement, indexOfLastElement);
   const currentServices = prioritizedServices.slice(indexOfFirstElement, indexOfLastElement);
-  const totalPages = Math.ceil(filteredAndSortedRooms.length / elementsPerPage);
+  // const totalPages = Math.ceil(filteredAndSortedRooms.length / elementsPerPage);
 
   // Manejar cambio al sigueinte paso
   const handleNextStep = (data) => {
@@ -604,6 +537,8 @@ function EditBookingClient({ sections }) {
   const handleCloseModal = () => {
     setShowMenusModal(false);
     setShowEquipmentsModal(false);
+    setModalCurrentPage(1);
+    setModalTotalPages(1);
 
     const roomId = selectedRooms[currentRoomIndex];
     // Manejar quitar catering si no hay menús seleccionados
@@ -665,6 +600,9 @@ function EditBookingClient({ sections }) {
     "Finalizar"
   ];
 
+  const selectedEquipmentsForRoom = selectedEquipments[selectedRooms[currentRoomIndex]] || [];
+  const selectedMenusForRoom = selectedMenus[selectedRooms[currentRoomIndex]] || []
+
   return (
     <>
       <div className="booking-header-container">
@@ -706,50 +644,18 @@ function EditBookingClient({ sections }) {
               {/*Paso 2 (salas)*/}
               {step === 1 &&
                 <div className="booking-client-step2">
-                  {/* Filtros */}
-                  <div className="edit-booking-filters">
-                    <div className="edit-booking-search-input">
-                      <label htmlFor="search">Buscar: </label>
-                      <input
-                        id="search"
-                        type="text"
-                        placeholder="Buscar por nombre..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="filter-input"
-                      />
-                    </div>
-
-                    <div className="edit-booking-filter-input">
-                      <label htmlFor="status">Filtrar: </label>
-                      <select
-                        id="status"
-                        value={filterType}
-                        onChange={(e) => setFilterType(e.target.value)}
-                        className="filter-select"
-                      >
-                        <option value="todos">Todos los tipos</option>
-                        {uniqueRoomTypes.map((type) => (
-                          <option key={type} value={type}>
-                            {type.charAt(0).toUpperCase() + type.slice(1)}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    
-                    <div className="edit-booking-sort-input">
-                      <label htmlFor="sort">Ordenar: </label>
-                      <select
-                        id="sort"
-                        value={sortOrder}
-                        onChange={(e) => setSortOrder(e.target.value)}
-                        className="filter-select"
-                      >
-                        <option value="asc">Precio: menor a mayor</option>
-                        <option value="desc">Precio: mayor a menor</option>
-                      </select>
-                    </div>
-                  </div>
+                  <Filters
+                    allElements={allZones}
+                    selectedElements={selectedRooms}
+                    setCurrentElements={setCurrentElements}
+                    setTotalPages={setTotalPages}
+                    currentPage={currentPage}
+                    setCurrentPage={setCurrentPage}
+                    getName={el => el.NAME}
+                    getType={el => el.TYPE}
+                    getId={el => el.ZONE_ID}
+                    getPrice={el => el.PRICE}
+                  />
 
                   <div className="elements-counter">
                     <p>Selecciona las salas</p>
@@ -758,7 +664,7 @@ function EditBookingClient({ sections }) {
 
                   {/* Salas compactas */}
                   <div className="edit-booking-grid">
-                    {currentRooms.map((room) => {
+                    {currentElements.map((room) => {
                       const isSelected = selectedRooms.includes(room.ZONE_ID);
                       const isNew = newRooms.includes(room.ZONE_ID);
                       let cardStyle = {};
@@ -881,62 +787,29 @@ function EditBookingClient({ sections }) {
                           <button type="button" onClick={() => handleCloseModal()}> x </button>
                         </div>
 
-                        {/* Filtros */}
-                        <div className="edit-booking-filters">
-                          <div className="edit-booking-search-input">
-                            <label htmlFor="search">Buscar: </label>
-                            <input
-                              id="search"
-                              type="text"
-                              placeholder="Buscar por nombre..."
-                              value={menuSearchTerm}
-                              onChange={e => { setMenuSearchTerm(e.target.value); setMenuCurrentPage(1); }}
-                              className="filter-input"
-                            />
-                          </div>
-
-                          <div className="edit-booking-filter-input">
-                            <label htmlFor="status">Filtrar: </label>
-                            <select
-                              id="status"
-                              value={menuFilterType}
-                              onChange={e => { setMenuFilterType(e.target.value); setMenuCurrentPage(1); }}
-                              className="filter-select"
-                            >
-                              <option value="todos">Todos los tipos</option>
-                              {uniqueMenuTypes.map((type) => (
-                                <option key={type} value={type}>
-                                  {type.charAt(0).toUpperCase() + type.slice(1)}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                          
-                          <div className="edit-booking-sort-input">
-                            <label htmlFor="sort">Ordenar: </label>
-                            <select
-                              id="sort"
-                              value={menuSortOrder}
-                              onChange={e => { setMenuSortOrder(e.target.value); setMenuCurrentPage(1); }}
-                              className="filter-select"
-                            >
-                              <option value="asc">Precio: menor a mayor</option>
-                              <option value="desc">Precio: mayor a menor</option>
-                            </select>
-                          </div>
-                        </div>
-
+                        <Filters
+                          allElements={allMenus}
+                          selectedElements={selectedMenusForRoom}
+                          setCurrentElements={setCurrentElements}
+                          setTotalPages={setModalTotalPages}
+                          currentPage={modalCurrentPage}
+                          setCurrentPage={setModalCurrentPage}
+                          getName={el => el?.NAME || ""}
+                          getType={el => el?.TYPE || ""}
+                          getId={el => el?.MENU_ID || ""}
+                          getPrice={el => el?.PRICE || 0}
+                        />
 
                         <div className="elements-counter">
                           <p>Selecciona los menus</p>
-                          <p>Menus seleccionados: {(selectedMenus[selectedRooms[currentRoomIndex]] || []).length}</p>
+                          <p>Menus seleccionados: {selectedMenusForRoom.length}</p>
                         </div>
 
                         {/* menus compactos */}
                         <div className="edit-booking-grid">
-                          {currentMenus.map((menu) => {
-                            const isSelected = (selectedMenus[selectedRooms[currentRoomIndex]] || []).includes(menu.MENU_ID);
-                            const isNew = (newMenus[selectedRooms[currentRoomIndex]] || []).includes(menu.MENU_ID);
+                          {currentElements.map((menu) => {
+                            const isSelected = selectedMenusForRoom.includes(menu.MENU_ID);
+                            const isNew = selectedMenusForRoom.includes(menu.MENU_ID);
                             let cardStyle = {};
                             if (isNew && !isSelected) {
                               cardStyle = { opacity: "100%" };
@@ -962,11 +835,11 @@ function EditBookingClient({ sections }) {
                         </div>
 
                         {/* Paginación */}
-                        {menusTotalPages > 1 && (
+                        {modalTotalPages > 1 && (
                           <Pagination
-                            currentPage={menuCurrentPage}
-                            totalPages={menusTotalPages}
-                            onPageChange={setMenuCurrentPage}
+                            currentPage={modalCurrentPage}
+                            totalPages={modalTotalPages}
+                            onPageChange={setModalCurrentPage}
                           />
                         )}
                       </div>
@@ -974,101 +847,71 @@ function EditBookingClient({ sections }) {
                   )}
 
                   {showEquipmentsModal && (
-                  <div className="booking-menus-modal">
-                    <div className="booking-menus-content">
-                      <div className="booking-menus-title-x">
-                        <h1>Selecciona los equipos</h1>
-                        <button type="button" onClick={() => handleCloseModal()}> x </button>
-                      </div>
-
-                      {/* Filtros */}
-                      <div className="edit-booking-filters">
-                        <div className="edit-booking-search-input">
-                          <label htmlFor="equipment-search">Buscar: </label>
-                          <input
-                            id="equipment-search"
-                            type="text"
-                            placeholder="Buscar por nombre..."
-                            value={equipmentSearchTerm}
-                            onChange={e => { setEquipmentSearchTerm(e.target.value); setEquipmentCurrentPage(1); }}
-                            className="filter-input"
-                          />
+                    <div className="booking-menus-modal">
+                      <div className="booking-menus-content">
+                        <div className="booking-menus-title-x">
+                          <h1>Selecciona los equipos</h1>
+                          <button type="button" onClick={() => handleCloseModal()}> x </button>
                         </div>
-                        <div className="edit-booking-filter-input">
-                          <label htmlFor="equipment-status">Filtrar: </label>
-                          <select
-                            id="equipment-status"
-                            value={equipmentFilterType}
-                            onChange={e => { setEquipmentFilterType(e.target.value); setEquipmentCurrentPage(1); }}
-                            className="filter-select"
-                          >
-                            <option value="todos">Todos los tipos</option>
-                            {uniqueEquipmentTypes.map((type) => (
-                              <option key={type} value={type}>
-                                {type?.charAt(0).toUpperCase() + type?.slice(1)}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        <div className="edit-booking-sort-input">
-                          <label htmlFor="equipment-sort">Ordenar: </label>
-                          <select
-                            id="equipment-sort"
-                            value={equipmentSortOrder}
-                            onChange={e => { setEquipmentSortOrder(e.target.value); setEquipmentCurrentPage(1); }}
-                            className="filter-select"
-                          >
-                            <option value="asc">Precio: menor a mayor</option>
-                            <option value="desc">Precio: mayor a menor</option>
-                          </select>
-                        </div>
-                      </div>
 
-                      <div className="elements-counter">
-                        <p>Selecciona los equipos</p>
-                        <p>Equipos seleccionados: {selectedEquipmentsForRoom.length}</p>
-                      </div>
-
-                      {/* equipos compactos */}
-                      <div className="edit-booking-grid">
-                        {currentEquipments.map((equipment) => {
-                          const isSelected = selectedEquipmentsForRoom.includes(equipment.ID);
-                          const isNew = (newEquipments[selectedRooms[currentRoomIndex]] || []).includes(equipment.ID);
-                          let cardStyle = {};
-                          if (isNew && !isSelected) {
-                            cardStyle = { opacity: "100%" };
-                          } else if (isSelected) {
-                            cardStyle = { opacity: "50%" };
-                          }
-                          return (
-                            <div
-                              key={equipment.ID}
-                              className={`edit-booking-card${isSelected ? " edit-booking-selected-card" : ""}`}
-                              onClick={() => handleEquipmentClicked(equipment)}
-                              style={cardStyle}
-                            >
-                              <CompactEquipment
-                                equipment={equipment}
-                                isBooking={true}
-                                isSelected={isSelected}
-                                isNew={isNew}
-                              />
-                            </div>
-                          );
-                        })}
-                      </div>
-
-                      {/* Paginación */}
-                      {equipmentsTotalPages > 1 && (
-                        <Pagination
-                          currentPage={equipmentCurrentPage}
-                          totalPages={equipmentsTotalPages}
-                          onPageChange={setEquipmentCurrentPage}
+                        <Filters
+                          allElements={allEquipments}
+                          selectedElements={selectedEquipmentsForRoom}
+                          setCurrentElements={setCurrentElements}
+                          setTotalPages={setModalTotalPages}
+                          currentPage={modalCurrentPage}
+                          setCurrentPage={setModalCurrentPage}
+                          getName={el => el?.name || ""}
+                          getType={el => el?.type || ""}
+                          getId={el => el?.ID || ""}
+                          getPrice={el => el?.unitaryPrice || 0}
                         />
-                      )}
+
+                        <div className="elements-counter">
+                          <p>Selecciona los equipos</p>
+                          <p>Equipos seleccionados: {selectedEquipmentsForRoom.length}</p>
+                        </div>
+
+                        {/* equipos compactos */}
+                        <div className="edit-booking-grid">
+                          {currentElements.map((equipment) => {
+                              const isSelected = selectedEquipmentsForRoom.includes(equipment.ID);
+                              const isNew = selectedEquipmentsForRoom.includes(equipment.ID);
+                              let cardStyle = {};
+                              if (isNew && !isSelected) {
+                                cardStyle = { opacity: "100%" };
+                              } else if (isSelected) {
+                                cardStyle = { opacity: "50%" };
+                              }
+                              return (
+                                <div
+                                  key={equipment.ID}
+                                  className={`edit-booking-card${isSelected ? " edit-booking-selected-card" : ""}`}
+                                  onClick={() => handleEquipmentClicked(equipment)}
+                                  style={cardStyle}
+                                >
+                                  <CompactEquipment
+                                    equipment={equipment}
+                                    isBooking={true}
+                                    isSelected={isSelected}
+                                    isNew={isNew}
+                                  />
+                                </div>
+                              );
+                            })}
+                        </div>
+
+                        {/* Paginación */}
+                        {modalTotalPages > 1 && (
+                          <Pagination
+                            currentPage={modalCurrentPage}
+                            totalPages={modalTotalPages}
+                            onPageChange={setModalCurrentPage}
+                          />
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
                   {/* Paginación */}
                   {totalPages > 1 && (

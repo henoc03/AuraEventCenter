@@ -6,25 +6,19 @@ import DefaultImage from "../../assets/images/default_no_image.jpg";
 const DEFAULT_ROUTE = "http://localhost:1522";
 
 const CompactEquipment = ({ equipment, isBooking = false, isSelected = false, isNew = false }) => {
-  const isCatering = equipment.name.toLowerCase().includes("catering");
-  const isEquipment = equipment.name.toLowerCase().includes("equipo");
-
-  // Etiqueta para el boton
   let buttonLabel = "Agregar";
-  if ((isSelected && !isNew) ||
-    (isSelected && isCatering) ||
-    (isSelected && isEquipment)) {
-      buttonLabel = "Agregado";
-  } else if (isSelected && isNew) {
+  if (isSelected && isNew) {
     buttonLabel = "Desagregar";
+  } else if (isSelected && !isNew) {
+    buttonLabel = "Agregado";
   }
   
   return (
     <div
       className={[
         "compact-equipment",
-        isSelected && !isCatering && !isEquipment ? "equipment-is-selected" : "",
-        isSelected && !isCatering && !isEquipment ? "equipment-is-new" : ""
+        isSelected ? "equipment-is-selected" : "",
+        isSelected ? "equipment-is-new" : ""
       ].join(" ").trim()}
     >
       <img
@@ -41,8 +35,8 @@ const CompactEquipment = ({ equipment, isBooking = false, isSelected = false, is
           <button
             className={[
               "add-equipment-booking-button",
-              isSelected && !isCatering && !isEquipment ? "equipment-is-selected" : "",
-              isNew && !isCatering && !isEquipment ? "equipment-is-new" : ""
+              isSelected ? "equipment-is-selected" : "",
+              isNew ? "equipment-is-new" : ""
             ].join(" ").trim()}
             type="button"
           >
