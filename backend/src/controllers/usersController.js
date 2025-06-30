@@ -94,8 +94,6 @@ exports.getUserById = async (req, res) => {
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
 
-    console.log(result);
-
     let user = result.rows[0] || {};
     if (user.PROFILE_IMAGE_PATH) {
       user.PROFILE_IMAGE_PATH = decrypt(user.PROFILE_IMAGE_PATH);

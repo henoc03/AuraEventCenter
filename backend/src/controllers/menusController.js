@@ -66,6 +66,7 @@ exports.getAllMenus = async (req, res) => {
       menu.PRICE = menu.PRODUCTS.reduce((sum, product) => sum + (product.UNITARY_PRICE || 0), 0);
     });
 
+    console.log(menus);
     res.json(menus);
   } catch (err) {
     console.error('❌ Error al obtener los menús:', err);

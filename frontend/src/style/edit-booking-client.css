@@ -35,7 +35,149 @@
     flex-direction: column;
 }
 
-.booking-client-step1 {
+.booking-client-step1{
     margin-top: 35px;
     padding: 0 250px;
+}
+
+.booking-client-step2, .booking-client-step3 {
+    margin-top: 35px;
+    padding: 0 50px;
+}
+
+.edit-booking-filters {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.edit-booking-search-input,
+.edit-booking-filter-input,
+.edit-booking-sort-input {
+  display: flex;
+  align-items: center;
+}
+
+.filter-input{
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  max-width: 400px;
+}
+
+.filter-select {
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+#search {
+  font-family: 'Merriweather', sans-serif;
+  width: 270px;
+  margin-left: 15px;
+}
+
+#sort {
+  margin-left: 15px;
+}
+
+#status {
+  margin-left: 15px;
+}
+
+.edit-booking-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 3rem;
+  margin-bottom: 60px;
+}
+
+.edit-booking-card {
+  transition: all 0.3s ease;
+  height: fit-content;
+}
+
+.elements-counter {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.rooms-counter p{
+    font-weight: bold;
+}
+
+.booking-next-step-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0;
+  width: 15%;
+  min-height: 40px;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  user-select: none;
+  opacity: 0.6;
+}
+
+.booking-next-step-button.active {
+  opacity: 1;
+  cursor: pointer;
+}
+
+.booking-next-step-button.active:hover {
+  background-color: #0056b3;
+}
+
+.elements-counter p b {
+  font-weight: bold;
+  font-family: 'Merriweather Sans', sans-serif;
+  font-size: 1.2rem;
+}
+
+.booking-menus-modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.booking-menus-content {
+  width: 70%;
+  height: 75%;
+  background-color: rgb(255, 255, 255);
+  border-radius: 10px;
+  padding: 50px;
+}
+
+.booking-menus-title-x {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 20px;
+}
+
+.booking-menus-title-x button{
+    font-family: 'Merriweather Sans', sans-serif;
+    font-size: 1.5rem;
+    padding: 0;
+    border: none;
+    background: none;
+    align-self: flex-start; 
+    margin-top: -20px; 
 }

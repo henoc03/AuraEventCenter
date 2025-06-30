@@ -1,4 +1,4 @@
-.compact-room {
+.compact-service {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -11,32 +11,32 @@
   cursor: pointer;
 }
 
-.compact-room.room-is-selected {
+.compact-service.service-is-selected {
   cursor: not-allowed;
 }
 
-.compact-room.room-is-new {
+.compact-service.service-is-new {
   cursor: pointer;
 }
 
-.compact-room:hover {
+.compact-service:hover {
   transform: translateY(-3px) scale(1);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
 }
 
-.compact-room >.compact-room-image {
+.compact-service >.compact-service-image {
   width: 100%;
   height: 200px;
   object-fit: cover;
 }
 
-.compact-room-info {
+.compact-service-info {
   padding: 1rem;
   text-align: center;
   font-family: 'Merriweather sans', sans-serif;
 }
 
-.compact-room-info h3 {
+.compact-service-info h3 {
   margin: 0;
   color: #333;
   font-size: 1.2rem;
@@ -45,7 +45,7 @@
   font-family: 'Merriweather', sans-serif;
 }
 
-.compact-room-link {
+.compact-service-link {
   display: inline-block;
   margin-top: 0.5rem;
   color: #007bff;
@@ -56,7 +56,7 @@
   margin-bottom: 10px;
 }
 
-.add-room-booking-button {
+.add-service-booking-button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -73,32 +73,32 @@
   cursor: pointer;
 }
 
-.add-room-booking-button:hover {
+.add-service-booking-button:hover {
   background-color: #1d4ed8;
 }
 
-.add-room-booking-button.room-is-selected {
+.add-service-booking-button.service-is-selected {
   cursor: not-allowed;
 }
 
-.add-room-booking-button.room-is-new {
+.add-service-booking-button.service-is-new {
   cursor: pointer;
   background-color: rgb(252, 68, 68);
 }
 
-.add-room-booking-button.room-is-new:hover {
+.add-service-booking-button.service-is-new:hover {
   background-color: #f50000;
 }
 
 
 @media (min-width: 1440px) {
-  .compact-room {
+  .compact-service {
     height: 75%;
   }
 }
 
 @media (max-width: 768px) {
-  .compact-room-info p{
+  .compact-service-info p{
     margin-top: 0;
     font-size: 0.9rem;
   }
