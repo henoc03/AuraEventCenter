@@ -84,6 +84,7 @@ function App() {
           <Route path="/contacto" element={<ContactForm />} />
           <Route path="/acerca" element={<AboutPage />} />
           <Route path="/pagos" element={<Payments />} />
+          <Route path="/pago/:bookingId" element={<Payments />} />
 
 
           

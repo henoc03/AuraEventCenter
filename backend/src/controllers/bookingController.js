@@ -91,12 +91,14 @@ exports.createBooking = async (req, res) => {
 
 exports.getBookingDetailForInvoice = async (req, res) => {
   const bookingId = req.params.bookingId;
+  const userIdFromToken = req.user?.userId; // viene del middleware
+
   let conn;
 
   try {
     conn = await getConnection();
 
-    // 1. Datos generales del booking
+    // 1. Obtener la reserva
     const bookingResult = await conn.execute(
       `SELECT B.BOOKING_ID, B.USER_ID, B.STATUS, B.BOOKING_NAME, B.EVENT_TYPE,
               B.EVENT_DATE, B.START_TIME, B.END_TIME, B.ADDITIONAL_NOTE, B.ID_CARD
@@ -107,19 +109,29 @@ exports.getBookingDetailForInvoice = async (req, res) => {
     );
 
     const booking = bookingResult.rows[0];
-    if (!booking) return res.status(404).json({ message: "Reserva no encontrada." });
 
-    // 2. Zonas + precio
+    if (!booking)
+      return res.status(404).json({ message: "Reserva no encontrada." });
+
+    // 2. Validar que el usuario autenticado sea el dueño
+    if (Number(booking.USER_ID) !== Number(userIdFromToken)) {
+      console.log(typeof booking.USER_ID, typeof userIdFromToken);
+      console.log("Usuario de la reserva:", booking.USER_ID, "Usuario autenticado:", userIdFromToken);
+      return res.status(403).json({
+        message: "No tienes permiso para ver esta reserva. BACKEND:403"
+      });
+    }
+    // 3. Obtener zonas
     const zonesResult = await conn.execute(
       `SELECT Z.ZONE_ID, Z.NAME, Z.PRICE
-       FROM CLIENT_SCHEMA.BOOKINGS_ZONES_MENUS BZM
-       JOIN ADMIN_SCHEMA.ZONES Z ON BZM.ZONE_ID = Z.ZONE_ID
-       WHERE BZM.BOOKING_ID = :bookingId`,
+       FROM CLIENT_SCHEMA.BOOKINGS_ZONES BZ
+       JOIN ADMIN_SCHEMA.ZONES Z ON BZ.ZONE_ID = Z.ZONE_ID
+       WHERE BZ.BOOKING_ID = :bookingId`,
       [bookingId],
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
 
-    // 3. Menús por zona
+    // 4. Menús por zona
     const menusResult = await conn.execute(
       `SELECT BZM.ZONE_ID, M.MENU_ID, M.NAME, M.PRICE
        FROM CLIENT_SCHEMA.BOOKINGS_ZONES_MENUS BZM
@@ -129,7 +141,7 @@ exports.getBookingDetailForInvoice = async (req, res) => {
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
 
-    // 4. Servicios adicionales por zona
+    // 5. Servicios adicionales por zona
     const servicesResult = await conn.execute(
       `SELECT BZS.ZONE_ID, S.ADDITIONAL_SERVICE_ID, S.NAME, S.PRICE
        FROM CLIENT_SCHEMA.BOOKINGS_ZONES_SERVICES BZS
@@ -139,7 +151,7 @@ exports.getBookingDetailForInvoice = async (req, res) => {
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
 
-    // 5. Equipos por zona
+    // 6. Equipos por zona
     const equipmentsResult = await conn.execute(
       `SELECT BZE.ZONE_ID, E.ID AS EQUIPMENT_ID, E.NAME, E.UNITARY_PRICE
        FROM CLIENT_SCHEMA.BOOKINGS_ZONES_EQUIPMENTS BZE
@@ -149,7 +161,7 @@ exports.getBookingDetailForInvoice = async (req, res) => {
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
 
-    // Agrupación y cálculo
+    // 7. Agrupación y cálculo
     let total = 0;
     const zonas = [];
 
@@ -177,11 +189,13 @@ exports.getBookingDetailForInvoice = async (req, res) => {
       });
     }
 
+    // 8. Enviar respuesta
     res.status(200).json({
       booking,
       zonas,
       total,
     });
+
   } catch (err) {
     console.error("❌ Error al obtener detalles de reserva:", err);
     res.status(500).json({ error: err.message });
