@@ -42,14 +42,11 @@ function EditBookingClient({ sections }) {
   const [newEquipments, setNewEquipments] = useState({});
   const [showMenusModal, setShowMenusModal] = useState(false);
   const [showEquipmentsModal, setShowEquipmentsModal] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [sortOrder, setSortOrder] = useState("asc");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [modalCurrentPage, setModalCurrentPage] = useState(1);
   const [modalTotalPages, setModalTotalPages] = useState(1);
   const [currentElements, setCurrentElements] = useState([]);
-  const elementsPerPage = 4;
   const navigate = useNavigate();
 
   // Obtener informacion de usuario para el header
@@ -384,30 +381,6 @@ function EditBookingClient({ sections }) {
     }
   }, [selectedRooms]);
 
-  // Filtros para los servicios
-  const filteredAndSortedServices = allServices
-    .filter((service) => {
-      const matchesSearch = service.name.toLowerCase().includes(searchTerm.toLowerCase());
-      return service.ID && matchesSearch;
-    })
-    .sort((a, b) => sortOrder === "asc" ? a.price - b.price : b.price - a.price);
-
-  // Ordenar para que los servicios seleccionados para la sala actual aparezcan primero
-  const currentRoomId = selectedRooms[currentRoomIndex];
-  const selectedForRoom = selectedServices[currentRoomId] || [];
-  const prioritizedServices = [...filteredAndSortedServices].sort((a, b) => {
-    const aSelected = selectedForRoom.includes(a.ID) ? 0 : 1;
-    const bSelected = selectedForRoom.includes(b.ID) ? 0 : 1;
-    return aSelected - bSelected;
-  });
-
-  // Paginación
-  const indexOfLastElement = currentPage * elementsPerPage;
-  const indexOfFirstElement = indexOfLastElement - elementsPerPage;
-  // const currentElements = prioritizedRooms.slice(indexOfFirstElement, indexOfLastElement);
-  const currentServices = prioritizedServices.slice(indexOfFirstElement, indexOfLastElement);
-  // const totalPages = Math.ceil(filteredAndSortedRooms.length / elementsPerPage);
-
   // Manejar cambio al sigueinte paso
   const handleNextStep = (data) => {
     setStep1Data(data);
@@ -602,6 +575,7 @@ function EditBookingClient({ sections }) {
 
   const selectedEquipmentsForRoom = selectedEquipments[selectedRooms[currentRoomIndex]] || [];
   const selectedMenusForRoom = selectedMenus[selectedRooms[currentRoomIndex]] || []
+  const selectedServicesForRoom = selectedServices[selectedRooms[currentRoomIndex]] || []
 
   return (
     <>
@@ -651,10 +625,10 @@ function EditBookingClient({ sections }) {
                     setTotalPages={setTotalPages}
                     currentPage={currentPage}
                     setCurrentPage={setCurrentPage}
-                    getName={el => el.NAME}
-                    getType={el => el.TYPE}
-                    getId={el => el.ZONE_ID}
-                    getPrice={el => el.PRICE}
+                    getName={el => el?.NAME || ""}
+                    getType={el => el?.TYPE || ""}
+                    getId={el => el?.ZONE_ID || ""}
+                    getPrice={el => el?.PRICE || ""}
                   />
 
                   <div className="elements-counter">
@@ -713,32 +687,18 @@ function EditBookingClient({ sections }) {
               {/* Paso 3 (servicios) */}
               {step === 2 && selectedRooms.length > 0 && (
                 <div className="booking-client-step3">
-                  {/* Filtros */}
-                  <div className="edit-booking-filters">
-                    <div className="edit-booking-search-input">
-                      <label htmlFor="search">Buscar: </label>
-                      <input
-                        id="search"
-                        type="text"
-                        placeholder="Buscar por nombre..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="filter-input"
-                      />
-                    </div>
-                    <div className="edit-booking-sort-input">
-                      <label htmlFor="sort">Ordenar: </label>
-                      <select
-                        id="sort"
-                        value={sortOrder}
-                        onChange={(e) => setSortOrder(e.target.value)}
-                        className="filter-select"
-                      >
-                        <option value="asc">Precio: menor a mayor</option>
-                        <option value="desc">Precio: mayor a menor</option>
-                      </select>
-                    </div>
-                  </div>
+                  <Filters
+                    allElements={allServices}
+                    selectedElements={selectedServicesForRoom}
+                    setCurrentElements={setCurrentElements}
+                    setTotalPages={setTotalPages}
+                    currentPage={currentPage}
+                    setCurrentPage={setCurrentPage}
+                    getName={el => el?.name|| ""}
+                    getType={el => el?.type || ""}
+                    getId={el => el?.ID || ""}
+                    getPrice={el => el?.price || ""}
+                  />
 
                   <div className="elements-counter">
                     <p>Selecciona los servicios para la sala:
@@ -747,13 +707,13 @@ function EditBookingClient({ sections }) {
                         {allZones.find(z => z.ZONE_ID === selectedRooms[currentRoomIndex])?.NAME || ("Sala " + (currentRoomIndex + 1))}
                       </b>
                     </p>
-                    <p>Servicios seleccionados: {(selectedServices[selectedRooms[currentRoomIndex]] || []).length}</p>
+                    <p>Servicios seleccionados: {selectedServicesForRoom.length}</p>
                   </div>
 
                   {/* Servicios compactos */}
                   <div className="edit-booking-grid">
-                    {currentServices.map((service) => {
-                      const isSelected = (selectedServices[selectedRooms[currentRoomIndex]] || []).includes(service.ID);
+                    {currentElements.map((service) => {
+                      const isSelected = selectedServicesForRoom.includes(service.ID);
                       const isNew = (newServices[selectedRooms[currentRoomIndex]] || []).includes(service.ID);
                       let cardStyle = {};
                       if (isNew && !isSelected) {
@@ -809,7 +769,7 @@ function EditBookingClient({ sections }) {
                         <div className="edit-booking-grid">
                           {currentElements.map((menu) => {
                             const isSelected = selectedMenusForRoom.includes(menu.MENU_ID);
-                            const isNew = selectedMenusForRoom.includes(menu.MENU_ID);
+                            const isNew = (newMenus[selectedRooms[currentRoomIndex]] || []).includes(menu.MENU_ID);
                             let cardStyle = {};
                             if (isNew && !isSelected) {
                               cardStyle = { opacity: "100%" };
@@ -876,7 +836,7 @@ function EditBookingClient({ sections }) {
                         <div className="edit-booking-grid">
                           {currentElements.map((equipment) => {
                               const isSelected = selectedEquipmentsForRoom.includes(equipment.ID);
-                              const isNew = selectedEquipmentsForRoom.includes(equipment.ID);
+                              const isNew = (newEquipments[selectedRooms[currentRoomIndex]] || []).includes(equipment.ID);
                               let cardStyle = {};
                               if (isNew && !isSelected) {
                                 cardStyle = { opacity: "100%" };

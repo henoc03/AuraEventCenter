@@ -6,8 +6,8 @@ import DefaultService from "../../assets/images/default_no_image.jpg";
 const DEFAULT_ROUTE = "http://localhost:1522";
 
 const Compactservice = ({ service, isBooking = false, isSelected = false, isNew = false}) => {
-  const isCatering = service.name.toLowerCase().includes("catering");
-  const isEquipment = service.name.toLowerCase().includes("equipo");
+  const isCatering = (service.name || "").toLowerCase().includes("catering");
+  const isEquipment = (service.name || "").toLowerCase().includes("equipo");
 
   // Etiqueta para el boton
   let buttonLabel = "Agregar";
