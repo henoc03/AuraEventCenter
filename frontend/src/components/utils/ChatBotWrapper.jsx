@@ -22,9 +22,12 @@ export default function ChatBotWrapper() {
   return (
     <div>
       {!isOpen && (
+        <div className="chatbot-button-wrapper">
+        <span className="chatbot-label blinking">Cotiza acá</span>
         <button className="chatbot-button blinking" onClick={openChat}>
           <img src={logo} alt="Chatbot" className="chatbot-icon" />
         </button>
+      </div>
       )}
 
       {isOpen && (

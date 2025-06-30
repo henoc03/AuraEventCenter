@@ -204,3 +204,72 @@ exports.getBookingEquipments = async (req, res) => {
     if (conn) await conn.close();
   }
 };
+
+exports.updateBookingStatuses = async () => {
+  let conn;
+  try {
+    conn = await getConnection();
+
+    // 1. Obtener todas las reservas relevantes con sus fechas y horas
+    const result = await conn.execute(`
+      SELECT BOOKING_ID, STATUS, EVENT_DATE, START_TIME, END_TIME
+      FROM CLIENT_SCHEMA.BOOKINGS
+      WHERE STATUS IN ('pendiente', 'en_progreso')
+    `);
+
+    const now = new Date();
+
+    for (const row of result.rows) {
+      const [bookng_id, status, eventDate, startTime, endTime] = row;
+
+      // Combinar EVENT_DATE con horas
+      const startDateTime = new Date(
+        eventDate.getFullYear(),
+        eventDate.getMonth(),
+        eventDate.getDate(),
+        startTime.getHours(),
+        startTime.getMinutes(),
+        startTime.getSeconds()
+      );
+
+      const endDateTime = new Date(
+        eventDate.getFullYear(),
+        eventDate.getMonth(),
+        eventDate.getDate(),
+        endTime.getHours(),
+        endTime.getMinutes(),
+        endTime.getSeconds()
+      );
+
+      let newStatus = null;
+
+      if (status === 'pendiente') {
+        if (now >= startDateTime) {
+          newStatus = 'en_progreso';
+        } else if (now > endDateTime) {
+          // Si ya pasó el evento y no se inició, cancelar
+          newStatus = 'cancelada';
+        }
+      } else if (status === 'en_progreso' && now >= endDateTime) {
+        newStatus = 'completada';
+      }
+
+      // Actualizar estado solo si cambió
+      if (newStatus && newStatus !== status) {
+        await conn.execute(
+          `UPDATE CLIENT_SCHEMA.BOOKINGS SET STATUS = :newStatus WHERE BOOKING_ID = :bookng_id`,
+          { newStatus, bookng_id },
+          { autoCommit: false }
+        );
+      }
+    }
+
+    await conn.commit();
+
+    console.log(`[CRON] Estados de reservas actualizados correctamente`);
+  } catch (err) {
+    console.error('[CRON] Error al actualizar estados de reservas:', err.message);
+  } finally {
+    if (conn) await conn.close();
+  }
+};
