@@ -3,10 +3,9 @@ import PropTypes from "prop-types";
 import "../../style/compact-service.css";
 import DefaultService from "../../assets/images/default_no_image.jpg";
 
+const DEFAULT_ROUTE = "http://localhost:1522";
+
 const Compactservice = ({ service, isBooking = false, isSelected = false, isNew = false}) => {
-
-  const DEFAULT_ROUTE = "http://localhost:1522";
-
   const isCatering = service.name.toLowerCase().includes("catering");
   const isEquipment = service.name.toLowerCase().includes("equipo");
 

@@ -10,6 +10,7 @@ import BookingForm from "../components/common/BookingForm.jsx";
 import CompactRoom from "../components/common/CompactRoom";
 import CompactService from "../components/common/CompactService.jsx";
 import CompactMenu from "../components/common/CompactMenu.jsx";
+import CompactEquipment from "../components/common/CompactEquipment.jsx";
 import Pagination from "../components/common/Pagination";
 import '../style/edit-booking-client.css'
 
@@ -39,7 +40,7 @@ function EditBookingClient({ sections }) {
   const [selectedEquipments, setSelectedEquipments] = useState({});
   const [newEquipments, setNewEquipments] = useState({});
   const [showMenusModal, setShowMenusModal] = useState(false);
-  const [showEquimentsModal, setShowEquipmentsModal] = useState(false);
+  const [showEquipmentsModal, setShowEquipmentsModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("todos");
   const [sortOrder, setSortOrder] = useState("asc");
@@ -47,6 +48,10 @@ function EditBookingClient({ sections }) {
   const [menuSearchTerm, setMenuSearchTerm] = useState("");
   const [menuFilterType, setMenuFilterType] = useState("todos");
   const [menuSortOrder, setMenuSortOrder] = useState("asc");
+  const [equipmentSearchTerm, setEquipmentSearchTerm] = useState("");
+  const [equipmentFilterType, setEquipmentFilterType] = useState("todos");
+  const [equipmentSortOrder, setEquipmentSortOrder] = useState("asc");
+  const [equipmentCurrentPage, setEquipmentCurrentPage] = useState(1);
   const [menuCurrentPage, setMenuCurrentPage] = useState(1);
   const elementsPerPage = 4;
   const navigate = useNavigate();
@@ -305,13 +310,81 @@ function EditBookingClient({ sections }) {
       } catch (error) {
         console.error("Error al obtener los menús de la sala:", error);
         alert("Ocurrió un error al obtener los menús.");
-      } finally {
-        setLoading(false);
       }
     };
 
     if (selectedRooms.length > 0) {
       getSelectedMenus();
+    }
+  }, [selectedRooms]);
+
+  // Obtener todos los equipos disponibles
+  useEffect(() => {
+    const getAllEquipments= async () => {
+      try {
+        const res = await fetch(`${DEFAULT_ROUTE}/equipments/`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          alert(errorData.message || "Error al obtener los equipos");
+          return;
+        }
+
+        const equipmentsData = await res.json();
+        setAllEquipments(equipmentsData);
+      } catch (error) {
+        console.error("Error al obtener los equipos:", error);
+        alert("Ocurrió un error al obtener los equipos.");
+      }
+    };
+
+    getAllEquipments();
+  }, []);
+
+  // Obtener los equipos que se habían seleccionado para la reserva
+  useEffect(() => {
+    const getSelectedEquipments = async () => {
+      try {
+        // TODO: Cambiar por el ID del equipo que se está editando
+        const bookingId = 1;
+        const equipmentsByRoom = {};
+
+        for (const roomId of selectedRooms) {
+          const res = await fetch(`${DEFAULT_ROUTE}/bookings/equipments`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ bookingId, roomId }),
+          });
+
+          if (!res.ok) {
+            const errorData = await res.json();
+            alert(errorData.message || "Error al obtener los equipos");
+            continue;
+          }
+
+          const equipmentsData = await res.json();
+
+          let ids = [];
+          if (equipmentsData.length > 0 && typeof equipmentsData[0] === 'object') {
+            const key = Object.keys(equipmentsData[0]).find(k => k.toLowerCase().includes('id'));
+            ids = equipmentsData.map(m => m[key]);
+          } else {
+            ids = equipmentsData;
+          }
+          equipmentsByRoom[roomId] = ids;
+        }
+        setSelectedEquipments(equipmentsByRoom);
+      } catch (error) {
+        console.error("Error al obtener los equipos de la sala:", error);
+        alert("Ocurrió un error al obtener los equipos.");
+      }
+    };
+
+    if (selectedRooms.length > 0) {
+      getSelectedEquipments();
     }
   }, [selectedRooms]);
 
@@ -361,12 +434,34 @@ function EditBookingClient({ sections }) {
   })
   .sort((a, b) => menuSortOrder === "asc" ? a.PRICE - b.PRICE : b.PRICE - a.PRICE);
 
-const selectedMenusForRoom = selectedMenus[selectedRooms[currentRoomIndex]] || [];
-const prioritizedMenus = [...filteredAndSortedMenus].sort((a, b) => {
-  const aSelected = selectedMenusForRoom.includes(a.MENU_ID) ? 0 : 1;
-  const bSelected = selectedMenusForRoom.includes(b.MENU_ID) ? 0 : 1;
-  return aSelected - bSelected;
-});
+  const selectedMenusForRoom = selectedMenus[selectedRooms[currentRoomIndex]] || [];
+  const prioritizedMenus = [...filteredAndSortedMenus].sort((a, b) => {
+    const aSelected = selectedMenusForRoom.includes(a.MENU_ID) ? 0 : 1;
+    const bSelected = selectedMenusForRoom.includes(b.MENU_ID) ? 0 : 1;
+    return aSelected - bSelected;
+  });
+
+  const uniqueEquipmentTypes = [...new Set(allEquipments.map((eq) => eq.type))];
+
+  const filteredAndSortedEquipments = allEquipments
+    .filter((eq) => {
+      const matchesSearch = eq.name?.toLowerCase().includes(equipmentSearchTerm.toLowerCase());
+      const matchesType = equipmentFilterType === "todos" || eq.type?.toLowerCase() === equipmentFilterType.toLowerCase();
+      return eq.ID && matchesSearch && matchesType;
+    })
+    .sort((a, b) => equipmentSortOrder === "asc" ? a.price - b.price : b.price - a.price);
+
+  const selectedEquipmentsForRoom = selectedEquipments[selectedRooms[currentRoomIndex]] || [];
+  const prioritizedEquipments = [...filteredAndSortedEquipments].sort((a, b) => {
+    const aSelected = selectedEquipmentsForRoom.includes(a.ID) ? 0 : 1;
+    const bSelected = selectedEquipmentsForRoom.includes(b.ID) ? 0 : 1;
+    return aSelected - bSelected;
+  });
+
+  const equipmentIndexOfLastElement = equipmentCurrentPage * elementsPerPage;
+  const equipmentIndexOfFirstElement = equipmentIndexOfLastElement - elementsPerPage;
+  const currentEquipments = prioritizedEquipments.slice(equipmentIndexOfFirstElement, equipmentIndexOfLastElement);
+  const equipmentsTotalPages = Math.ceil(filteredAndSortedEquipments.length / elementsPerPage);
 
 
   // Paginación
@@ -477,6 +572,35 @@ const prioritizedMenus = [...filteredAndSortedMenus].sort((a, b) => {
     });
   };
 
+  const handleEquipmentClicked = (equipment) => {
+    const equipmentID = equipment.ID;
+    const roomId = selectedRooms[currentRoomIndex];
+    const isOriginal = (selectedEquipments[roomId] || []).includes(equipmentID);
+    const isNew = (newEquipments[roomId] || []).includes(equipmentID);
+
+    if (isOriginal && !isNew) {
+      return;
+    }
+
+    setSelectedEquipments(prev => {
+      const current = prev[roomId] || [];
+      if (current.includes(equipmentID)) {
+        return { ...prev, [roomId]: current.filter(id => id !== equipmentID) };
+      } else {
+        return { ...prev, [roomId]: [...current, equipmentID] };
+      }
+    });
+
+    setNewEquipments(prev => {
+      const current = prev[roomId] || [];
+      if (current.includes(equipmentID)) {
+        return { ...prev, [roomId]: current.filter(id => id !== equipmentID) };
+      } else {
+        return { ...prev, [roomId]: [...current, equipmentID] };
+      }
+    });
+  };
+
   const handleCloseModal = () => {
     setShowMenusModal(false);
     setShowEquipmentsModal(false);
@@ -484,7 +608,7 @@ const prioritizedMenus = [...filteredAndSortedMenus].sort((a, b) => {
     const roomId = selectedRooms[currentRoomIndex];
     // Manejar quitar catering si no hay menús seleccionados
     const cateringService = allServices.find(
-      s => s.name && s.name.toLowerCase().includes("catering")
+      s => s.name?.toLowerCase().includes("catering")
     );
     if (
       cateringService &&
@@ -503,7 +627,7 @@ const prioritizedMenus = [...filteredAndSortedMenus].sort((a, b) => {
 
     // Manejar quitar equipos si no hay equipos seleccionados
     const equipmentService = allServices.find(
-      s => s.name && s.name.toLowerCase().includes("equipos")
+      s => s.name?.toLowerCase().includes("equipos")
     );
     // Suponiendo que tienes un estado selectedEquipments similar a selectedMenus
     if (
@@ -848,6 +972,103 @@ const prioritizedMenus = [...filteredAndSortedMenus].sort((a, b) => {
                       </div>
                     </div>
                   )}
+
+                  {showEquipmentsModal && (
+                  <div className="booking-menus-modal">
+                    <div className="booking-menus-content">
+                      <div className="booking-menus-title-x">
+                        <h1>Selecciona los equipos</h1>
+                        <button type="button" onClick={() => handleCloseModal()}> x </button>
+                      </div>
+
+                      {/* Filtros */}
+                      <div className="edit-booking-filters">
+                        <div className="edit-booking-search-input">
+                          <label htmlFor="equipment-search">Buscar: </label>
+                          <input
+                            id="equipment-search"
+                            type="text"
+                            placeholder="Buscar por nombre..."
+                            value={equipmentSearchTerm}
+                            onChange={e => { setEquipmentSearchTerm(e.target.value); setEquipmentCurrentPage(1); }}
+                            className="filter-input"
+                          />
+                        </div>
+                        <div className="edit-booking-filter-input">
+                          <label htmlFor="equipment-status">Filtrar: </label>
+                          <select
+                            id="equipment-status"
+                            value={equipmentFilterType}
+                            onChange={e => { setEquipmentFilterType(e.target.value); setEquipmentCurrentPage(1); }}
+                            className="filter-select"
+                          >
+                            <option value="todos">Todos los tipos</option>
+                            {uniqueEquipmentTypes.map((type) => (
+                              <option key={type} value={type}>
+                                {type?.charAt(0).toUpperCase() + type?.slice(1)}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="edit-booking-sort-input">
+                          <label htmlFor="equipment-sort">Ordenar: </label>
+                          <select
+                            id="equipment-sort"
+                            value={equipmentSortOrder}
+                            onChange={e => { setEquipmentSortOrder(e.target.value); setEquipmentCurrentPage(1); }}
+                            className="filter-select"
+                          >
+                            <option value="asc">Precio: menor a mayor</option>
+                            <option value="desc">Precio: mayor a menor</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="elements-counter">
+                        <p>Selecciona los equipos</p>
+                        <p>Equipos seleccionados: {selectedEquipmentsForRoom.length}</p>
+                      </div>
+
+                      {/* equipos compactos */}
+                      <div className="edit-booking-grid">
+                        {currentEquipments.map((equipment) => {
+                          const isSelected = selectedEquipmentsForRoom.includes(equipment.ID);
+                          const isNew = (newEquipments[selectedRooms[currentRoomIndex]] || []).includes(equipment.ID);
+                          let cardStyle = {};
+                          if (isNew && !isSelected) {
+                            cardStyle = { opacity: "100%" };
+                          } else if (isSelected) {
+                            cardStyle = { opacity: "50%" };
+                          }
+                          return (
+                            <div
+                              key={equipment.ID}
+                              className={`edit-booking-card${isSelected ? " edit-booking-selected-card" : ""}`}
+                              onClick={() => handleEquipmentClicked(equipment)}
+                              style={cardStyle}
+                            >
+                              <CompactEquipment
+                                equipment={equipment}
+                                isBooking={true}
+                                isSelected={isSelected}
+                                isNew={isNew}
+                              />
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {/* Paginación */}
+                      {equipmentsTotalPages > 1 && (
+                        <Pagination
+                          currentPage={equipmentCurrentPage}
+                          totalPages={equipmentsTotalPages}
+                          onPageChange={setEquipmentCurrentPage}
+                        />
+                      )}
+                    </div>
+                  </div>
+                )}
 
                   {/* Paginación */}
                   {totalPages > 1 && (

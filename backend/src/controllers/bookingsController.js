@@ -174,3 +174,33 @@ exports.getBookingMenus = async (req, res) => {
     if (conn) await conn.close();
   }
 };
+
+/**
+ * Obtiene todos los equipos de una reserva.
+ */
+exports.getBookingEquipments = async (req, res) => {
+  let conn;
+  try {
+    const { bookingId, roomId } = req.body;
+    conn = await getConnection();
+
+    const equipments_result = await conn.execute(
+      `SELECT EQUIPMENT_ID FROM CLIENT_SCHEMA.BOOKINGS_ZONES_EQUIPMENTS WHERE BOOKING_ID = :bookingId AND ZONE_ID = :roomId`,
+      [bookingId, roomId],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    const equipments = equipments_result.rows.map(equipment => {
+      return {
+        ID: equipment.EQUIPMENT_ID,
+      };
+    });
+
+    res.json(equipments || []);
+  } catch (err) {
+    console.error("Error al obtener los equipos de la reserva:", err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
