@@ -45,7 +45,7 @@ function EditBookingClient({ sections }) {
   const [modalCurrentPage, setModalCurrentPage] = useState(1);
   const [modalTotalPages, setModalTotalPages] = useState(1);
   const [currentElements, setCurrentElements] = useState([]);
-  const [modalCurrentElementes, setModalCurrentElements] = useState([])
+  const [modalCurrentElements, setModalCurrentElements] = useState([])
 
   // Otros estados
   const [showMenusModal, setShowMenusModal] = useState(false);
@@ -115,8 +115,6 @@ function EditBookingClient({ sections }) {
         setStep1Data(bookingData);
       } catch {
         alert('Ocurrió un error al obtener la información de la reserva.');
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -125,11 +123,18 @@ function EditBookingClient({ sections }) {
 
   // Obtener todas las zonas disponiles para agendar
   useEffect(() => {
-    const getAllZones = async () => {
+    const getAllAvailableZones = async () => {
+      setLoading(true);
       try {
-        const res = await fetch(`${DEFAULT_ROUTE}/zones/`, {
-          method: "GET",
+        const res = await fetch(`${DEFAULT_ROUTE}/zones/available`, {
+          method: "POST",
           headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            date: step1Data.date, 
+            startTime: step1Data.startTime, 
+            endTime: step1Data.endTime,
+            bookingId: 1
+          }),
         });
 
         if (!res.ok) {
@@ -143,11 +148,15 @@ function EditBookingClient({ sections }) {
       } catch (error) {
         console.error("Error al obtener salas:", error);
         alert("Ocurrió un error al obtener las salas.");
+      } finally {
+        setLoading(false);
       }
     };
 
-    getAllZones();
-  }, []);
+    if (step1Data.date && step1Data.startTime && step1Data.endTime) {
+      getAllAvailableZones();
+    }
+  }, [step1Data.date, step1Data.startTime, step1Data.endTime]);
 
   // Obtener las zonas que se habian seleccionado para la reserva
   useEffect(() => {
@@ -775,7 +784,7 @@ function EditBookingClient({ sections }) {
 
                         {/* menus compactos */}
                         <div className="edit-booking-grid">
-                          {modalCurrentElementes.map((menu) => {
+                          {modalCurrentElements.map((menu) => {
                             const isSelected = selectedMenusForRoom.includes(menu.MENU_ID);
                             const isNew = (newMenus[selectedRooms[currentRoomIndex]] || []).includes(menu.MENU_ID);
                             let cardStyle = {};
@@ -842,7 +851,7 @@ function EditBookingClient({ sections }) {
 
                         {/* equipos compactos */}
                         <div className="edit-booking-grid">
-                          {modalCurrentElementes.map((equipment) => {
+                          {modalCurrentElements.map((equipment) => {
                               const isSelected = selectedEquipmentsForRoom.includes(equipment.ID);
                               const isNew = (newEquipments[selectedRooms[currentRoomIndex]] || []).includes(equipment.ID);
                               let cardStyle = {};

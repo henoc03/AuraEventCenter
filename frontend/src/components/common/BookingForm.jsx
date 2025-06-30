@@ -49,6 +49,8 @@ function BookingForm( {onNextStep, isEditMode = false, bookingInfo = {}} ) {
       additionalNote: data.additional_info,
     };
 
+    console.log(formData);
+
     onNextStep(formData);
   }
 
