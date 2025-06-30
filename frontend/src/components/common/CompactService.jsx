@@ -7,16 +7,27 @@ const Compactservice = ({ service, isBooking = false, isSelected = false, isNew 
 
   const DEFAULT_ROUTE = "http://localhost:1522";
 
+  const isCatering = service.name.toLowerCase().includes("catering");
+  const isEquipment = service.name.toLowerCase().includes("equipo");
+
   // Etiqueta para el boton
   let buttonLabel = "Agregar";
-  if (isSelected && isNew) {
+  if ((isSelected && !isNew) ||
+    (isSelected && isCatering) ||
+    (isSelected && isEquipment)) {
+      buttonLabel = "Agregado";
+  } else if (isSelected && isNew) {
     buttonLabel = "Desagregar";
-  } else if (isSelected && !isNew) {
-    buttonLabel = "Agregado";
   }
 
   return (
-    <div className={`compact-service ${isSelected ? "service-is-selected" : ""} ${isNew ? " service-is-new" : ""}`}>
+    <div
+      className={[
+        "compact-service",
+        isSelected && !isCatering && !isEquipment ? "service-is-selected" : "",
+        isSelected && !isCatering && !isEquipment ? "service-is-new" : ""
+      ].join(" ").trim()}
+    >
       <img
         src={service.imagePath && service.imagePath.trim() !== "" ? `${DEFAULT_ROUTE}/${service.imagePath}` : DefaultService}
         alt={`Imagen de ${service.NAME}`}
@@ -28,7 +39,11 @@ const Compactservice = ({ service, isBooking = false, isSelected = false, isNew 
           <span className="compact-service-link">Ver más &gt; </span>
         ) : (
           <button
-            className={`add-service-booking-button${isSelected ? " service-is-selected" : ""}${isNew ? " service-is-new" : ""}`}
+            className={[
+              "add-service-booking-button",
+              isSelected && !isCatering && !isEquipment ? "service-is-selected" : "",
+              isNew && !isCatering && !isEquipment ? "service-is-new" : ""
+            ].join(" ").trim()}
             type="button"
           >
             {buttonLabel}

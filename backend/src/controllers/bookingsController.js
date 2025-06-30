@@ -144,3 +144,33 @@ exports.getBookingServices = async (req, res) => {
     if (conn) await conn.close();
   }
 };
+
+/**
+ * Obtiene todos los menús de una reserva.
+ */
+exports.getBookingMenus = async (req, res) => {
+  let conn;
+  try {
+    const { bookingId, roomId } = req.body;
+    conn = await getConnection();
+
+    const menus_result = await conn.execute(
+      `SELECT MENU_ID FROM CLIENT_SCHEMA.BOOKINGS_ZONES_MENUS WHERE BOOKING_ID = :bookingId AND ZONE_ID = :roomId`,
+      [bookingId, roomId],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    const menus = menus_result.rows.map(menu => {
+      return {
+        ID: menu.MENU_ID,
+      };
+    });
+
+    res.json(menus || []);
+  } catch (err) {
+    console.error("Error al obtener los menús de la reserva:", err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};

@@ -9,6 +9,7 @@ import StepBar from "../components/common/StepBar.jsx";
 import BookingForm from "../components/common/BookingForm.jsx";
 import CompactRoom from "../components/common/CompactRoom";
 import CompactService from "../components/common/CompactService.jsx";
+import CompactMenu from "../components/common/CompactMenu.jsx";
 import Pagination from "../components/common/Pagination";
 import '../style/edit-booking-client.css'
 
@@ -31,13 +32,26 @@ function EditBookingClient({ sections }) {
   const [allServices, setAllServices] = useState([]);
   const [selectedServices, setSelectedServices] = useState({});
   const [newServices, setNewServices] = useState({});
+  const [allMenus, setAllMenus] = useState([]);
+  const [selectedMenus, setSelectedMenus] = useState({});
+  const [newMenus, setNewMenus] = useState({});
+  const [allEquipments, setAllEquipments] = useState([]);
+  const [selectedEquipments, setSelectedEquipments] = useState({});
+  const [newEquipments, setNewEquipments] = useState({});
+  const [showMenusModal, setShowMenusModal] = useState(false);
+  const [showEquimentsModal, setShowEquipmentsModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("todos");
   const [sortOrder, setSortOrder] = useState("asc");
   const [currentPage, setCurrentPage] = useState(1);
+  const [menuSearchTerm, setMenuSearchTerm] = useState("");
+  const [menuFilterType, setMenuFilterType] = useState("todos");
+  const [menuSortOrder, setMenuSortOrder] = useState("asc");
+  const [menuCurrentPage, setMenuCurrentPage] = useState(1);
   const elementsPerPage = 4;
   const navigate = useNavigate();
 
+  // Obtener informacion de usuario para el header
   useEffect(() => {
     const getSetUserInfo = async () => {
       const token = localStorage.getItem('token');
@@ -75,9 +89,11 @@ function EditBookingClient({ sections }) {
     getSetUserInfo();
   }, [navigate]);
 
+  // Obtener informacion de la reserva para el formulario
   useEffect(() => {
     const getBookingInfo = async () => {
       try {
+        //TODO: Cambiar por el ID de la reserva que se esta editando
         const res = await fetch(`${DEFAULT_ROUTE}/bookings/1`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -102,6 +118,7 @@ function EditBookingClient({ sections }) {
     getBookingInfo();
   }, [navigate]);
 
+  // Obtener todas las zonas disponiles para agendar
   useEffect(() => {
     const getAllZones = async () => {
       try {
@@ -127,9 +144,11 @@ function EditBookingClient({ sections }) {
     getAllZones();
   }, []);
 
+  // Obtener las zonas que se habian seleccionado para la reserva
   useEffect(() => {
     const getSelectedZones = async () => {
       try {
+        //TODO: Cambiar por el ID de la reserva que se esta editando
         const res = await fetch(`${DEFAULT_ROUTE}/bookings/zones/1`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -152,6 +171,7 @@ function EditBookingClient({ sections }) {
     getSelectedZones();
   }, [navigate]);
 
+  // Obtener todos los servicios disponibles
   useEffect(() => {
     const getAllServices = async () => {
       try {
@@ -177,9 +197,11 @@ function EditBookingClient({ sections }) {
     getAllServices();
   }, []);
 
+  // Obtener los servicios que se habian seleccionado para la reserva
   useEffect(() => {
     const getSelectedServices = async () => {
       try {
+        // TODO: Cambiar por el ID de la reserva que se esta editando
         const bookingId = 1;
         const servicesByRoom = {};
 
@@ -221,9 +243,77 @@ function EditBookingClient({ sections }) {
     }
   }, [selectedRooms]);
 
+  // Obtener todos los menus disponibles
   useEffect(() => {
-    console.log("Servicios seleccionados:", selectedServices);
-  }, [selectedServices]);
+    const getAllMenus= async () => {
+      try {
+        const res = await fetch(`${DEFAULT_ROUTE}/menus/`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          alert(errorData.message || "Error al obtener los menus");
+          return;
+        }
+
+        const menusData = await res.json();
+        setAllMenus(menusData);
+      } catch (error) {
+        console.error("Error al obtener los menus:", error);
+        alert("Ocurrió un error al obtener los menus.");
+      }
+    };
+
+    getAllMenus();
+  }, []);
+
+  // Obtener los menús que se habían seleccionado para la reserva
+  useEffect(() => {
+    const getSelectedMenus = async () => {
+      try {
+        // TODO: Cambiar por el ID del menu que se está editando
+        const bookingId = 1;
+        const menusByRoom = {};
+
+        for (const roomId of selectedRooms) {
+          const res = await fetch(`${DEFAULT_ROUTE}/bookings/menus`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ bookingId, roomId }),
+          });
+
+          if (!res.ok) {
+            const errorData = await res.json();
+            alert(errorData.message || "Error al obtener los menús");
+            continue;
+          }
+
+          const menusData = await res.json();
+
+          let ids = [];
+          if (menusData.length > 0 && typeof menusData[0] === 'object') {
+            const key = Object.keys(menusData[0]).find(k => k.toLowerCase().includes('id'));
+            ids = menusData.map(m => m[key]);
+          } else {
+            ids = menusData;
+          }
+          menusByRoom[roomId] = ids;
+        }
+        setSelectedMenus(menusByRoom);
+      } catch (error) {
+        console.error("Error al obtener los menús de la sala:", error);
+        alert("Ocurrió un error al obtener los menús.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (selectedRooms.length > 0) {
+      getSelectedMenus();
+    }
+  }, [selectedRooms]);
 
   // Filtros para las salas
   const uniqueRoomTypes = [...new Set(allZones.map((room) => room.TYPE))];
@@ -260,18 +350,43 @@ function EditBookingClient({ sections }) {
     return aSelected - bSelected;
   });
 
+  // Filtros para los menus
+  const uniqueMenuTypes = [...new Set(allMenus.map((menu) =>  menu.TYPE))];
+
+  const filteredAndSortedMenus = allMenus
+  .filter((menu) => {
+    const matchesSearch = menu.NAME.toLowerCase().includes(menuSearchTerm.toLowerCase());
+    const matchesType = menuFilterType === "todos" || menu.TYPE.toLowerCase() === menuFilterType.toLowerCase();
+    return menu.MENU_ID && matchesSearch && matchesType;
+  })
+  .sort((a, b) => menuSortOrder === "asc" ? a.PRICE - b.PRICE : b.PRICE - a.PRICE);
+
+const selectedMenusForRoom = selectedMenus[selectedRooms[currentRoomIndex]] || [];
+const prioritizedMenus = [...filteredAndSortedMenus].sort((a, b) => {
+  const aSelected = selectedMenusForRoom.includes(a.MENU_ID) ? 0 : 1;
+  const bSelected = selectedMenusForRoom.includes(b.MENU_ID) ? 0 : 1;
+  return aSelected - bSelected;
+});
+
+
   // Paginación
   const indexOfLastElement = currentPage * elementsPerPage;
   const indexOfFirstElement = indexOfLastElement - elementsPerPage;
+  const modalIndexOfLastElement = menuCurrentPage * elementsPerPage;
+  const modalIndexOfFirstElement = modalIndexOfLastElement - elementsPerPage;
+  const currentMenus = prioritizedMenus.slice(modalIndexOfFirstElement, modalIndexOfLastElement);
+  const menusTotalPages = Math.ceil(filteredAndSortedMenus.length / elementsPerPage);
   const currentRooms = prioritizedRooms.slice(indexOfFirstElement, indexOfLastElement);
   const currentServices = prioritizedServices.slice(indexOfFirstElement, indexOfLastElement);
   const totalPages = Math.ceil(filteredAndSortedRooms.length / elementsPerPage);
 
+  // Manejar cambio al sigueinte paso
   const handleNextStep = (data) => {
     setStep1Data(data);
     setStep(prev => prev + 1);
   };
 
+  // Manejar el eleccion de una sala
   const handleRoomClicked = (roomID) => {
     if (selectedRooms.includes(roomID) && !newRooms.includes(roomID)) {
       return;
@@ -288,10 +403,25 @@ function EditBookingClient({ sections }) {
     }
   };
 
-  const handleServiceClicked = (serviceID) => {
+  const handleServiceClicked = (service) => {
+    const isCatering = service.name.toLowerCase().includes("catering");
+    const isEquipos = service.name.toLowerCase().includes("equipos");
+
+    const serviceID = service.ID;
     const roomId = selectedRooms[currentRoomIndex];
     const isOriginal = (selectedServices[roomId] || []).includes(serviceID);
     const isNew = (newServices[roomId] || []).includes(serviceID);
+
+    // Si es catering o equipos y ya está seleccionado, no permitir quitarlo
+    if ((isCatering || isEquipos) && (isOriginal || isNew)) {
+      // Abrir el modal si corresponde, pero no quitar de la selección
+      if (isCatering) setShowMenusModal(true);
+      if (isEquipos) setShowEquipmentsModal(true);
+      return;
+    }
+
+    if (isCatering) setShowMenusModal(true);
+    if (isEquipos) setShowEquipmentsModal(true);
 
     // Si es original y no es nuevo, no permitir quitarlo
     if (isOriginal && !isNew) {
@@ -306,6 +436,7 @@ function EditBookingClient({ sections }) {
         return { ...prev, [roomId]: [...current, serviceID] };
       }
     });
+
     setNewServices(prev => {
       const current = prev[roomId] || [];
       if (current.includes(serviceID)) {
@@ -316,6 +447,82 @@ function EditBookingClient({ sections }) {
     });
   };
 
+  const handleMenuClicked = (menu) => {
+    const menuID = menu.MENU_ID;
+    const roomId = selectedRooms[currentRoomIndex];
+    const isOriginal = (selectedMenus[roomId] || []).includes(menuID);
+    const isNew = (newMenus[roomId] || []).includes(menuID);
+
+    // Si es original y no es nuevo, no permitir quitarlo
+    if (isOriginal && !isNew) {
+      return;
+    }
+
+    setSelectedMenus(prev => {
+      const current = prev[roomId] || [];
+      if (current.includes(menuID)) {
+        return { ...prev, [roomId]: current.filter(id => id !== menuID) };
+      } else {
+        return { ...prev, [roomId]: [...current, menuID] };
+      }
+    });
+
+    setNewMenus(prev => {
+      const current = prev[roomId] || [];
+      if (current.includes(menuID)) {
+        return { ...prev, [roomId]: current.filter(id => id !== menuID) };
+      } else {
+        return { ...prev, [roomId]: [...current, menuID] };
+      }
+    });
+  };
+
+  const handleCloseModal = () => {
+    setShowMenusModal(false);
+    setShowEquipmentsModal(false);
+
+    const roomId = selectedRooms[currentRoomIndex];
+    // Manejar quitar catering si no hay menús seleccionados
+    const cateringService = allServices.find(
+      s => s.name && s.name.toLowerCase().includes("catering")
+    );
+    if (
+      cateringService &&
+      (selectedMenus[roomId]?.length === 0 || !selectedMenus[roomId])
+    ) {
+      const cateringId = cateringService.ID;
+      setSelectedServices(prev => ({
+      ...prev,
+      [roomId]: (prev[roomId] || []).filter(id => id !== cateringId)
+      }));
+      setNewServices(prev => ({
+      ...prev,
+      [roomId]: (prev[roomId] || []).filter(id => id !== cateringId)
+      }));
+    }
+
+    // Manejar quitar equipos si no hay equipos seleccionados
+    const equipmentService = allServices.find(
+      s => s.name && s.name.toLowerCase().includes("equipos")
+    );
+    // Suponiendo que tienes un estado selectedEquipments similar a selectedMenus
+    if (
+      equipmentService &&
+      (selectedEquipments?.[roomId]?.length === 0 || !selectedEquipments?.[roomId])
+    ) {
+      const equipmentId = equipmentService.ID;
+      setSelectedServices(prev => ({
+      ...prev,
+      [roomId]: (prev[roomId] || []).filter(id => id !== equipmentId)
+      }));
+      setNewServices(prev => ({
+      ...prev,
+      [roomId]: (prev[roomId] || []).filter(id => id !== equipmentId)
+      }));
+    }
+  }
+
+  // Manejar el click en el botón para regresar
   const handleReturn = () => {
     if (step > 0) {
       setStep(prev => prev - 1);
@@ -360,7 +567,7 @@ function EditBookingClient({ sections }) {
             <StepBar steps={steps} currentStep={step} />
 
             <div className="booking-client-step-content">
-              {/* Contenido del paso actual */}
+              {/* Paso 1 (formulario) */}
               {step === 0 && 
                 <div className="booking-client-step1">
                   <p>Los campos marcados con <span style={{ color: 'red' }}>*</span> son obligatorios</p>
@@ -371,6 +578,8 @@ function EditBookingClient({ sections }) {
                   />
                 </div>
               }
+
+              {/*Paso 2 (salas)*/}
               {step === 1 &&
                 <div className="booking-client-step2">
                   {/* Filtros */}
@@ -471,6 +680,7 @@ function EditBookingClient({ sections }) {
                 </div>
               }
 
+              {/* Paso 3 (servicios) */}
               {step === 2 && selectedRooms.length > 0 && (
                 <div className="booking-client-step3">
                   {/* Filtros */}
@@ -525,7 +735,7 @@ function EditBookingClient({ sections }) {
                         <div
                           key={service.ID}
                           className={`edit-booking-card${isSelected ? " edit-booking-selected-card" : "" }`}
-                          onClick={() => handleServiceClicked(service.ID)}
+                          onClick={() => handleServiceClicked(service)}
                           style={cardStyle}
                         >
                           <CompactService
@@ -539,6 +749,106 @@ function EditBookingClient({ sections }) {
                     })}
                   </div>
 
+                  {showMenusModal && (
+                    <div className="booking-menus-modal">
+                      <div className="booking-menus-content">
+                        <div className="booking-menus-title-x">
+                          <h1>Selecciona los menús</h1>
+                          <button type="button" onClick={() => handleCloseModal()}> x </button>
+                        </div>
+
+                        {/* Filtros */}
+                        <div className="edit-booking-filters">
+                          <div className="edit-booking-search-input">
+                            <label htmlFor="search">Buscar: </label>
+                            <input
+                              id="search"
+                              type="text"
+                              placeholder="Buscar por nombre..."
+                              value={menuSearchTerm}
+                              onChange={e => { setMenuSearchTerm(e.target.value); setMenuCurrentPage(1); }}
+                              className="filter-input"
+                            />
+                          </div>
+
+                          <div className="edit-booking-filter-input">
+                            <label htmlFor="status">Filtrar: </label>
+                            <select
+                              id="status"
+                              value={menuFilterType}
+                              onChange={e => { setMenuFilterType(e.target.value); setMenuCurrentPage(1); }}
+                              className="filter-select"
+                            >
+                              <option value="todos">Todos los tipos</option>
+                              {uniqueMenuTypes.map((type) => (
+                                <option key={type} value={type}>
+                                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          
+                          <div className="edit-booking-sort-input">
+                            <label htmlFor="sort">Ordenar: </label>
+                            <select
+                              id="sort"
+                              value={menuSortOrder}
+                              onChange={e => { setMenuSortOrder(e.target.value); setMenuCurrentPage(1); }}
+                              className="filter-select"
+                            >
+                              <option value="asc">Precio: menor a mayor</option>
+                              <option value="desc">Precio: mayor a menor</option>
+                            </select>
+                          </div>
+                        </div>
+
+
+                        <div className="elements-counter">
+                          <p>Selecciona los menus</p>
+                          <p>Menus seleccionados: {(selectedMenus[selectedRooms[currentRoomIndex]] || []).length}</p>
+                        </div>
+
+                        {/* menus compactos */}
+                        <div className="edit-booking-grid">
+                          {currentMenus.map((menu) => {
+                            const isSelected = (selectedMenus[selectedRooms[currentRoomIndex]] || []).includes(menu.MENU_ID);
+                            const isNew = (newMenus[selectedRooms[currentRoomIndex]] || []).includes(menu.MENU_ID);
+                            let cardStyle = {};
+                            if (isNew && !isSelected) {
+                              cardStyle = { opacity: "100%" };
+                            } else if (isSelected) {
+                              cardStyle = { opacity: "50%" };
+                            }
+                            return (
+                              <div
+                                key={menu.MENU_ID}
+                                className={`edit-booking-card${isSelected ? " edit-booking-selected-card" : "" }`}
+                                onClick={() => handleMenuClicked(menu)}
+                                style={cardStyle}
+                              >
+                                <CompactMenu
+                                  menu={menu}
+                                  isBooking={true}
+                                  isSelected={isSelected}
+                                  isNew={isNew}
+                                />
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {/* Paginación */}
+                        {menusTotalPages > 1 && (
+                          <Pagination
+                            currentPage={menuCurrentPage}
+                            totalPages={menusTotalPages}
+                            onPageChange={setMenuCurrentPage}
+                          />
+                        )}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Paginación */}
                   {totalPages > 1 && (
                     <Pagination
@@ -548,10 +858,10 @@ function EditBookingClient({ sections }) {
                     />
                   )}
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 16 }}>
+                  <div className = "" style={{ display: 'flex', justifyContent: 'space-between', marginTop: 16 }}>
                     <button
                       type="button"
-                      className="booking-next-step-button"
+                      className="booking-next-step-button active"
                       disabled={currentRoomIndex === 0}
                       onClick={() => setCurrentRoomIndex(i => i - 1)}
                     >
