@@ -24,6 +24,7 @@ const upload = multer({ storage });
 router.get('/', zonesController.getAllZones);
 router.get('/:id', zonesController.getZoneById);
 router.post('/', zonesController.createZone);
+router.post('/available', zonesController.getAllAvailableZones);
 router.put('/:id', zonesController.updateZone);
 router.delete('/:id', zonesController.deleteZone);
 

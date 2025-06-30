@@ -186,9 +186,7 @@ exports.updateService = async (req, res) => {
     );
 
     const currentEncryptedImagePath = result.rows[0]?.IMAGE_PATH;
-
-
-    const encryptedPath = imagePath ? imagePath : currentEncryptedImagePath;
+    const encryptedPath = imagePath || currentEncryptedImagePath;
 
     await conn.execute(
       `UPDATE ADMIN_SCHEMA.ADDITIONAL_SERVICES

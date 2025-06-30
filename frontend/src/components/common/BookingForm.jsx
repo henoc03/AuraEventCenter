@@ -1,24 +1,55 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import PropTypes from "prop-types";
 import '../../style/booking-form.css';
 
-function BookingForm( {onNextStep} ) {
-  const { register, handleSubmit, formState: { errors, isValid } } = useForm({ mode: "onChange" });
+function BookingForm( {onNextStep, isEditMode = false, bookingInfo = {}} ) {
+  const { register, handleSubmit, formState: { errors, isValid }, reset } = useForm({
+    mode: "onChange",
+    defaultValues: {
+      owner: isEditMode ? bookingInfo.owner : "",
+      event_name: isEditMode ? bookingInfo.bookingName : "",
+      id_card: isEditMode ? bookingInfo.idCard : "",
+      email: isEditMode ? bookingInfo.email : "",
+      phone: isEditMode ? bookingInfo.phone : "",
+      event_type: isEditMode ? bookingInfo.eventType : "",
+      start_time: isEditMode ? bookingInfo.startTime : "",
+      end_time: isEditMode ? bookingInfo.endTime : "",
+      date: isEditMode ? bookingInfo.date : "",
+      additional_info: isEditMode ? bookingInfo.additionalNote : "",
+    }
+  });
+
+  useEffect(() => {
+    reset({
+      owner: isEditMode ? bookingInfo.owner : "",
+      event_name: isEditMode ? bookingInfo.bookingName : "",
+      id_card: isEditMode ? bookingInfo.idCard : "",
+      email: isEditMode ? bookingInfo.email : "",
+      phone: isEditMode ? bookingInfo.phone : "",
+      event_type: isEditMode ? bookingInfo.eventType : "",
+      start_time: isEditMode ? bookingInfo.startTime : "",
+      end_time: isEditMode ? bookingInfo.endTime : "",
+      date: isEditMode ? bookingInfo.date : "",
+      additional_info: isEditMode ? bookingInfo.additionalNote : "",
+    });
+  }, [isEditMode, bookingInfo, reset]);
 
   const onSubmit = async (data) => {
     const formData = {
       owner: data.owner,
-      event_name: data.event_name,
-      id_card: data.id_card,
+      bookingName: data.event_name,
+      idCard: data.id_card,
       email: data.email,
       phone: data.phone,
-      event_type: data.even_type,
-      start_time: data.start_time,
-      end_time: data.end_time,
+      eventType: data.event_type,
+      startTime: data.start_time,
+      endTime: data.end_time,
       date: data.date,
-      additional_info: data.additional_info,
+      additionalNote: data.additional_info,
     };
+
+    console.log(formData);
 
     onNextStep(formData);
   }
@@ -31,7 +62,6 @@ function BookingForm( {onNextStep} ) {
         id="owner-input"
         type="text"
         className="input"
-        defaultValue={""}
         {...register("owner", { required: "Nombre del propietario requerido" })}
       />
       {errors.owner && <span className="error">{errors.owner.message}</span>}
@@ -42,7 +72,6 @@ function BookingForm( {onNextStep} ) {
         id="event-name-input"
         type="text"
         className="input"
-        defaultValue={""}
         {...register("event_name", { required: "Nombre del evento requerido" })}
       />
       {errors.event_name && <span className="error">{errors.event_name.message}</span>}
@@ -53,7 +82,6 @@ function BookingForm( {onNextStep} ) {
         id="id-card-input"
         type="number"
         className="input"
-        defaultValue={""}
         {...register("id_card", { 
           required: "Cédula requerida",
           pattern: {
@@ -70,7 +98,6 @@ function BookingForm( {onNextStep} ) {
         id="email-input"
         type="email"
         className="input"
-        defaultValue={""}
         {...register("email", { required: "Correo electrónico requerido" })}
       />
       {errors.email && <span className="error">{errors.email.message}</span>}
@@ -81,7 +108,6 @@ function BookingForm( {onNextStep} ) {
         id="phone-input"
         type="tel"
         className="input"
-        defaultValue={""}
         {...register("phone", { 
           required: "Número de teléfono requerido",
           pattern: {
@@ -146,7 +172,6 @@ function BookingForm( {onNextStep} ) {
         id="start-time-input"
         type="time"
         className="input"
-        defaultValue={""}
         {...register("start_time", { required: "Hora de inicio requerida" })}
       />
       {errors.start_time && <span className="error">{errors.start_time.message}</span>}
@@ -157,7 +182,6 @@ function BookingForm( {onNextStep} ) {
         id="end-time-input"
         type="time"
         className="input"
-        defaultValue={""}
         {...register("end_time", { required: "Hora de finalización requerida" })}
       />
       {errors.end_time && <span className="error">{errors.end_time.message}</span>}
@@ -168,7 +192,6 @@ function BookingForm( {onNextStep} ) {
         id="date-time-input"
         type="date"
         className="input"
-        defaultValue={""}
         {...register("date", { required: "Fecha requerida" })}
       />
       {errors.date && <span className="error">{errors.date.message}</span>}
@@ -180,6 +203,8 @@ function BookingForm( {onNextStep} ) {
 
 BookingForm.propTypes = {
   onNextStep: PropTypes.func.isRequired,
+  isEditMode: PropTypes.bool,
+  bookingInfo: PropTypes.object,
 };
 
 export default BookingForm;

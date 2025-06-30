@@ -11,6 +11,14 @@
   cursor: pointer;
 }
 
+.compact-menu.menu-is-selected {
+  cursor: not-allowed;
+}
+
+.compact-menu.menu-is-new {
+  cursor: pointer;
+}
+
 .compact-menu:hover {
   transform: translateY(-3px) scale(1);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
@@ -30,7 +38,6 @@
 
 .compact-menu-info h3 {
   margin: 0;
-  font-size: 1.1rem;
   color: #333;
   font-size: 1.2rem;
   font-weight: bold;
@@ -41,13 +48,46 @@
 .compact-menu-link {
   display: inline-block;
   margin-top: 0.5rem;
-  font-size: 0.95rem;
   color: #007bff;
   font-weight: 500;
   text-decoration: underline;
   font-family: 'Merriweather sans', sans-serif;
   font-size: 0.95rem;
   margin-bottom: 10px;
+}
+
+.add-menu-booking-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: center;
+  margin-top: 15px;
+  width: 40%;
+  min-height: 35px;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-family: "Merriweather sans", sans-serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.add-menu-booking-button:hover {
+  background-color: #1d4ed8;
+}
+
+.add-menu-booking-button.menu-is-selected {
+  cursor: not-allowed;
+}
+
+.add-menu-booking-button.menu-is-new {
+  cursor: pointer;
+  background-color: rgb(252, 68, 68);
+}
+
+.add-menu-booking-button.menu-is-new:hover {
+  background-color: #f50000;
 }
 
 .expanded-menu {
