@@ -60,6 +60,66 @@ const zones = result.rows.map(zone => {
 };
 
 /**
+ * Obtiene todas las zonas disponibles para reservar en una fecha especifica.
+ */
+exports.getAllAvailableZones = async (req, res) => {
+  const { date, startTime, endTime, bookingId } = req.body;
+
+  if (!date || !startTime || !endTime) {
+    return res.status(400).json({ error: "Faltan parámetros requeridos: date, startTime o endTime." });
+  }
+
+  const cleanTime = t => t.length > 5 ? t.slice(0,5) : t;
+  const startTimeOnly = cleanTime(startTime);
+  const endTimeOnly = cleanTime(endTime);
+
+  console.log(date);
+
+  let conn;
+  try {
+    conn = await getConnection();
+
+    const result = await conn.execute(
+      `SELECT ZONE_ID, NAME, DESCRIPTION, CAPACITY, TYPE, EVENT_CENTER_ID, PRICE, IMAGE_PATH, ACTIVE
+      FROM ADMIN_SCHEMA.ZONES z
+      WHERE z.zone_id NOT IN (
+        SELECT bz.zone_id
+        FROM CLIENT_SCHEMA.BOOKINGS_ZONES bz
+        JOIN CLIENT_SCHEMA.BOOKINGS b ON bz.booking_id = b.booking_id
+        WHERE b.event_date = TO_DATE(:event_date, 'YYYY-MM-DD')
+        AND (
+          TO_DATE(:start_datetime, 'HH24:MI') < b.end_time AND
+          TO_DATE(:end_datetime, 'HH24:MI') > b.start_time
+        )
+        AND b.booking_id != :booking_id
+      )`,
+      {
+        event_date: date,
+        start_datetime: startTimeOnly,
+        end_datetime: endTimeOnly,
+        booking_id: bookingId
+      },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    const zones = result.rows.map(zone => {
+      const decryptedPath = zone.IMAGE_PATH ? decrypt(zone.IMAGE_PATH) : null;
+      return {
+        ...zone,
+        IMAGE_PATH: decryptedPath
+      };
+    });
+
+    res.json(zones);
+  } catch (err) {
+    console.error('❌ Error al obtener zonas:', err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
+/**
  * Obtiene una zona específica por su ID.
  */
 exports.getZoneById = async (req, res) => {
