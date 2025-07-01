@@ -8,6 +8,98 @@
 const { getConnection, oracledb } = require('../config/db');
 const { encrypt, decrypt } = require('../utils/encryption');
 
+/**
+ * Obtiene todas las reservas del sistema.
+ */
+exports.getAllBookings = async (req, res) => {
+  let conn;
+  try {
+    conn = await getConnection();
+
+    const bookingsResult = await conn.execute(
+      `SELECT 
+        B.BOOKING_ID,
+        B.USER_ID,
+        B.BOOKING_NAME,
+        B.STATUS,
+        B.ADDITIONAL_NOTE,
+        B.START_TIME,
+        B.END_TIME,
+        B.ID_CARD,
+        B.EVENT_TYPE,
+        B.EVENT_DATE,
+        U.FIRST_NAME,
+        U.LAST_NAME_1,
+        U.LAST_NAME_2,
+        U.EMAIL,
+        U.PHONE
+      FROM CLIENT_SCHEMA.BOOKINGS B
+      JOIN CLIENT_SCHEMA.USERS U ON B.USER_ID = U.USER_ID`,
+      [],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    const bookings = [];
+
+    for (const b of bookingsResult.rows) {
+      const [zonesRes, servicesRes, menusRes, equipmentsRes] = await Promise.all([
+        conn.execute(`
+          SELECT Z.NAME AS ZONE_NAME
+          FROM CLIENT_SCHEMA.BOOKINGS_ZONES BZ
+          JOIN ADMIN_SCHEMA.ZONES Z ON BZ.ZONE_ID = Z.ZONE_ID
+          WHERE BZ.BOOKING_ID = :id`, 
+          [b.BOOKING_ID], { outFormat: oracledb.OUT_FORMAT_OBJECT }),
+
+        conn.execute(`
+          SELECT DISTINCT S.NAME AS SERVICE_NAME
+          FROM CLIENT_SCHEMA.BOOKINGS_ZONES_SERVICES BZS
+          JOIN ADMIN_SCHEMA.ADDITIONAL_SERVICES S ON BZS.ADDITIONAL_SERVICE_ID = S.ADDITIONAL_SERVICE_ID
+          WHERE BZS.BOOKING_ID = :id`,
+          [b.BOOKING_ID], { outFormat: oracledb.OUT_FORMAT_OBJECT }),
+
+        conn.execute(`
+          SELECT DISTINCT M.NAME AS MENU_NAME
+          FROM CLIENT_SCHEMA.BOOKINGS_ZONES_MENUS BZM
+          JOIN ADMIN_SCHEMA.CATERING_MENUS M ON BZM.MENU_ID = M.MENU_ID
+          WHERE BZM.BOOKING_ID = :id`,
+          [b.BOOKING_ID], { outFormat: oracledb.OUT_FORMAT_OBJECT }),
+
+        conn.execute(`
+          SELECT DISTINCT E.NAME AS EQUIPMENT_NAME
+          FROM CLIENT_SCHEMA.BOOKINGS_ZONES_EQUIPMENTS BZE
+          JOIN ADMIN_SCHEMA.EQUIPMENTS E ON BZE.EQUIPMENT_ID = E.ID
+          WHERE BZE.BOOKING_ID = :id`,
+          [b.BOOKING_ID], { outFormat: oracledb.OUT_FORMAT_OBJECT })
+      ]);
+
+      bookings.push({
+        id: b.BOOKING_ID,
+        booking_name: b.BOOKING_NAME,
+        status: b.STATUS,
+        additional_note: b.ADDITIONAL_NOTE,
+        start_time: b.START_TIME,
+        end_time: b.END_TIME,
+        id_card: b.ID_CARD,
+        event_type: b.EVENT_TYPE,
+        event_date: b.EVENT_DATE,
+        owner: `${b.FIRST_NAME} ${b.LAST_NAME_1} ${b.LAST_NAME_2}`,
+        email: b.EMAIL,
+        phone: b.PHONE,
+        zones: zonesRes.rows.map(z => z.ZONE_NAME),
+        services: servicesRes.rows.map(s => s.SERVICE_NAME),
+        menus: menusRes.rows.map(m => m.MENU_NAME),
+        equipments: equipmentsRes.rows.map(e => e.EQUIPMENT_NAME)
+      });
+    }
+
+    res.json(bookings);
+  } catch (err) {
+    console.error("Error al obtener reservas completas:", err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
 
 /**
  * Obtiene un equipo específico por ID.
@@ -200,6 +292,164 @@ exports.getBookingEquipments = async (req, res) => {
   } catch (err) {
     console.error("Error al obtener los equipos de la reserva:", err);
     res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
+exports.deleteBooking = async (req, res) => {
+  let conn;
+  try {
+    const bookingId = req.params.id;
+    conn = await getConnection();
+
+    await conn.execute(
+      `UPDATE CLIENT_SCHEMA.BOOKINGS 
+       SET STATUS = 'cancelada' 
+       WHERE BOOKING_ID = :id`,
+      [bookingId]
+    );
+
+    const deleteTables = [
+      'BOOKINGS_ZONES_SERVICES',
+      'BOOKINGS_ZONES_MENUS',
+      'BOOKINGS_ZONES_EQUIPMENTS',
+      'BOOKINGS_ZONES'
+    ];
+
+    for (const table of deleteTables) {
+      await conn.execute(
+        `DELETE FROM CLIENT_SCHEMA.${table} 
+         WHERE BOOKING_ID = :id`,
+        [bookingId]
+      );
+    }
+
+    await conn.commit();
+    res.json({ message: "Reserva cancelada y asociaciones eliminadas." });
+
+  } catch (err) {
+    console.error("Error al cancelar reserva:", err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
+/**
+ * Calcula el resumen de pago para una reserva en edición.
+ * Espera en req.body:
+ * {
+ *   rooms: [zoneId, ...],
+ *   menus: { [zoneId]: [menuId, ...], ... },
+ *   services: { [zoneId]: [serviceId, ...], ... },
+ *   equipments: { [zoneId]: [equipmentId, ...], ... }
+ * }
+ */
+exports.getPaymentSummary = async (req, res) => {
+  let conn;
+  try {
+    const { rooms = [], menus = {}, services = {}, equipments = {} } = req.body;
+    conn = await getConnection();
+
+    // Helper para IN clause
+    const makeInClause = (arr, prefix) => {
+      if (!arr || arr.length === 0) return { clause: '(NULL)', binds: {} };
+      const binds = {};
+      const clause = arr.map((id, i) => {
+        binds[`${prefix}${i}`] = id;
+        return `:${prefix}${i}`;
+      }).join(',');
+      return { clause: `(${clause})`, binds };
+    };
+
+    // 1. Traer info de zonas/salas
+    let zonas = [];
+    let total = 0;
+
+    for (const zoneId of rooms) {
+      // Sala base
+      const zoneRes = await conn.execute(
+        `SELECT ZONE_ID, NAME, PRICE FROM ADMIN_SCHEMA.ZONES WHERE ZONE_ID = :id`,
+        { id: zoneId },
+        { outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
+      const zone = zoneRes.rows[0];
+      if (!zone) continue;
+
+      // Menús
+      const menuIds = menus[zoneId] || [];
+      let menuList = [];
+      let subtotalMenus = 0;
+      if (menuIds.length > 0) {
+        const { clause, binds } = makeInClause(menuIds, 'menu');
+        const menusRes = await conn.execute(
+          `SELECT MENU_ID, NAME, PRICE FROM ADMIN_SCHEMA.CATERING_MENUS WHERE MENU_ID IN ${clause}`,
+          binds,
+          { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+        menuList = menusRes.rows;
+        subtotalMenus = menuList.reduce((sum, m) => sum + (Number(m.PRICE) || 0), 0);
+      }
+
+      // Servicios
+      const serviceIds = services[zoneId] || [];
+      let serviceList = [];
+      let subtotalServices = 0;
+      if (serviceIds.length > 0) {
+        const { clause, binds } = makeInClause(serviceIds, 'srv');
+        const servicesRes = await conn.execute(
+          `SELECT ADDITIONAL_SERVICE_ID, NAME, PRICE FROM ADMIN_SCHEMA.ADDITIONAL_SERVICES WHERE ADDITIONAL_SERVICE_ID IN ${clause}`,
+          binds,
+          { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+        serviceList = servicesRes.rows;
+        subtotalServices = serviceList.reduce((sum, s) => sum + (Number(s.PRICE) || 0), 0);
+      }
+
+      // Equipos
+      const equipmentIds = equipments[zoneId] || [];
+      let equipmentList = [];
+      let subtotalEquipments = 0;
+      if (equipmentIds.length > 0) {
+        const { clause, binds } = makeInClause(equipmentIds, 'eq');
+        const eqRes = await conn.execute(
+          `SELECT EQUIPMENT_ID, NAME, UNITARY_PRICE FROM ADMIN_SCHEMA.EQUIPMENTS WHERE EQUIPMENT_ID IN ${clause}`,
+          binds,
+          { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+        equipmentList = eqRes.rows;
+        subtotalEquipments = equipmentList.reduce((sum, e) => sum + (Number(e.UNITARY_PRICE) || 0), 0);
+      }
+
+      const basePrice = Number(zone.PRICE) || 0;
+      const subtotal = basePrice + subtotalMenus + subtotalServices + subtotalEquipments;
+
+      zonas.push({
+        zoneId: zone.ZONE_ID,
+        name: zone.NAME,
+        basePrice,
+        menus: menuList,
+        services: serviceList,
+        equipments: equipmentList,
+        subtotal,
+      });
+
+      total += subtotal;
+    }
+
+    const iva = Math.round(total * 0.13);
+    const totalConIva = total + iva;
+
+    res.json({
+      zonas,
+      total,
+      iva,
+      totalConIva,
+    });
+  } catch (err) {
+    console.error('Error al calcular el resumen de pago:', err);
+    res.status(500).json({ message: 'Error al calcular el resumen de pago.' });
   } finally {
     if (conn) await conn.close();
   }
