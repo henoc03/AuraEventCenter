@@ -29,7 +29,7 @@
 
 .chatbot-msg.user {
   align-self: flex-end;
-  background-color: #dcf8c6;
+  background-color: #c6e4f8;
 }
 
 .chatbot-msg.bot {
@@ -49,7 +49,7 @@
 }
 
 .chatbot-input button {
-  background-color: #4caf50;
+  background-color: #0074d9;
   color: white;
   border: none;
   padding: 10px 16px;
@@ -61,8 +61,27 @@
 }
 
 .chatbot-input button:hover {
-  background-color: #45a049;
+  background-color: #0056a3;
 }
+.chatbot-button-wrapper {
+  position: fixed;
+  bottom: 98px;
+  right: 8px;
+  text-align: center;
+  z-index: 1000;
+}
+
+.chatbot-label {
+  display: block;
+  margin-bottom: 5px;
+  background-color: #fff;
+  color: #0074d9;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
 
 .chatbot-button {
   position: fixed;
@@ -137,6 +156,8 @@
   height: 60px;
 
 }
+
+
 .blinking {
   animation: blink-animation 1.5s infinite;
 }

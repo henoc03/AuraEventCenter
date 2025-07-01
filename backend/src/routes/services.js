@@ -5,6 +5,7 @@ const servicesController = require('../controllers/servicesController');
 
 
 router.get('/', servicesController.getAllServices);
+router.get('/active', servicesController.getAllServicesActive );
 router.get('/:id', servicesController.getServiceById);
 router.get('/:serviceId/images', servicesController.getAllServiceImages);
 router.post("/", upload.single("image"), servicesController.createService);

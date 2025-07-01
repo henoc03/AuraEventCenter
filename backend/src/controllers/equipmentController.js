@@ -62,6 +62,38 @@ exports.getAllEquipments = async (req, res) => {
   }
 };
 
+exports.getAllEquipmentsActive = async (req, res) => {
+  let conn;
+  try {
+    conn = await getConnection();
+    const result = await conn.execute(
+      `SELECT ID, NAME, TYPE, DESCRIPTION, QUANTITY, IMAGE_PATH, UNITARY_PRICE 
+       FROM ADMIN_SCHEMA.EQUIPMENTS 
+       WHERE ACTIVE = 1`,
+      [],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    const equipments = result.rows.map(e => ({
+      ID: e.ID,
+      name: e.NAME,
+      type: e.TYPE,
+      description: e.DESCRIPTION,
+      quantity: e.QUANTITY,
+      imagePath: e.IMAGE_PATH ? decrypt(e.IMAGE_PATH) : null,
+      unitaryPrice: e.UNITARY_PRICE,
+    }));
+
+    res.json(equipments);
+  } catch (err) {
+    console.error("Error al obtener equipos activos:", err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
+
 /**
  * Obtiene todos los servicios disponibles para reservar en una fecha especifica.
  */
