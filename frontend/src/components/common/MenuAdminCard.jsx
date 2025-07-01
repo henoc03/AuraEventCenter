@@ -62,9 +62,11 @@ function MenuAdminCard ({id, menu, onClose, onSuccess}) {
             {menu.AVAILABLE == 1 ? "Disponible" : "No disponible"}
             </p>
           <div className="menu-card-buttons">
-            <a href="#" className="btn btn-primary button" onClick={() => setShowDeleteConfirmation(true)}>Eliminar</a>
-            <a href="#" className="btn btn-primary button" onClick={() => setIsEditClicked(!isEditClicked)}>Editar</a>
             <a href="#" className="btn btn-primary button" onClick={() => setIsViewClicked(!isViewClicked)}>Visualizar</a>
+            <a href="#" className="btn btn-primary button" onClick={() => setIsEditClicked(!isEditClicked)}>Editar</a>
+            <a href="#" className="btn btn-primary button" onClick={() => setShowDeleteConfirmation(true)}>Eliminar</a>
+            
+    
           </div>
         </div>
       </div>

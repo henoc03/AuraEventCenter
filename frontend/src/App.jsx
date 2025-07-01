@@ -100,6 +100,7 @@ function App() {
             <Route path="/admin/servicios/equipos" element={<EquipmentAdmin sections={SectionAdmin} />} />
             <Route path="/admin/calendario" element={<CalendarView sections={SectionAdmin} />} />
             <Route path="/admin/reservas" element={<BookingsAdmin sections={SectionAdmin} />} />
+            <Route path="/admin/reservas/crear" element={<CreateBookingClient sections={SectionAdmin} />} />
           </Route>
 
           {/* Rutas protegidas para root-admin */}
@@ -114,6 +115,7 @@ function App() {
             <Route path="/root-admin/servicios/equipos" element={<EquipmentAdmin sections={SectionRoot} />} />
             <Route path="/root-admin/calendario" element={<CalendarView sections={SectionRoot} />} />
             <Route path="/root-admin/reservas" element={<BookingsAdmin sections={SectionRoot} />} />
+            <Route path="/root-admin/reservas/crear" element={<CreateBookingClient sections={SectionRoot} />} />
           </Route>
 
           {/* Página 404 */}

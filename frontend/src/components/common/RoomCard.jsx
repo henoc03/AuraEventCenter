@@ -55,9 +55,9 @@ function RoomCard ({id, name, image, state, type, capacity, price, description, 
             {state == 1 ? "Publicada" : "No publicada"}
             </p>
           <div className="buttons">
-            <a href="#" className="btn btn-primary button" onClick={(e) => { e.preventDefault(); setShowDeleteConfirmation(true); }}>Borrar</a>
-            <a href="#" className="btn btn-primary button" onClick={() => setIsEditClicked(!isEditClicked)}>Editar</a>
             <a href="#" className="btn btn-primary button" onClick={() => setIsViewClicked(!isViewClicked)}>Visualizar</a>
+            <a href="#" className="btn btn-primary button" onClick={() => setIsEditClicked(!isEditClicked)}>Editar</a>
+            <a href="#" className="btn btn-primary button" onClick={(e) => { e.preventDefault(); setShowDeleteConfirmation(true); }}>Borrar</a>
           </div>
         </div>
       </div>

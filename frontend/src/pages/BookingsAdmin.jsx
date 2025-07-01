@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import Header from "../components/common/Header";
 import SideNav from "../components/common/SideNav";
 import AlertMessage from "../components/common/AlertMessage";
@@ -20,6 +21,10 @@ const Bookings = ({ sections }) => {
   const [modalMode, setModalMode] = useState("");
   const [messageType, setMessageType] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
 
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("todos");
@@ -130,14 +135,11 @@ const Bookings = ({ sections }) => {
       <div className="bookings-dashboard">
         <SideNav sections={sections} />
         <main className="bookings-dashboard-content">
-          <button type='button' className="back-btn" onClick={() => window.history.back()}>
-            <i className="bi bi-arrow-left"></i> Regresar
-          </button>
           <div className="bookings-content-wrapper">
             <section className="bookings-section">
               <div className="bookings-section-header">
                 <h2 className="bookings-section-title">Reservas</h2>
-                <button className="btn-add-booking" onClick={() => openModal("add")}>
+                <button className="btn-add-booking" onClick={() => navigate(`${location.pathname.replace(/\/$/, "")}/crear`)}>
                   Agregar
                 </button>
               </div>

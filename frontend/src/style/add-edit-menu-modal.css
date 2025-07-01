@@ -55,8 +55,7 @@
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s ease;
-  height: 47px;
-  margin-top: -10px;
+  margin-top: 0px;
 }
 
 .input-add-button:hover {
@@ -79,3 +78,32 @@
   margin-top: 1rem;
 }
 
+/* Estilo para el select de productos */
+select#product-input {
+  width: 100%;
+  max-width: 300px;
+  padding: 8px 12px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+  color: #333;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  appearance: none; /* quita el estilo por defecto del navegador */
+  cursor: pointer;
+}
+
+select#product-input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  outline: none;
+}
+
+/* Opcional: ícono personalizado para el dropdown */
+select#product-input::-ms-expand {
+  display: none;
+}
+
+select#product-input option {
+  padding: 8px;
+}

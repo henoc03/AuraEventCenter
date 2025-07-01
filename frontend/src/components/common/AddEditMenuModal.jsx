@@ -71,6 +71,27 @@ function AddEditMenuModal({
     }
   }, [menu, isAdd]);
 
+
+  // Obtener todos los productos existentes
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`${DEFAULT_ROUTE}/products`);
+      const data = await res.json();
+      setProducts(data);
+    } catch (err) {
+      console.error("Error al obtener productos:", err);
+      setErrorMessage("Error al cargar productos");
+      setShowError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
   const handleAddProduct = () => {
     const input = document.getElementById("product-input");
     const searchValue = input?.value?.trim().toLowerCase();
@@ -282,11 +303,20 @@ function AddEditMenuModal({
           />
           {errors.type && <span className="error">{errors.type.message}</span>}
 
-          <label>Productos <span style={{ color: "red" }}>*</span></label>
-          <div className="input-add-container">
-            <input id="product-input" type="text" className="input" placeholder="Buscar producto..." />
+          <label>Selecciona producto <span style={{ color: "red" }}>*</span></label>
+          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+            <select id="product-input" className="input">
+              <option value="">-- Selecciona un producto --</option>
+              {products.map((product) => (
+                <option key={product.id} value={product.name}>
+                  {product.name}
+                </option>
+              ))}
+            </select>
             <button type="button" onClick={handleAddProduct} className="input-add-button">Agregar</button>
           </div>
+
+
 
           {selectedProducts.length > 0 && (
             <div className="tag-container">
