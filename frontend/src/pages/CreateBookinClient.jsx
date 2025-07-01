@@ -78,7 +78,7 @@ const handleSubmit = async () => {
                 </div>
         
                 <div className="booking-client-content">
-                  <button type='button' className="back-btn-bookings-client" onClick={() => navigate("/inicio")}>
+                  <button type='button' className="back-btn-bookings-client" onClick={() => window.history.back()}>
                     <i className="bi bi-arrow-left"></i> Regresar
                   </button>
         <div className="booking-client-content">
