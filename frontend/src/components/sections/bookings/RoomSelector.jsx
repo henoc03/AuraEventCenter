@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import Filters from "../../common/Filters.jsx";
 import Pagination from "../../common/Pagination.jsx";
 import CompactRoom from "../../common/CompactRoom.jsx";
+import LoadingPage from "../../common/LoadingPage.jsx";
 
-function RoomSelector({ allZones, selectedRooms, setSelectedRooms, onNext, onBack }) {
+function RoomSelector({ allZones, selectedRooms, setSelectedRooms, onNext, onBack, loading  }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [currentElements, setCurrentElements] = useState([]);
@@ -20,6 +21,9 @@ function RoomSelector({ allZones, selectedRooms, setSelectedRooms, onNext, onBac
     setCurrentPage(1);
   }, [allZones]);
 
+    if (loading) {
+    return <LoadingPage />;
+  }
   return (
     <div className="booking-client-step2">
       <Filters

@@ -103,6 +103,7 @@ const handleSubmit = async () => {
                 setSelectedRooms={setSelectedRooms}
                 onNext={() => setStep(2)}
                 onBack={() => setStep(0)}
+                loading={loading}
               />
             )}
 

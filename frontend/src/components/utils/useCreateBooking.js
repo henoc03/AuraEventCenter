@@ -47,21 +47,30 @@ export default function useCreateBooking() {
     .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => {
-    if (step1Data.date && step1Data.startTime && step1Data.endTime) {
-      fetch(`${DEFAULT_ROUTE}/zones/available`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          date: step1Data.date,
-          startTime: step1Data.startTime,
-          endTime: step1Data.endTime,
-        }),
+useEffect(() => {
+  if (step1Data.date && step1Data.startTime && step1Data.endTime) {
+    setLoading(true);
+
+    fetch(`${DEFAULT_ROUTE}/zones/available`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        date: step1Data.date,
+        startTime: step1Data.startTime,
+        endTime: step1Data.endTime,
+      }),
+    })
+      .then(res => res.json())
+      .then(data => {
+        setAllZones(data);
+        setLoading(false);
       })
-        .then(res => res.json())
-        .then(setAllZones);
-    }
-  }, [step1Data]);
+      .catch(() => {
+        setLoading(false);
+      });
+  }
+}, [step1Data]);
+
 
   return {
     user,
