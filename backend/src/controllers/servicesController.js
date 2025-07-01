@@ -60,6 +60,42 @@ exports.getAllServices = async (req, res) => {
 };
 
 /**
+ * Obtiene todos los servicios activos (ACTIVE = 1).
+ */
+exports.getAllServicesActive = async (req, res) => {
+  let conn;
+  try {
+    conn = await getConnection();
+    const result = await conn.execute(
+      `SELECT ADDITIONAL_SERVICE_ID, NAME, DESCRIPTION, PRICE, IMAGE_PATH, ACTIVE
+       FROM ADMIN_SCHEMA.ADDITIONAL_SERVICES
+       WHERE ACTIVE = 1`,
+      [],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    const services = result.rows.map(service => {
+      const decryptedPath = service.IMAGE_PATH ? decrypt(service.IMAGE_PATH) : null;
+      return {
+        ID: service.ADDITIONAL_SERVICE_ID,
+        name: service.NAME,
+        description: service.DESCRIPTION,
+        price: service.PRICE,
+        imagePath: decryptedPath,
+        active: service.ACTIVE,
+      };
+    });
+
+    res.json(services);
+  } catch (err) {
+    console.error('Error al obtener los servicios activos:', err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
+/**
  * Obtiene un servicio específico por su ID.
  */
 exports.getServiceById = async (req, res) => {

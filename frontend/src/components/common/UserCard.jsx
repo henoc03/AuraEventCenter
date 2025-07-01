@@ -18,9 +18,9 @@ const UserCard = ({ user, onView, onEdit, onDelete }) => {
       </p>
 
       <div className="user-card-actions">
-        <button className="btn-user-card" onClick={() => onDelete(user)}>Eliminar</button>
-        <button className="btn-user-card" onClick={() => onEdit(user)}>Editar</button>
         <button className="btn-user-card" onClick={() => onView(user)}>Visualizar</button>
+        <button className="btn-user-card" onClick={() => onEdit(user)}>Editar</button>
+        <button className="btn-user-card" onClick={() => onDelete(user)}>Eliminar</button>
       </div>
     </div>
   );

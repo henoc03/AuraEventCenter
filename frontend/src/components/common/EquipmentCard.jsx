@@ -16,9 +16,10 @@ const EquipmentCard = ({ equipment, onView, onEdit, onDelete }) => {
         <h3 className="equipment-card-title">{equipment.name}</h3>
         <h2><p><strong>Cantidad:</strong> {equipment.quantity}</p></h2>
         <div className="equipment-card-buttons">
-          <button className="btn btn-primary button" onClick={() => onDelete(equipment)}>Eliminar</button>
-          <button className="btn btn-primary button" onClick={() => onEdit(equipment)}>Editar</button>
           <button className="btn btn-primary button" onClick={() => onView(equipment)}>Visualizar</button>
+          <button className="btn btn-primary button" onClick={() => onEdit(equipment)}>Editar</button>
+          <button className="btn btn-primary button" onClick={() => onDelete(equipment)}>Eliminar</button>
+          
         </div>
       </div>
     </div>

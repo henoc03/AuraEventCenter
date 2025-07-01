@@ -16,8 +16,8 @@ const navigationLinks = [
     },
     { 
         id: 4,
-        link: 'Cotización',
-        href: '/cotizacion' 
+        link: 'Reservar',
+        href: '/reservar' 
     },
     { 
         id: 5,

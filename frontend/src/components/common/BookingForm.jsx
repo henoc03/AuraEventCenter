@@ -6,34 +6,34 @@ import '../../style/booking-form.css';
 function BookingForm( {onNextStep, isEditMode = false, bookingInfo = {}} ) {
   const { register, handleSubmit, formState: { errors, isValid }, reset } = useForm({
     mode: "onChange",
-    defaultValues: {
-      owner: isEditMode ? bookingInfo.owner : "",
-      event_name: isEditMode ? bookingInfo.bookingName : "",
-      id_card: isEditMode ? bookingInfo.idCard : "",
-      email: isEditMode ? bookingInfo.email : "",
-      phone: isEditMode ? bookingInfo.phone : "",
-      event_type: isEditMode ? bookingInfo.eventType : "",
-      start_time: isEditMode ? bookingInfo.startTime : "",
-      end_time: isEditMode ? bookingInfo.endTime : "",
-      date: isEditMode ? bookingInfo.date : "",
-      additional_info: isEditMode ? bookingInfo.additionalNote : "",
-    }
+defaultValues: {
+    owner: bookingInfo.owner || "",
+    event_name: bookingInfo.bookingName || "",
+    id_card: bookingInfo.idCard || "",
+    email: bookingInfo.email || "",
+    phone: bookingInfo.phone || "",
+    event_type: bookingInfo.eventType || "",
+    start_time: bookingInfo.startTime || "",
+    end_time: bookingInfo.endTime || "",
+    date: bookingInfo.date || "",
+    additional_info: bookingInfo.additionalNote || "",
+  }
   });
 
   useEffect(() => {
     reset({
-      owner: isEditMode ? bookingInfo.owner : "",
-      event_name: isEditMode ? bookingInfo.bookingName : "",
-      id_card: isEditMode ? bookingInfo.idCard : "",
-      email: isEditMode ? bookingInfo.email : "",
-      phone: isEditMode ? bookingInfo.phone : "",
-      event_type: isEditMode ? bookingInfo.eventType : "",
-      start_time: isEditMode ? bookingInfo.startTime : "",
-      end_time: isEditMode ? bookingInfo.endTime : "",
-      date: isEditMode ? bookingInfo.date : "",
-      additional_info: isEditMode ? bookingInfo.additionalNote : "",
+      owner: bookingInfo.owner || "",
+      event_name: bookingInfo.bookingName || "",
+      id_card: bookingInfo.idCard || "",
+      email: bookingInfo.email || "",
+      phone: bookingInfo.phone || "",
+      event_type: bookingInfo.eventType || "",
+      start_time: bookingInfo.startTime || "",
+      end_time: bookingInfo.endTime || "",
+      date: bookingInfo.date || "",
+      additional_info: bookingInfo.additionalNote || "",
     });
-  }, [isEditMode, bookingInfo, reset]);
+  }, [bookingInfo, reset]);
 
   const onSubmit = async (data) => {
     const formData = {
