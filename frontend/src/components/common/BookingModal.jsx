@@ -40,28 +40,28 @@ const BookingModal = ({ isOpen, mode, booking, onClose, onDelete }) => {
             {booking.zones?.length > 0 && (
               <div className="modal-section">
                 <h5><strong>Salas</strong></h5>
-                <ul>{booking.zones.map((z, idx) => <li className="booking-list" key={idx}>{z}</li>)}</ul>
+                <ul>{booking.zones.map((z) => <li className="booking-list" key={z}>{z}</li>)}</ul>
               </div>
             )}
 
             {booking.services?.length > 0 && (
               <div className="modal-section">
                 <h5><strong>Servicios</strong></h5>
-                <ul>{booking.services.map((s, idx) => <li className="booking-list"key={idx}>{s}</li>)}</ul>
+                <ul>{booking.services.map((s) => <li className="booking-list"key={s}>{s}</li>)}</ul>
               </div>
             )}
 
             {booking.menus?.length > 0 && (
               <div className="modal-section">
                 <h5><strong>Menús</strong></h5>
-                <ul>{booking.menus.map((m, idx) => <li className="booking-list" key={idx}>{m}</li>)}</ul>
+                <ul>{booking.menus.map((m) => <li className="booking-list" key={m}>{m}</li>)}</ul>
               </div>
             )}
 
             {booking.equipments?.length > 0 && (
               <div className="modal-section">
                 <h5><strong>Equipos</strong></h5>
-                <ul>{booking.equipments.map((e, idx) => <li className="booking-list" key={idx}>{e}</li>)}</ul>
+                <ul>{booking.equipments.map((e) => <li className="booking-list" key={e}>{e}</li>)}</ul>
               </div>
             )}
           </div>

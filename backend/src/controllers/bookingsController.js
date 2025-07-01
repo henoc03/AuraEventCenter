@@ -296,3 +296,42 @@ exports.getBookingEquipments = async (req, res) => {
     if (conn) await conn.close();
   }
 };
+
+exports.deleteBooking = async (req, res) => {
+  let conn;
+  try {
+    const bookingId = req.params.id;
+    conn = await getConnection();
+
+    await conn.execute(
+      `UPDATE CLIENT_SCHEMA.BOOKINGS 
+       SET STATUS = 'cancelada' 
+       WHERE BOOKING_ID = :id`,
+      [bookingId]
+    );
+
+    const deleteTables = [
+      'BOOKINGS_ZONES_SERVICES',
+      'BOOKINGS_ZONES_MENUS',
+      'BOOKINGS_ZONES_EQUIPMENTS',
+      'BOOKINGS_ZONES'
+    ];
+
+    for (const table of deleteTables) {
+      await conn.execute(
+        `DELETE FROM CLIENT_SCHEMA.${table} 
+         WHERE BOOKING_ID = :id`,
+        [bookingId]
+      );
+    }
+
+    await conn.commit();
+    res.json({ message: "Reserva cancelada y asociaciones eliminadas." });
+
+  } catch (err) {
+    console.error("Error al cancelar reserva:", err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};

@@ -9,7 +9,22 @@ const BookingCard = ({ booking, onView, onDelete, onEdit }) => {
 		status = "pendiente"
 	} = booking;
 
-	const statusClass = status.toLowerCase() === "completada" ? "completed" : "pendant";
+	const getStatusClass = (status) => {
+		const normalized = status.toLowerCase();
+		switch (normalized) {
+		case "completada":
+			return "status-completed";
+		case "en_progreso":
+			return "status-in-progress";
+		case "cancelada":
+			return "status-cancelled";
+		case "pendiente":
+		default:
+			return "status-pending";
+		}
+	};
+
+	const statusClass = getStatusClass(status);
 
   return (
 		<div className="booking-card-container">

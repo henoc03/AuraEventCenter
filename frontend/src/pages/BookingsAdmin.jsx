@@ -29,7 +29,6 @@ const Bookings = ({ sections }) => {
 
   const uniqueTypes = Array.from(new Set(bookings.map(b => b.status).filter(Boolean)));
 
-
   useEffect(() => {
     const fetchUserInfo = async () => {
       const token = localStorage.getItem("token");
@@ -169,7 +168,7 @@ const Bookings = ({ sections }) => {
                 >
                   <option value="todos">Todos</option>
                   {uniqueTypes.map(type => (
-                    <option key={type} value={type.toLowerCase()}>{type}</option>
+                    <option key={type} value={type}>{type.charAt(0).toUpperCase() + type.slice(1)}</option>
                   ))}
                 </select>
 
@@ -195,7 +194,7 @@ const Bookings = ({ sections }) => {
                     booking={booking}
                     onView={() => openModal("view", booking)}
                     onDelete={() => openModal("delete", booking)}
-                    onEdit={() => console.log("Editar aún no implementado")}
+                    onEdit={() => console.log("Hay que implementar")}
                   />
                 ))}
               </div>

@@ -214,11 +214,19 @@
   display: inline-block;
 }
 
-.booking-status-indicator.completed {
+.status-completed {
   background-color: #22c55e;
 }
 
-.booking-status-indicator.pendant {
+.status-in-progress {
+  background-color: #3b82f6; 
+}
+
+.status-cancelled {
+  background-color: #ef4444;
+}
+
+.status-pending {
   background-color: #facc15;
 }
 
