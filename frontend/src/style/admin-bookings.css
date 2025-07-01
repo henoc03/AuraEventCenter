@@ -256,3 +256,70 @@
   background-color: #2563eb;
   color: white;
 }
+
+.booking-card-horizontal {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  background-color: #fafafa;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.05);
+  width: 100%;
+  min-height: 140px;
+}
+
+.booking-card-icon {
+  font-size: 3rem;
+  color: #777;
+  margin-right: 16px;
+}
+
+.booking-card-content {
+  flex: 1;
+}
+
+.booking-card-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.booking-card-date-time {
+  color: #555;
+  font-size: 0.95rem;
+  margin-bottom: 16px;
+}
+
+.booking-card-price {
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.booking-card-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.bookings-client-grid {
+  display: flex;
+  flex-direction: column;
+}
+
+.bookings-two-column {
+  padding-top: 20px;
+  display: flex;
+  flex-wrap: row;
+  gap: 60px;
+}
+
+.bookings-two-column .bookings-client-grid {
+  width: 40%;
+}
+
+.bookings-two-column .promo-text-block {
+  width: 100%;
+}

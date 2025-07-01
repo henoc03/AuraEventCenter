@@ -102,6 +102,93 @@ exports.getAllBookings = async (req, res) => {
 };
 
 /**
+ * Obtiene todas las reservas del usuario autenticado, con información completa.
+ */
+exports.getMyBookings = async (req, res) => {
+  let conn;
+  try {
+    const userId = req.user.id;
+    conn = await getConnection();
+
+    const result = await conn.execute(
+      `SELECT 
+        B.BOOKING_ID,
+        B.BOOKING_NAME,
+        B.STATUS,
+        B.ADDITIONAL_NOTE,
+        B.START_TIME,
+        B.END_TIME,
+        B.ID_CARD,
+        B.EVENT_TYPE,
+        B.EVENT_DATE,
+        U.FIRST_NAME,
+        U.LAST_NAME_1,
+        U.LAST_NAME_2,
+        U.EMAIL,
+        U.PHONE
+      FROM CLIENT_SCHEMA.BOOKINGS B
+      JOIN CLIENT_SCHEMA.USERS U ON B.USER_ID = U.USER_ID
+      WHERE B.USER_ID = :userId
+      ORDER BY B.EVENT_DATE DESC`,
+      [userId],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    const bookings = [];
+
+    for (const b of result.rows) {
+      const [zonesRes, servicesRes, equipmentsRes] = await Promise.all([
+        conn.execute(`
+          SELECT Z.NAME AS ZONE_NAME
+          FROM CLIENT_SCHEMA.BOOKINGS_ZONES BZ
+          JOIN ADMIN_SCHEMA.ZONES Z ON BZ.ZONE_ID = Z.ZONE_ID
+          WHERE BZ.BOOKING_ID = :id`, 
+          [b.BOOKING_ID], { outFormat: oracledb.OUT_FORMAT_OBJECT }),
+
+        conn.execute(`
+          SELECT DISTINCT S.NAME AS SERVICE_NAME
+          FROM CLIENT_SCHEMA.BOOKINGS_ZONES_SERVICES BZS
+          JOIN ADMIN_SCHEMA.ADDITIONAL_SERVICES S ON BZS.ADDITIONAL_SERVICE_ID = S.ADDITIONAL_SERVICE_ID
+          WHERE BZS.BOOKING_ID = :id`,
+          [b.BOOKING_ID], { outFormat: oracledb.OUT_FORMAT_OBJECT }),
+
+        conn.execute(`
+          SELECT DISTINCT E.NAME AS EQUIPMENT_NAME
+          FROM CLIENT_SCHEMA.BOOKINGS_ZONES_EQUIPMENTS BZE
+          JOIN ADMIN_SCHEMA.EQUIPMENTS E ON BZE.EQUIPMENT_ID = E.ID
+          WHERE BZE.BOOKING_ID = :id`,
+          [b.BOOKING_ID], { outFormat: oracledb.OUT_FORMAT_OBJECT })
+      ]);
+
+      bookings.push({
+        id: b.BOOKING_ID,
+        bookingName: b.BOOKING_NAME,
+        status: b.STATUS,
+        additionalNote: b.ADDITIONAL_NOTE,
+        date: b.EVENT_DATE ? b.EVENT_DATE.toISOString().split('T')[0] : null,
+        startTime: b.START_TIME ? b.START_TIME.toISOString().split('T')[1].slice(0, 8) : null,
+        endTime: b.END_TIME ? b.END_TIME.toISOString().split('T')[1].slice(0, 8) : null,
+        eventType: b.EVENT_TYPE,
+        idCard: b.ID_CARD,
+        owner: `${b.FIRST_NAME} ${b.LAST_NAME_1} ${b.LAST_NAME_2}`,
+        email: b.EMAIL,
+        phone: b.PHONE,
+        zones: zonesRes.rows.map(z => z.ZONE_NAME),
+        services: servicesRes.rows.map(s => s.SERVICE_NAME),
+        equipments: equipmentsRes.rows.map(e => e.EQUIPMENT_NAME)
+      });
+    }
+
+    res.json(bookings);
+  } catch (err) {
+    console.error("Error al obtener historial del usuario:", err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
+/**
  * Obtiene un equipo específico por ID.
  */
 exports.getBookingById = async (req, res) => {
