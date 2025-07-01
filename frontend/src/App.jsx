@@ -78,7 +78,7 @@ function App() {
           <Route path="/cuenta" element={<AccountSettings sections={SectionProfile}/>} />
           <Route path="/cuenta/cambiar-contraseña" element={<ChangePassword sections={SectionProfile}/>} />
           <Route path="/cuenta/verificar-codigo" element={<VerifyAccountCode sections={SectionProfile}/>} />
-          <Route path="/reserva/editar" element={<EditBookingClient sections={SectionProfile}/>} />
+          <Route path="/reserva/editar/:bookingId" element={<EditBookingClient sections={SectionProfile}/>} />
           <Route path="/servicios" element={<ServicesClient />} />
           <Route path="/servicios/menus" element={<MenusClient />} />
           <Route path="/servicios/equipos" element={<EquipmentsClient />} />
@@ -101,6 +101,7 @@ function App() {
             <Route path="/admin/calendario" element={<CalendarView sections={SectionAdmin} />} />
             <Route path="/admin/reservas" element={<BookingsAdmin sections={SectionAdmin} />} />
             <Route path="/admin/reservas/crear" element={<CreateBookingClient sections={SectionAdmin} />} />
+            <Route path="/admin/reservas/editar/:bookingId" element={<EditBookingClient sections={SectionAdmin} />} />
           </Route>
 
           {/* Rutas protegidas para root-admin */}
@@ -116,6 +117,7 @@ function App() {
             <Route path="/root-admin/calendario" element={<CalendarView sections={SectionRoot} />} />
             <Route path="/root-admin/reservas" element={<BookingsAdmin sections={SectionRoot} />} />
             <Route path="/root-admin/reservas/crear" element={<CreateBookingClient sections={SectionRoot} />} />
+            <Route path="/root-admin/reservas/editar/:bookingId" element={<EditBookingClient sections={SectionRoot} />} />
           </Route>
 
           {/* Página 404 */}

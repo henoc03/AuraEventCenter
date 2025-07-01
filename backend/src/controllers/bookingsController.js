@@ -463,6 +463,108 @@ const bookingId = result.outBinds.outBookingId;
   }
 };
 
+exports.updateBooking = async (req, res) => {
+  let conn;
+  try {
+    const { userId, bookingId, bookingInfo, rooms, services, menus, equipments } = req.body;
+    console.log(services);
+
+    conn = await getConnection();
+
+    const {
+      owner, bookingName, idCard, email, phone,
+      eventType, startTime, endTime, date, additionalNote
+    } = bookingInfo;
+
+    const cleanTime = t => t.length > 5 ? t.slice(0,5) : t;
+    const startTimeOnly = cleanTime(startTime);
+    const endTimeOnly = cleanTime(endTime);
+
+    const result = await conn.execute(
+      `UPDATE CLIENT_SCHEMA.BOOKINGS
+       SET
+        USER_ID = :userId,
+        BOOKING_NAME = :bookingName,
+        STATUS = 'pendiente',
+        ADDITIONAL_NOTE = :note,
+        START_TIME = TO_DATE(:startTime, 'HH24:MI'),
+        END_TIME = TO_DATE(:endTime, 'HH24:MI'),
+        ID_CARD = :idCard,
+        EVENT_TYPE = :eventType,
+        EVENT_DATE = TO_DATE(:eventDate, 'YYYY-MM-DD')
+       WHERE BOOKING_ID = :bookingId`,
+      {
+        userId: userId,
+        bookingName: bookingName,
+        note: additionalNote,
+        startTime: startTimeOnly,
+        endTime: endTimeOnly,
+        idCard: idCard,
+        eventType: eventType,
+        eventDate: date,
+        bookingId: bookingId
+      },
+      { autoCommit: false }
+    );
+
+    for (const zoneId of rooms) {
+      const exists = await conn.execute(
+        `SELECT 1 FROM CLIENT_SCHEMA.BOOKINGS_ZONES WHERE BOOKING_ID = :bookingId AND ZONE_ID = :zoneId`,
+        { bookingId, zoneId }
+      );
+
+      if (exists.rows.length === 0) {
+        await conn.execute(
+          `INSERT INTO CLIENT_SCHEMA.BOOKINGS_ZONES (BOOKING_ID, ZONE_ID)
+          VALUES (:bookingId, :zoneId)`,
+          { bookingId, zoneId },
+          { autoCommit: false }
+        );
+      }
+
+      const zoneServices = services?.[zoneId] || [];
+      for (const serviceId of zoneServices) {
+        await conn.execute(
+          `INSERT INTO CLIENT_SCHEMA.BOOKINGS_ZONES_SERVICES (BOOKING_ID, ZONE_ID, ADDITIONAL_SERVICE_ID)
+           VALUES (:bookingId, :zoneId, :serviceId)`,
+          { bookingId, zoneId, serviceId },
+          { autoCommit: false }
+        );
+      }
+
+      const zoneMenus = menus?.[zoneId] || [];
+      for (const menuId of zoneMenus) {
+        await conn.execute(
+          `INSERT INTO CLIENT_SCHEMA.BOOKINGS_ZONES_MENUS (BOOKING_ID, ZONE_ID, MENU_ID)
+           VALUES (:bookingId, :zoneId, :menuId)`,
+          { bookingId, zoneId, menuId },
+          { autoCommit: false }
+        );
+      }
+
+      const zoneEquipments = equipments?.[zoneId] || [];
+      console.log(zoneEquipments)
+      for (const equipmentId of zoneEquipments) {
+        await conn.execute(
+          `INSERT INTO CLIENT_SCHEMA.BOOKINGS_ZONES_EQUIPMENTS (BOOKING_ID, ZONE_ID, EQUIPMENT_ID)
+           VALUES (:bookingId, :zoneId, :equipmentId)`,
+          { bookingId:bookingId, zoneId:zoneId, equipmentId:equipmentId },
+          { autoCommit: false }
+        );
+      }
+    }
+
+    await conn.commit();
+    res.status(201).json({ message: "Reserva actualizada exitosamente", bookingId });
+
+  } catch (err) {
+    console.error("Error al actualizar la reserva:", err);
+    if (conn) await conn.rollback();
+    res.status(500).json({ error: "Error al actualizar la reserva" });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
 
 exports.deleteBooking = async (req, res) => {
   let conn;
@@ -516,7 +618,8 @@ exports.deleteBooking = async (req, res) => {
 exports.getPaymentSummary = async (req, res) => {
   let conn;
   try {
-    const { rooms = [], menus = {}, services = {}, equipments = {} } = req.body;
+    // 1. Obtén las horas de la reserva (asegúrate de recibirlas en el payload)
+    const { rooms = [], menus = {}, services = {}, equipments = {}, startTime, endTime } = req.body;
     conn = await getConnection();
 
     // Helper para IN clause
@@ -581,7 +684,7 @@ exports.getPaymentSummary = async (req, res) => {
       if (equipmentIds.length > 0) {
         const { clause, binds } = makeInClause(equipmentIds, 'eq');
         const eqRes = await conn.execute(
-          `SELECT EQUIPMENT_ID, NAME, UNITARY_PRICE FROM ADMIN_SCHEMA.EQUIPMENTS WHERE EQUIPMENT_ID IN ${clause}`,
+          `SELECT ID AS EQUIPMENT_ID, NAME, UNITARY_PRICE FROM ADMIN_SCHEMA.EQUIPMENTS WHERE ID IN ${clause}`,
           binds,
           { outFormat: oracledb.OUT_FORMAT_OBJECT }
         );
@@ -589,13 +692,26 @@ exports.getPaymentSummary = async (req, res) => {
         subtotalEquipments = equipmentList.reduce((sum, e) => sum + (Number(e.UNITARY_PRICE) || 0), 0);
       }
 
-      const basePrice = Number(zone.PRICE) || 0;
-      const subtotal = basePrice + subtotalMenus + subtotalServices + subtotalEquipments;
+      // Calcula la cantidad de horas
+      function getHourDelta(start, end) {
+        // start y end en formato "HH:MM"
+        const [sh, sm] = start.split(":").map(Number);
+        const [eh, em] = end.split(":").map(Number);
+        let delta = (eh + em/60) - (sh + sm/60);
+        if (delta < 0) delta += 24; // por si cruza medianoche
+        return delta;
+      }
+      const hours = getHourDelta(startTime, endTime);
 
+      const basePrice = (Number(zone.PRICE) || 0) * hours;
+      const subtotal = basePrice + subtotalMenus + subtotalServices + subtotalEquipments;
+      console.log({ startTime, endTime, hours });
+      
       zonas.push({
         zoneId: zone.ZONE_ID,
         name: zone.NAME,
         basePrice,
+        hours,
         menus: menuList,
         services: serviceList,
         equipments: equipmentList,
