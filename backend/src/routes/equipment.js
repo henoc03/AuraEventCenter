@@ -25,6 +25,7 @@ router.get("/", equipmentsController.getAllEquipments);
 router.get("/active", equipmentsController.getAllEquipmentsActive );
 router.get('/:id', equipmentsController.getEquipmentById);
 router.post("/", equipmentsController.createEquipment);
+router.post("/available", equipmentsController.getAllAvailableEquipments);
 router.put("/:id", equipmentsController.updateEquipment);
 router.delete("/:id", equipmentsController.deleteEquipment);
 
