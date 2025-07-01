@@ -40,6 +40,54 @@ function ServiceSelector({
   const currentMenus = selectedMenus?.[currentRoom] || [];
   const currentEquipments = selectedEquipments?.[currentRoom] || [];
 
+
+const handleIncrease = (id) => {
+  const roomId = selectedRooms[currentRoomIndex];
+  setSelectedMenus((prev) => {
+    const roomMenus = prev[roomId] || [];
+    const found = roomMenus.find((m) => m.ID_MENU === id);
+    let updatedRoomMenus;
+
+    if (found) {
+      updatedRoomMenus = roomMenus.map((m) =>
+        m.ID_MENU === id ? { ...m, CANTIDAD: m.CANTIDAD + 1 } : m
+      );
+    } else {
+      updatedRoomMenus = [...roomMenus, { ID_MENU: id, CANTIDAD: 1 }];
+    }
+
+    return {
+      ...prev,
+      [roomId]: updatedRoomMenus,
+    };
+  });
+};
+
+
+const handleDecrease = (id) => {
+  const roomId = selectedRooms[currentRoomIndex];
+  setSelectedMenus((prev) => {
+    const roomMenus = prev[roomId] || [];
+    const found = roomMenus.find((m) => m.ID_MENU === id);
+    let updatedRoomMenus;
+
+    if (found && found.CANTIDAD > 1) {
+      updatedRoomMenus = roomMenus.map((m) =>
+        m.ID_MENU === id ? { ...m, CANTIDAD: m.CANTIDAD - 1 } : m
+      );
+    } else {
+      updatedRoomMenus = roomMenus.filter((m) => m.ID_MENU !== id);
+    }
+
+    return {
+      ...prev,
+      [roomId]: updatedRoomMenus,
+    };
+  });
+};
+
+
+
     useEffect(() => {
     const roomId = selectedRooms[currentRoomIndex];
     const cateringService = allServices.find(s => s.name?.toLowerCase().includes("catering"));
@@ -107,42 +155,64 @@ function ServiceSelector({
     });
   };
 
-  const handleMenuClicked = (menuID) => {
-    const roomId = selectedRooms[currentRoomIndex];
-    const isOriginal = (selectedMenus[roomId] || []).includes(menuID);
-    const isNew = (newMenus[roomId] || []).includes(menuID);
-    
+const handleMenuClicked = (menuID) => {
+  const roomId = selectedRooms[currentRoomIndex];
+  const current = selectedMenus[roomId] || [];
+  const exists = current.find((m) => m.ID_MENU === menuID);
+
+  if (!exists) {
+    setSelectedMenus(prev => ({
+      ...prev,
+      [roomId]: [...current, { ID_MENU: menuID, CANTIDAD: 1 }]
+    }));
+  }
+  
+  // También activar el servicio de catering si no está
+  const cateringService = allServices.find(s => s.name?.toLowerCase().includes("catering"));
+  if (cateringService) {
+    setSelectedServices(prev => {
+      const current = prev[roomId] || [];
+      if (!current.includes(cateringService.ID)) {
+        return { ...prev, [roomId]: [...current, cateringService.ID] };
+      }
+      return prev;
+    });
+  }
+};
+
+const handleQuantityChange = (menuID, newQuantity) => {
+  const roomId = selectedRooms[currentRoomIndex];
+  if (newQuantity < 1) {
+    // Si cantidad es menor que 1, eliminar menú
     setSelectedMenus(prev => {
-      const current = prev[roomId] || [];
-      if (current.includes(menuID)) {
-        return { ...prev, [roomId]: current.filter(id => id !== menuID) };
+      const roomMenus = prev[roomId] || [];
+      return {
+        ...prev,
+        [roomId]: roomMenus.filter((m) => m.ID_MENU !== menuID),
+      };
+    });
+  } else {
+    // Actualizar cantidad
+    setSelectedMenus(prev => {
+      const roomMenus = prev[roomId] || [];
+      const found = roomMenus.find((m) => m.ID_MENU === menuID);
+      if (found) {
+        return {
+          ...prev,
+          [roomId]: roomMenus.map((m) =>
+            m.ID_MENU === menuID ? { ...m, CANTIDAD: newQuantity } : m
+          ),
+        };
       } else {
-        return { ...prev, [roomId]: [...current, menuID] };
+        // Si no existe, agregarlo con la cantidad
+        return {
+          ...prev,
+          [roomId]: [...roomMenus, { ID_MENU: menuID, CANTIDAD: newQuantity }],
+        };
       }
     });
-
-    setNewMenus(prev => {
-      const current = prev[roomId] || [];
-      if (current.includes(menuID)) {
-        return { ...prev, [roomId]: current.filter(id => id !== menuID) };
-      } else {
-        return { ...prev, [roomId]: [...current, menuID] };
-      }
-    });
-    if (!isOriginal && !isNew) {
-    const cateringService = allServices.find(s => s.name?.toLowerCase().includes("catering"));
-    if (cateringService) {
-        setSelectedServices(prev => {
-        const current = prev[roomId] || [];
-        if (!current.includes(cateringService.ID)) {
-            return { ...prev, [roomId]: [...current, cateringService.ID] };
-        }
-        return prev;
-        });
-    }
-    }
-
-  };
+  }
+};
 
   const handleEquipmentClicked = (equipmentID) => {
     const roomId = selectedRooms[currentRoomIndex];
@@ -266,28 +336,48 @@ function ServiceSelector({
               getPrice={(el) => el?.PRICE || 0}
             />
 
-            <div className="edit-booking-grid">
-              {modalCurrentElements.map((menu) => {
-                const isSelected = currentMenus.includes(menu.MENU_ID);
-                const isNew = currentMenus.includes(menu.MENU_ID);
-                let cardStyle = {};
-                            if (!isSelected) {
-                              cardStyle = { opacity: "100%" };
-                            } else if (isSelected) {
-                              cardStyle = { opacity: "50%" };
-                            }
-                return (
-                  <div
-                    key={menu.MENU_ID}
-                    className={`edit-booking-card${isSelected ? " edit-booking-selected-card" : ""}`}
-                    onClick={() => handleMenuClicked(menu.MENU_ID)}
-                    style={cardStyle}
-                  >
-                    <CompactMenu menu={menu} isBooking={true} isSelected={isSelected}  isNew={isNew} />
-                  </div>
-                );
-              })}
-            </div>
+          <div className="edit-booking-grid">
+            {modalCurrentElements.map((menu) => {
+              const isSelected = currentMenus.some(m => m.ID_MENU === menu.MENU_ID);
+              const isNew = newMenus[currentRoom]?.includes(menu.MENU_ID);
+              const menuEntry = currentMenus.find(m => m.ID_MENU === menu.MENU_ID);
+              const quantity = menuEntry ? menuEntry.CANTIDAD : 0;
+
+              let cardStyle = {};
+              if (!isSelected) {
+                cardStyle = { opacity: "100%" };
+              } else if (isSelected) {
+                cardStyle = { opacity: "50%" };
+              }
+
+              return (
+                <div
+                  key={menu.MENU_ID}
+                  className={`edit-booking-card${isSelected ? " edit-booking-selected-card" : ""}`}
+                  style={cardStyle}
+                >
+                  <CompactMenu
+                    menu={menu}
+                    isBooking={true}
+                    isSelected={isSelected}
+                    isNew={isNew}
+                    quantity={quantity}
+                    onIncrease={() => handleIncrease(menu.MENU_ID)}
+                    onDecrease={() => handleDecrease(menu.MENU_ID)}
+                    onQuantityChange={handleQuantityChange}
+                  />
+                </div>
+              );
+            })}
+          </div>
+
+            <button
+              className={`add-menu-booking-button`}
+              type="button"
+              onClick={handleCloseModal}
+            >
+              Agregar
+            </button>
 
             {modalTotalPages > 1 && (
               <Pagination

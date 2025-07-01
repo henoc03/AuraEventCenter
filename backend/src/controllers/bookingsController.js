@@ -429,14 +429,25 @@ const bookingId = result.outBinds.outBookingId;
 
  
       const zoneMenus = menus?.[zoneId] || [];
-      for (const menuId of zoneMenus) {
-        await conn.execute(
-          `INSERT INTO CLIENT_SCHEMA.BOOKINGS_ZONES_MENUS (BOOKING_ID, ZONE_ID, MENU_ID)
-           VALUES (:bookingId, :zoneId, :menuId)`,
-          { bookingId, zoneId, menuId },
-          { autoCommit: false }
-        );
-      }
+      console.log(zoneMenus)
+      for (const { ID_MENU, CANTIDAD } of zoneMenus) {
+  await conn.execute(
+    `INSERT INTO CLIENT_SCHEMA.BOOKINGS_ZONES_MENUS (
+      BOOKING_ID, ZONE_ID, MENU_ID, QUANTITY
+    ) VALUES (
+      :bookingId, :zoneId, :menuId, :quantity
+    )`,
+    {
+      bookingId,
+      zoneId,
+      menuId: ID_MENU,
+      quantity: CANTIDAD
+    },
+    { autoCommit: false }
+  );
+}
+
+
 
 
       const zoneEquipments = equipments?.[zoneId] || [];

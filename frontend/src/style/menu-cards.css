@@ -183,6 +183,63 @@
   color: #dc3545;
 }
 
+.menu-quantity-control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 12px ;
+}
+
+.menu-quantity-control button {
+  background-color: #007bff;
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  font-size: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease;
+  min-width: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.menu-quantity-control button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.menu-quantity-control button:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.menu-quantity-control input[type="number"] {
+  width: 60px;
+  padding: 6px 8px;
+  font-size: 1rem;
+  border: 1.5px solid #ccc;
+  border-radius: 4px;
+  text-align: center;
+  outline-offset: 2px;
+  transition: border-color 0.2s ease;
+  -moz-appearance: textfield; /* Firefox */
+}
+
+.menu-quantity-control input[type="number"]:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Quitar flechas nativas del input para Chrome/Safari/Edge */
+.menu-quantity-control input[type="number"]::-webkit-inner-spin-button,
+.menu-quantity-control input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; transform: scale(0.98); }
   to { opacity: 1; transform: scale(1); }
