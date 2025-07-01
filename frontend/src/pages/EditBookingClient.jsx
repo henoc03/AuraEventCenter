@@ -16,6 +16,7 @@ import Filters from "../components/common/Filters.jsx";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import PayPalCard from "../assets/images/paypal-card.png";
 import '../style/edit-booking-client.css'
+import CheckoutPayment from "../components/common/CheckoutPayment.jsx";
 
 const DEFAULT_ROUTE = "http://localhost:1522";
 
@@ -618,10 +619,14 @@ function EditBookingClient({ sections }) {
         // Construir el payload con la selección actual
         const payload = {
           rooms: selectedRooms,
-          menus: selectedMenus,
-          services: selectedServices,
-          equipments: selectedEquipments,
+          menus: Object.fromEntries(selectedRooms.map(id => [id, selectedMenus[id] || []])),
+          services: Object.fromEntries(selectedRooms.map(id => [id, selectedServices[id] || []])),
+          equipments: Object.fromEntries(selectedRooms.map(id => [id, selectedEquipments[id] || []])),
+          startTime: step1Data.startTime, // asegúrate que esté en formato "HH:MM"
+          endTime: step1Data.endTime
         };
+        console.log("Hora inicio;", payload.startTime);
+        console.log("Hora fin:", payload.endTime);
         console.log("PAYMENT PAYLOAD:", payload); // <-- Agrega esto
         // Llama a un endpoint backend que calcule el resumen de precios
         const res = await fetch(`${DEFAULT_ROUTE}/bookings/payment-summary`, {
@@ -995,8 +1000,6 @@ function EditBookingClient({ sections }) {
                     >
                       {currentRoomIndex < selectedRooms.length - 1 ? 'Siguiente sala' : 'Siguiente'}
                     </button>
-
-                    <button onClick={() => handleUpdate()}>actualizar</button>
                   </div>
                 </div>
               )}
@@ -1004,101 +1007,16 @@ function EditBookingClient({ sections }) {
               {/* Paso de pago */}
               {step === 3 && (
                 <div className="checkout-container">
-                  {paymentLoading ? (
-                    <LoadingPage />
-                  ) : paymentSummary ? (
-                    <div className="checkout-content">
-                      <div className="checkout-grid">
-                        <div className="checkout-main">
-                          <h2 className="checkout-subtitle">Proceder al pago</h2>
-                          <h1 className="checkout-title">PayPal</h1>
-                          <div className="paypal-box">
-                            <img src={PayPalCard} alt="PayPal Card" className="paypal-image" />
-                            <p className="paypal-description">
-                              Después de hacer clic en "Pagar",<br />
-                              serás redirigido a PayPal para completar<br />
-                              tu compra de forma segura.
-                            </p>
-                            <div className="paypal-buttons">
-                              <PayPalScriptProvider options={{ "client-id": import.meta.env.VITE_PAYPAL_CLIENT_ID }}>
-                                <PayPalButtons
-                                  style={{ layout: "horizontal", label: "pay" }}
-                                  createOrder={(data, actions) => {
-                                    return actions.order.create({
-                                      purchase_units: [
-                                        {
-                                          amount: {
-                                            value: (paymentSummary.total / 540).toFixed(2),
-                                            currency_code: "USD",
-                                          },
-                                        },
-                                      ],
-                                    });
-                                  }}
-                                  onApprove={(data, actions) => {
-                                    return actions.order.capture().then((details) => {
-                                      alert(`Pago completado por ${details.payer.name.given_name}`);
-                                      // Aquí puedes enviar la confirmación al backend si lo necesitas
-                                    });
-                                  }}
-                                  onError={(err) => {
-                                    console.error(err);
-                                    alert("Error en el pago con PayPal");
-                                  }}
-                                />
-                              </PayPalScriptProvider>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="checkout-sidebar">
-                          {paymentSummary.zonas.map((zona) => (
-                            <div key={zona.zoneId} className="room-summary">
-                              <div className="room-info">
-                                <h3 className="room-title">{zona.name}</h3>
-                                <p className="room-price">₡{zona.basePrice.toLocaleString()}</p>
-                              </div>
-                              <div className="room-options">
-                                <ul className="room-options-list">
-                                  {zona.menus.map((menu) => (
-                                    <li key={menu.MENU_ID}>
-                                      {menu.NAME} - ₡{menu.PRICE.toLocaleString()}
-                                    </li>
-                                  ))}
-                                  {zona.services.map((s) => (
-                                    <li key={s.ADDITIONAL_SERVICE_ID}>
-                                      {s.NAME} - ₡{s.PRICE.toLocaleString()}
-                                    </li>
-                                  ))}
-                                  {zona.equipments.map((e) => (
-                                    <li key={e.EQUIPMENT_ID}>
-                                      {e.NAME} - ₡{e.UNITARY_PRICE.toLocaleString()}
-                                    </li>
-                                  ))}
-                                </ul>
-                                <p><strong>Subtotal zona:</strong> ₡{zona.subtotal.toLocaleString()}</p>
-                              </div>
-                            </div>
-                          ))}
-                          <div className="checkout-summary">
-                            <div className="summary-line">
-                              <span>Subtotal:</span>
-                              <span>₡{paymentSummary.total.toLocaleString()}</span>
-                            </div>
-                            <div className="summary-line">
-                              <span>Iva (13%):</span>
-                              <span>₡{paymentSummary.iva.toLocaleString()}</span>
-                            </div>
-                            <div className="summary-total">
-                              <span>Total:</span>
-                              <span>₡{paymentSummary.totalConIva.toLocaleString()}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div>No se pudo calcular el resumen de pago.</div>
-                  )}
+                  <CheckoutPayment
+                    paymentSummary={paymentSummary}
+                    paymentLoading={paymentLoading}
+                    onPaymentSuccess={(details) => {
+                      // Aquí puedes manejar lógica extra después del pago
+                    }}
+                    onPaymentError={(err) => {
+                      // Aquí puedes manejar errores de pago
+                    }}
+                  />
                 </div>
               )}
             </div>
