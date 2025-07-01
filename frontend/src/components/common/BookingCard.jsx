@@ -1,25 +1,25 @@
 import React from "react";
 import PropTypes from "prop-types";
+import "../../style/admin-bookings.css";
 
 const BookingCard = ({ booking, onView, onDelete, onEdit }) => {
-	const {
-		event_type, 
+	const { 
 		booking_name, 
 		event_date, 
 		status = "pendiente"
 	} = booking;
 
-	const statusClass = status.toLowerCase() === "completada" ? "active" : "inactive";
+	const statusClass = status.toLowerCase() === "completada" ? "completed" : "pendant";
 
   return (
 		<div className="booking-card-container">
 			<div className="booking-card-info">
-				<h3 className="booking-card-type">{event_type} - {booking_name}</h3>
-				<p className="reservation-card-date">{event_date}</p>
+				<h3 className="booking-card-type">{booking_name}</h3>
+				<p className="booking-card-date">{event_date.slice(0, 10)}</p>
 			</div>
 
-			<p className="product-card-status-text">
-				<span className={`status-indicator ${statusClass}`}></span>
+			<p className="booking-card-status-text">
+				<span className={`booking-status-indicator ${statusClass}`}></span>
 				{status.charAt(0).toUpperCase() + status.slice(1)}
 			</p>
 

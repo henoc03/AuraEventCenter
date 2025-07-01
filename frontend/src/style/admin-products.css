@@ -68,7 +68,6 @@
 .back-btn{
   text-align: left;
   width: fit-content;
-  margin-bottom: 20px;
   font-family: 'Merriweather sans', sans-serif;
   font-size: 1.05rem;
   transition: font-weight 0.2s;
@@ -76,6 +75,7 @@
   border: none;
   margin: 30px 0px -10px 30px;
 }
+
 .products-section-header{
   display: flex;
   align-items: center;

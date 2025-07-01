@@ -5,7 +5,9 @@ import AlertMessage from "../components/common/AlertMessage";
 import LoadingPage from "../components/common/LoadingPage";
 import BookingCard from "../components/common/BookingCard";
 import BookingModal from "../components/common/BookingModal";
+import Pagination from "../components/common/Pagination";
 import { jwtDecode } from 'jwt-decode';
+import "../style/admin-bookings.css";
 
 const PORT = "http://localhost:1522";
 
@@ -18,6 +20,15 @@ const Bookings = ({ sections }) => {
   const [modalMode, setModalMode] = useState("");
   const [messageType, setMessageType] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [typeFilter, setTypeFilter] = useState("todos");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [currentPage, setCurrentPage] = useState(1);
+  const bookingsPerPage = 4;
+
+  const uniqueTypes = Array.from(new Set(bookings.map(b => b.status).filter(Boolean)));
+
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -68,19 +79,37 @@ const Bookings = ({ sections }) => {
   };
 
   const handleDelete = async (booking) => {
-  try {
-    await fetch(`${PORT}/bookings/${booking.id}`, {
-      method: "DELETE"
+    try {
+      await fetch(`${PORT}/bookings/${booking.id}`, {
+        method: "DELETE"
+      });
+      setMessage("Reserva eliminada correctamente");
+      setMessageType("success");
+      fetchBookings();
+    } catch (err) {
+      console.error("Error al eliminar reserva:", err);
+      setMessage("Error al eliminar reserva");
+      setMessageType("error");
+    }
+  };
+
+  const filteredBookings = bookings
+    .filter((b) => {
+      const matchesSearch = b.booking_name.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesType = typeFilter === "todos" || b.status?.toLowerCase() === typeFilter;
+      return matchesSearch && matchesType;
+    })
+    .sort((a, b) => {
+      const nameA = a.booking_name.toLowerCase();
+      const nameB = b.booking_name.toLowerCase();
+      return sortOrder === "asc" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
     });
-    setMessage("Reserva eliminada correctamente");
-    setMessageType("success");
-    fetchBookings();
-  } catch (err) {
-    console.error("Error al eliminar reserva:", err);
-    setMessage("Error al eliminar reserva");
-    setMessageType("error");
-  }
-};
+
+  const indexOfLastBooking = currentPage * bookingsPerPage;
+  const indexOfFirstBooking = indexOfLastBooking - bookingsPerPage;
+  const currentBookings = filteredBookings.slice(indexOfFirstBooking, indexOfLastBooking);
+  const totalPages = Math.ceil(filteredBookings.length / bookingsPerPage);
+
 
   if (loading) return <LoadingPage />;
 
@@ -107,19 +136,77 @@ const Bookings = ({ sections }) => {
           </button>
           <div className="bookings-content-wrapper">
             <section className="bookings-section">
-              <h2 className="bookings-section-title">Reservas registradas</h2>
+              <div className="bookings-section-header">
+                <h2 className="bookings-section-title">Reservas</h2>
+                <button className="btn-add-booking" onClick={() => openModal("add")}>
+                  Agregar
+                </button>
+              </div>
+
+              <div className="bookings-controls">
+                <label htmlFor="search">Buscar:</label>
+                <input
+                  id="search"
+                  type="text"
+                  placeholder="Buscar reserva..."
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="bookings-search-input"
+                />
+
+                <label htmlFor="type">Filtrar:</label>
+                <select
+                  id="type"
+                  value={typeFilter}
+                  onChange={(e) => {
+                    setTypeFilter(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="bookings-status-select"
+                >
+                  <option value="todos">Todos</option>
+                  {uniqueTypes.map(type => (
+                    <option key={type} value={type.toLowerCase()}>{type}</option>
+                  ))}
+                </select>
+
+                <label htmlFor="sort">Orden:</label>
+                <select
+                  id="sort"
+                  value={sortOrder}
+                  onChange={(e) => {
+                    setSortOrder(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="bookings-sort-select"
+                >
+                  <option value="asc">A-Z</option>
+                  <option value="desc">Z-A</option>
+                </select>
+              </div>
 
               <div className="bookings-grid">
-                {bookings.map((booking) => (
+                {currentBookings.map((booking) => (
                   <BookingCard
                     key={booking.id}
                     booking={booking}
-                    onView={() => openModal(booking)}
+                    onView={() => openModal("view", booking)}
                     onDelete={() => openModal("delete", booking)}
                     onEdit={() => console.log("Editar aún no implementado")}
                   />
                 ))}
               </div>
+
+              {totalPages > 1 && (
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                />
+              )}
             </section>
           </div>
         </main>
