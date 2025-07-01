@@ -8,6 +8,7 @@ router.post('/menus', bookingsController.getBookingMenus);
 router.post('/services', bookingsController.getBookingServices);
 router.get('/zones/:id', bookingsController.getBookingZones);
 router.get('/:id', bookingsController.getBookingById);
+router.post('/create', bookingsController.createBooking);
 router.delete('/:id', bookingsController.deleteBooking);
 router.post('/payment-summary', bookingsController.getPaymentSummary);
 

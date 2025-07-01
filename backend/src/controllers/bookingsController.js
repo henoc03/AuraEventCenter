@@ -297,6 +297,173 @@ exports.getBookingEquipments = async (req, res) => {
   }
 };
 
+exports.updateBookingStatuses = async () => {
+  let conn;
+  try {
+    conn = await getConnection();
+
+    // 1. Obtener todas las reservas relevantes con sus fechas y horas
+    const result = await conn.execute(`
+      SELECT BOOKING_ID, STATUS, EVENT_DATE, START_TIME, END_TIME
+      FROM CLIENT_SCHEMA.BOOKINGS
+      WHERE STATUS IN ('pendiente', 'en_progreso')
+    `);
+
+    const now = new Date();
+
+    for (const row of result.rows) {
+      const [bookng_id, status, eventDate, startTime, endTime] = row;
+
+      // Combinar EVENT_DATE con horas
+      const startDateTime = new Date(
+        eventDate.getFullYear(),
+        eventDate.getMonth(),
+        eventDate.getDate(),
+        startTime.getHours(),
+        startTime.getMinutes(),
+        startTime.getSeconds()
+      );
+
+      const endDateTime = new Date(
+        eventDate.getFullYear(),
+        eventDate.getMonth(),
+        eventDate.getDate(),
+        endTime.getHours(),
+        endTime.getMinutes(),
+        endTime.getSeconds()
+      );
+
+      let newStatus = null;
+
+      if (status === 'pendiente') {
+        if (now >= startDateTime) {
+          newStatus = 'en_progreso';
+        } else if (now > endDateTime) {
+          // Si ya pasó el evento y no se inició, cancelar
+          newStatus = 'cancelada';
+        }
+      } else if (status === 'en_progreso' && now >= endDateTime) {
+        newStatus = 'completada';
+      }
+
+      // Actualizar estado solo si cambió
+      if (newStatus && newStatus !== status) {
+        await conn.execute(
+          `UPDATE CLIENT_SCHEMA.BOOKINGS SET STATUS = :newStatus WHERE BOOKING_ID = :bookng_id`,
+          { newStatus, bookng_id },
+          { autoCommit: false }
+        );
+      }
+    }
+
+    await conn.commit();
+
+    console.log(`[CRON] Estados de reservas actualizados correctamente`);
+  } catch (err) {
+    console.error('[CRON] Error al actualizar estados de reservas:', err.message);
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
+exports.createBooking = async (req, res) => {
+  let conn;
+  try {
+    const { userId, bookingInfo, rooms, services, menus, equipments } = req.body;
+
+    conn = await getConnection();
+
+    const {
+      owner, bookingName, idCard, email, phone,
+      eventType, startTime, endTime, date, additionalNote
+    } = bookingInfo;
+
+const result = await conn.execute(
+  `BEGIN
+     INSERT INTO CLIENT_SCHEMA.BOOKINGS (
+       USER_ID, BOOKING_NAME, STATUS, ADDITIONAL_NOTE,
+       START_TIME, END_TIME, ID_CARD, EVENT_TYPE, EVENT_DATE
+     ) VALUES (
+       :userId, :bookingName, 'pendiente', :note,
+       TO_DATE(:startTime, 'HH24:MI'), TO_DATE(:endTime, 'HH24:MI'),
+       :idCard, :eventType, TO_DATE(:eventDate, 'YYYY-MM-DD')
+     )
+     RETURNING BOOKING_ID INTO :outBookingId;
+   END;`,
+  {
+    userId,
+    bookingName,
+    note: additionalNote,
+    startTime,
+    endTime,
+    idCard,
+    eventType,
+    eventDate: date,
+    outBookingId: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER }
+  },
+  { autoCommit: false }
+);
+
+const bookingId = result.outBinds.outBookingId;
+
+
+    for (const zoneId of rooms) {
+
+      await conn.execute(
+        `INSERT INTO CLIENT_SCHEMA.BOOKINGS_ZONES (BOOKING_ID, ZONE_ID)
+         VALUES (:bookingId, :zoneId)`,
+        { bookingId, zoneId },
+        { autoCommit: false }
+      );
+
+  
+      const zoneServices = services?.[zoneId] || [];
+      for (const serviceId of zoneServices) {
+        await conn.execute(
+          `INSERT INTO CLIENT_SCHEMA.BOOKINGS_ZONES_SERVICES (BOOKING_ID, ZONE_ID, ADDITIONAL_SERVICE_ID)
+           VALUES (:bookingId, :zoneId, :serviceId)`,
+          { bookingId, zoneId, serviceId },
+          { autoCommit: false }
+        );
+      }
+
+ 
+      const zoneMenus = menus?.[zoneId] || [];
+      for (const menuId of zoneMenus) {
+        await conn.execute(
+          `INSERT INTO CLIENT_SCHEMA.BOOKINGS_ZONES_MENUS (BOOKING_ID, ZONE_ID, MENU_ID)
+           VALUES (:bookingId, :zoneId, :menuId)`,
+          { bookingId, zoneId, menuId },
+          { autoCommit: false }
+        );
+      }
+
+
+      const zoneEquipments = equipments?.[zoneId] || [];
+      for (const equipmentId of zoneEquipments) {
+        await conn.execute(
+          `INSERT INTO CLIENT_SCHEMA.BOOKINGS_ZONES_EQUIPMENTS (BOOKING_ID, ZONE_ID, EQUIPMENT_ID)
+           VALUES (:bookingId, :zoneId, :equipmentId)`,
+          { bookingId, zoneId, equipmentId },
+          { autoCommit: false }
+        );
+      }
+    }
+
+    await conn.commit();
+
+    res.status(201).json({ message: "Reserva creada exitosamente", bookingId });
+
+  } catch (err) {
+    console.error("Error al crear reserva:", err);
+    if (conn) await conn.rollback();
+    res.status(500).json({ error: "Error al crear la reserva" });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
+
 exports.deleteBooking = async (req, res) => {
   let conn;
   try {
