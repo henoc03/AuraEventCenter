@@ -618,7 +618,8 @@ exports.deleteBooking = async (req, res) => {
 exports.getPaymentSummary = async (req, res) => {
   let conn;
   try {
-    const { rooms = [], menus = {}, services = {}, equipments = {} } = req.body;
+    // 1. Obtén las horas de la reserva (asegúrate de recibirlas en el payload)
+    const { rooms = [], menus = {}, services = {}, equipments = {}, startTime, endTime } = req.body;
     conn = await getConnection();
 
     // Helper para IN clause
@@ -683,7 +684,7 @@ exports.getPaymentSummary = async (req, res) => {
       if (equipmentIds.length > 0) {
         const { clause, binds } = makeInClause(equipmentIds, 'eq');
         const eqRes = await conn.execute(
-          `SELECT EQUIPMENT_ID, NAME, UNITARY_PRICE FROM ADMIN_SCHEMA.EQUIPMENTS WHERE EQUIPMENT_ID IN ${clause}`,
+          `SELECT ID AS EQUIPMENT_ID, NAME, UNITARY_PRICE FROM ADMIN_SCHEMA.EQUIPMENTS WHERE ID IN ${clause}`,
           binds,
           { outFormat: oracledb.OUT_FORMAT_OBJECT }
         );
@@ -691,13 +692,26 @@ exports.getPaymentSummary = async (req, res) => {
         subtotalEquipments = equipmentList.reduce((sum, e) => sum + (Number(e.UNITARY_PRICE) || 0), 0);
       }
 
-      const basePrice = Number(zone.PRICE) || 0;
-      const subtotal = basePrice + subtotalMenus + subtotalServices + subtotalEquipments;
+      // Calcula la cantidad de horas
+      function getHourDelta(start, end) {
+        // start y end en formato "HH:MM"
+        const [sh, sm] = start.split(":").map(Number);
+        const [eh, em] = end.split(":").map(Number);
+        let delta = (eh + em/60) - (sh + sm/60);
+        if (delta < 0) delta += 24; // por si cruza medianoche
+        return delta;
+      }
+      const hours = getHourDelta(startTime, endTime);
 
+      const basePrice = (Number(zone.PRICE) || 0) * hours;
+      const subtotal = basePrice + subtotalMenus + subtotalServices + subtotalEquipments;
+      console.log({ startTime, endTime, hours });
+      
       zonas.push({
         zoneId: zone.ZONE_ID,
         name: zone.NAME,
         basePrice,
+        hours,
         menus: menuList,
         services: serviceList,
         equipments: equipmentList,
