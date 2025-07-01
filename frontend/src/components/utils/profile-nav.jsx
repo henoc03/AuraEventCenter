@@ -3,7 +3,7 @@ import { faUser, faGear, faUnlock, faBell, faEye} from '@fortawesome/free-solid-
 
 const SectionProfile = [
   {
-    title: '',
+    title: 'GENERAL',
     links: [
       { id: 1, label: 'Perfil', icon: <FontAwesomeIcon icon={faUser} />, href: '/perfil' },
       { id: 2, label: 'Cuenta', icon: <FontAwesomeIcon icon={faGear} />, href: '/cuenta' },
