@@ -1,7 +1,7 @@
 import React, {useEffect, useState } from "react";
 import PropTypes from 'prop-types';
 import {jwtDecode} from 'jwt-decode';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import LoadingPage from "../components/common/LoadingPage.jsx";
 import Header from "../components/common/Header.jsx";
 import SideNav from "../components/common/SideNav.jsx"
@@ -54,6 +54,8 @@ function EditBookingClient({ sections }) {
   const [loading, setLoading] = useState(true)
   const [step, setStep] = useState(0);
   const [step1Data, setStep1Data] = useState({});
+  const { bookingId } = useParams();
+  console.log(bookingId);
   const navigate = useNavigate();
 
   // Obtener informacion de usuario para el header
@@ -92,14 +94,13 @@ function EditBookingClient({ sections }) {
     };
 
     getSetUserInfo();
-  }, [navigate]);
+  }, [navigate, bookingId]);
 
   // Obtener informacion de la reserva para el formulario
   useEffect(() => {
     const getBookingInfo = async () => {
       try {
-        //TODO: Cambiar por el ID de la reserva que se esta editando
-        const res = await fetch(`${DEFAULT_ROUTE}/bookings/1`, {
+        const res = await fetch(`${DEFAULT_ROUTE}/bookings/${bookingId}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
         });
@@ -119,7 +120,7 @@ function EditBookingClient({ sections }) {
     };
 
     getBookingInfo();
-  }, [navigate]);
+  }, [navigate, bookingId]);
 
   // Obtener todas las zonas disponiles para agendar
   useEffect(() => {
@@ -133,7 +134,7 @@ function EditBookingClient({ sections }) {
             date: step1Data.date, 
             startTime: step1Data.startTime, 
             endTime: step1Data.endTime,
-            bookingId: 1
+            bookingId: bookingId
           }),
         });
 
@@ -148,22 +149,19 @@ function EditBookingClient({ sections }) {
       } catch (error) {
         console.error("Error al obtener salas:", error);
         alert("Ocurrió un error al obtener las salas.");
-      } finally {
-        setLoading(false);
       }
     };
 
     if (step1Data.date && step1Data.startTime && step1Data.endTime) {
       getAllAvailableZones();
     }
-  }, [step1Data.date, step1Data.startTime, step1Data.endTime]);
+  }, [step1Data.date, step1Data.startTime, step1Data.endTime, bookingId]);
 
   // Obtener las zonas que se habian seleccionado para la reserva
   useEffect(() => {
     const getSelectedZones = async () => {
       try {
-        //TODO: Cambiar por el ID de la reserva que se esta editando
-        const res = await fetch(`${DEFAULT_ROUTE}/bookings/zones/1`, {
+        const res = await fetch(`${DEFAULT_ROUTE}/bookings/zones/${bookingId}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
         });
@@ -183,7 +181,7 @@ function EditBookingClient({ sections }) {
     };
 
     getSelectedZones();
-  }, [navigate]);
+  }, [navigate, bookingId]);
 
   // Obtener todos los servicios disponibles
   useEffect(() => {
@@ -215,8 +213,6 @@ function EditBookingClient({ sections }) {
   useEffect(() => {
     const getSelectedServices = async () => {
       try {
-        // TODO: Cambiar por el ID de la reserva que se esta editando
-        const bookingId = 1;
         const servicesByRoom = {};
 
         for (const roomId of selectedRooms) {
@@ -255,7 +251,7 @@ function EditBookingClient({ sections }) {
     if (selectedRooms.length > 0) {
       getSelectedServices();
     }
-  }, [selectedRooms]);
+  }, [selectedRooms, bookingId]);
 
   // Obtener todos los menus disponibles
   useEffect(() => {
@@ -287,8 +283,6 @@ function EditBookingClient({ sections }) {
   useEffect(() => {
     const getSelectedMenus = async () => {
       try {
-        // TODO: Cambiar por el ID del menu que se está editando
-        const bookingId = 1;
         const menusByRoom = {};
 
         for (const roomId of selectedRooms) {
@@ -325,15 +319,21 @@ function EditBookingClient({ sections }) {
     if (selectedRooms.length > 0) {
       getSelectedMenus();
     }
-  }, [selectedRooms]);
+  }, [selectedRooms, bookingId]);
 
   // Obtener todos los equipos disponibles
   useEffect(() => {
     const getAllEquipments= async () => {
       try {
-        const res = await fetch(`${DEFAULT_ROUTE}/equipments/`, {
-          method: "GET",
+        const res = await fetch(`${DEFAULT_ROUTE}/equipments/available`, {
+          method: "POST",
           headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            date: step1Data.date, 
+            startTime: step1Data.startTime, 
+            endTime: step1Data.endTime,
+            bookingId: bookingId
+          }),
         });
 
         if (!res.ok) {
@@ -347,18 +347,20 @@ function EditBookingClient({ sections }) {
       } catch (error) {
         console.error("Error al obtener los equipos:", error);
         alert("Ocurrió un error al obtener los equipos.");
+      } finally {
+        setLoading(false);
       }
     };
 
-    getAllEquipments();
-  }, []);
+    if (step1Data.date && step1Data.startTime && step1Data.endTime) {
+      getAllEquipments();
+    }
+  }, [bookingId, step1Data.date, step1Data.startTime, step1Data.endTime]);
 
   // Obtener los equipos que se habían seleccionado para la reserva
   useEffect(() => {
     const getSelectedEquipments = async () => {
       try {
-        // TODO: Cambiar por el ID del equipo que se está editando
-        const bookingId = 1;
         const equipmentsByRoom = {};
 
         for (const roomId of selectedRooms) {
@@ -395,7 +397,7 @@ function EditBookingClient({ sections }) {
     if (selectedRooms.length > 0) {
       getSelectedEquipments();
     }
-  }, [selectedRooms]);
+  }, [selectedRooms, bookingId]);
 
   // Manejar cambio al sigueinte paso
   const handleNextStep = (data) => {
@@ -649,7 +651,7 @@ function EditBookingClient({ sections }) {
                   />
 
                   <div className="elements-counter">
-                    <p>Selecciona las salas</p>
+                    <p>Selecciona las salas, las que no estén disponibles en la fecha y horario especifícados no aparecen.</p>
                     <p>Salas seleccionadas: {selectedRooms.length}</p>
                   </div>
 
