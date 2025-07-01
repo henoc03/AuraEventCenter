@@ -24,6 +24,7 @@ const upload = multer({ storage });
 router.post('/upload-primary-image', upload.single('image'), menusController.uploadMenuPrimaryImage);
 router.delete('/:id/delete-primary-image', menusController.deleteMenuPrimaryImage);
 router.get('/', menusController.getAllMenus);
+router.get('/active', menusController.getAllMenusAvailable );
 router.get('/:id', menusController.getMenuById);
 router.get('/:menuId/images', menusController.getAllMenuImages);
 router.post('/', menusController.createMenu);

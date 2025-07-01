@@ -22,6 +22,7 @@ const upload = multer({ storage });
 
 router.post("/upload-image", upload.single("image"), equipmentsController.uploadImage);
 router.get("/", equipmentsController.getAllEquipments);
+router.get("/active", equipmentsController.getAllEquipmentsActive );
 router.get('/:id', equipmentsController.getEquipmentById);
 router.post("/", equipmentsController.createEquipment);
 router.put("/:id", equipmentsController.updateEquipment);

@@ -35,9 +35,9 @@ export default function useCreateBooking() {
 
   useEffect(() => {
     Promise.all([
-      fetch(`${DEFAULT_ROUTE}/services/`).then(res => res.json()),
-      fetch(`${DEFAULT_ROUTE}/menus/`).then(res => res.json()),
-      fetch(`${DEFAULT_ROUTE}/equipments/`).then(res => res.json()),
+      fetch(`${DEFAULT_ROUTE}/services/active`).then(res => res.json()),
+      fetch(`${DEFAULT_ROUTE}/menus/active`).then(res => res.json()),
+      fetch(`${DEFAULT_ROUTE}/equipments/active`).then(res => res.json()),
     ])
     .then(([services, menus, equipments]) => {
       setAllServices(services);
