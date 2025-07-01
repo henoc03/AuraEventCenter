@@ -20,6 +20,7 @@ import ContactForm from './pages/ContactForm';
 import EquipmentsClient from './pages/EquipmentsClient';
 import AboutPage from './pages/About';
 import EditBookingClient from './pages/EditBookingClient';
+import CreateBookingClient from './pages/CreateBookinClient';
 import ChatBotWrapper from './components/utils/ChatBotWrapper';
 // Páginas protegidas
 import AdminDashboard from "./pages/AdminDashBoard";
@@ -83,7 +84,9 @@ function App() {
           <Route path="/contacto" element={<ContactForm />} />
           <Route path="/acerca" element={<AboutPage />} />
 
-
+          <Route element={<PrivateRoute allowedRoles={['cliente']} />}>
+          <Route path="/reservar" element={<CreateBookingClient sections={SectionProfile} />} />
+          </Route>
           
           {/* Rutas protegidas para administradores comunes */}
           <Route element={<PrivateRoute allowedRoles={['admin']} />}>

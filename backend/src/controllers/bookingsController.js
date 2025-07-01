@@ -273,3 +273,101 @@ exports.updateBookingStatuses = async () => {
     if (conn) await conn.close();
   }
 };
+
+exports.createBooking = async (req, res) => {
+  let conn;
+  try {
+    const { userId, bookingInfo, rooms, services, menus, equipments } = req.body;
+
+    conn = await getConnection();
+
+    const {
+      owner, bookingName, idCard, email, phone,
+      eventType, startTime, endTime, date, additionalNote
+    } = bookingInfo;
+
+const result = await conn.execute(
+  `BEGIN
+     INSERT INTO CLIENT_SCHEMA.BOOKINGS (
+       USER_ID, BOOKING_NAME, STATUS, ADDITIONAL_NOTE,
+       START_TIME, END_TIME, ID_CARD, EVENT_TYPE, EVENT_DATE
+     ) VALUES (
+       :userId, :bookingName, 'pendiente', :note,
+       TO_DATE(:startTime, 'HH24:MI'), TO_DATE(:endTime, 'HH24:MI'),
+       :idCard, :eventType, TO_DATE(:eventDate, 'YYYY-MM-DD')
+     )
+     RETURNING BOOKING_ID INTO :outBookingId;
+   END;`,
+  {
+    userId,
+    bookingName,
+    note: additionalNote,
+    startTime,
+    endTime,
+    idCard,
+    eventType,
+    eventDate: date,
+    outBookingId: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER }
+  },
+  { autoCommit: false }
+);
+
+const bookingId = result.outBinds.outBookingId;
+
+
+    for (const zoneId of rooms) {
+
+      await conn.execute(
+        `INSERT INTO CLIENT_SCHEMA.BOOKINGS_ZONES (BOOKING_ID, ZONE_ID)
+         VALUES (:bookingId, :zoneId)`,
+        { bookingId, zoneId },
+        { autoCommit: false }
+      );
+
+  
+      const zoneServices = services?.[zoneId] || [];
+      for (const serviceId of zoneServices) {
+        await conn.execute(
+          `INSERT INTO CLIENT_SCHEMA.BOOKINGS_ZONES_SERVICES (BOOKING_ID, ZONE_ID, ADDITIONAL_SERVICE_ID)
+           VALUES (:bookingId, :zoneId, :serviceId)`,
+          { bookingId, zoneId, serviceId },
+          { autoCommit: false }
+        );
+      }
+
+ 
+      const zoneMenus = menus?.[zoneId] || [];
+      for (const menuId of zoneMenus) {
+        await conn.execute(
+          `INSERT INTO CLIENT_SCHEMA.BOOKINGS_ZONES_MENUS (BOOKING_ID, ZONE_ID, MENU_ID)
+           VALUES (:bookingId, :zoneId, :menuId)`,
+          { bookingId, zoneId, menuId },
+          { autoCommit: false }
+        );
+      }
+
+
+      const zoneEquipments = equipments?.[zoneId] || [];
+      for (const equipmentId of zoneEquipments) {
+        await conn.execute(
+          `INSERT INTO CLIENT_SCHEMA.BOOKINGS_ZONES_EQUIPMENTS (BOOKING_ID, ZONE_ID, EQUIPMENT_ID)
+           VALUES (:bookingId, :zoneId, :equipmentId)`,
+          { bookingId, zoneId, equipmentId },
+          { autoCommit: false }
+        );
+      }
+    }
+
+    await conn.commit();
+
+    res.status(201).json({ message: "Reserva creada exitosamente", bookingId });
+
+  } catch (err) {
+    console.error("Error al crear reserva:", err);
+    if (conn) await conn.rollback();
+    res.status(500).json({ error: "Error al crear la reserva" });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
