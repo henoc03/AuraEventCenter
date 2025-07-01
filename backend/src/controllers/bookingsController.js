@@ -502,3 +502,122 @@ exports.deleteBooking = async (req, res) => {
     if (conn) await conn.close();
   }
 };
+
+/**
+ * Calcula el resumen de pago para una reserva en edición.
+ * Espera en req.body:
+ * {
+ *   rooms: [zoneId, ...],
+ *   menus: { [zoneId]: [menuId, ...], ... },
+ *   services: { [zoneId]: [serviceId, ...], ... },
+ *   equipments: { [zoneId]: [equipmentId, ...], ... }
+ * }
+ */
+exports.getPaymentSummary = async (req, res) => {
+  let conn;
+  try {
+    const { rooms = [], menus = {}, services = {}, equipments = {} } = req.body;
+    conn = await getConnection();
+
+    // Helper para IN clause
+    const makeInClause = (arr, prefix) => {
+      if (!arr || arr.length === 0) return { clause: '(NULL)', binds: {} };
+      const binds = {};
+      const clause = arr.map((id, i) => {
+        binds[`${prefix}${i}`] = id;
+        return `:${prefix}${i}`;
+      }).join(',');
+      return { clause: `(${clause})`, binds };
+    };
+
+    // 1. Traer info de zonas/salas
+    let zonas = [];
+    let total = 0;
+
+    for (const zoneId of rooms) {
+      // Sala base
+      const zoneRes = await conn.execute(
+        `SELECT ZONE_ID, NAME, PRICE FROM ADMIN_SCHEMA.ZONES WHERE ZONE_ID = :id`,
+        { id: zoneId },
+        { outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
+      const zone = zoneRes.rows[0];
+      if (!zone) continue;
+
+      // Menús
+      const menuIds = menus[zoneId] || [];
+      let menuList = [];
+      let subtotalMenus = 0;
+      if (menuIds.length > 0) {
+        const { clause, binds } = makeInClause(menuIds, 'menu');
+        const menusRes = await conn.execute(
+          `SELECT MENU_ID, NAME, PRICE FROM ADMIN_SCHEMA.CATERING_MENUS WHERE MENU_ID IN ${clause}`,
+          binds,
+          { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+        menuList = menusRes.rows;
+        subtotalMenus = menuList.reduce((sum, m) => sum + (Number(m.PRICE) || 0), 0);
+      }
+
+      // Servicios
+      const serviceIds = services[zoneId] || [];
+      let serviceList = [];
+      let subtotalServices = 0;
+      if (serviceIds.length > 0) {
+        const { clause, binds } = makeInClause(serviceIds, 'srv');
+        const servicesRes = await conn.execute(
+          `SELECT ADDITIONAL_SERVICE_ID, NAME, PRICE FROM ADMIN_SCHEMA.ADDITIONAL_SERVICES WHERE ADDITIONAL_SERVICE_ID IN ${clause}`,
+          binds,
+          { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+        serviceList = servicesRes.rows;
+        subtotalServices = serviceList.reduce((sum, s) => sum + (Number(s.PRICE) || 0), 0);
+      }
+
+      // Equipos
+      const equipmentIds = equipments[zoneId] || [];
+      let equipmentList = [];
+      let subtotalEquipments = 0;
+      if (equipmentIds.length > 0) {
+        const { clause, binds } = makeInClause(equipmentIds, 'eq');
+        const eqRes = await conn.execute(
+          `SELECT EQUIPMENT_ID, NAME, UNITARY_PRICE FROM ADMIN_SCHEMA.EQUIPMENTS WHERE EQUIPMENT_ID IN ${clause}`,
+          binds,
+          { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+        equipmentList = eqRes.rows;
+        subtotalEquipments = equipmentList.reduce((sum, e) => sum + (Number(e.UNITARY_PRICE) || 0), 0);
+      }
+
+      const basePrice = Number(zone.PRICE) || 0;
+      const subtotal = basePrice + subtotalMenus + subtotalServices + subtotalEquipments;
+
+      zonas.push({
+        zoneId: zone.ZONE_ID,
+        name: zone.NAME,
+        basePrice,
+        menus: menuList,
+        services: serviceList,
+        equipments: equipmentList,
+        subtotal,
+      });
+
+      total += subtotal;
+    }
+
+    const iva = Math.round(total * 0.13);
+    const totalConIva = total + iva;
+
+    res.json({
+      zonas,
+      total,
+      iva,
+      totalConIva,
+    });
+  } catch (err) {
+    console.error('Error al calcular el resumen de pago:', err);
+    res.status(500).json({ message: 'Error al calcular el resumen de pago.' });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
