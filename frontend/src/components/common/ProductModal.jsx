@@ -37,7 +37,7 @@ const ProductModal = ({ isOpen, mode, product, onClose, onDelete, onSubmit: onSu
     setActive(product.active ?? 1);
   }
   
-}, [mode, product, reset, , isAddMode, isEditMode, isViewMode]);
+}, [mode, product, reset, isAddMode, isEditMode, isViewMode]);
 
 
   const onSubmit = async (data) => {
