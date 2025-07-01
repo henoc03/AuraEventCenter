@@ -22,6 +22,7 @@ const DEFAULT_ROUTE = "http://localhost:1522";
 // Componente para la página de edición de reservas para el cliente
 function EditBookingClient({ sections }) {
   // Estados para información del header
+  const [userID, setUserID] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [lastname, setLastname] = useState("");
@@ -86,6 +87,7 @@ function EditBookingClient({ sections }) {
         const userData = await res.json();
 
         // Guarda los datos traidos
+        setUserID(userData.USER_ID)
         setName(userData.FIRST_NAME)
         setEmail(userData.EMAIL)
         setLastname(userData.LAST_NAME_1)
@@ -401,6 +403,29 @@ function EditBookingClient({ sections }) {
       getSelectedEquipments();
     }
   }, [selectedRooms, bookingId]);
+
+  const handleUpdate = async () => {
+    const res = await fetch(`${DEFAULT_ROUTE}/bookings/update`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId: userID,
+        bookingId: bookingId,
+        bookingInfo: step1Data,
+        rooms: selectedRooms,
+        services: newServices,
+        menus: newMenus,
+        equipments: newEquipments
+      })
+    });
+
+    if (res.ok) {
+      alert("Reserva actualizada con éxito");
+      navigate("/inicio");
+    } else {
+      alert("Error al actualizar la reserva");
+    }
+  };
 
   // Manejar cambio al sigueinte paso
   const handleNextStep = (data) => {
@@ -970,6 +995,8 @@ function EditBookingClient({ sections }) {
                     >
                       {currentRoomIndex < selectedRooms.length - 1 ? 'Siguiente sala' : 'Siguiente'}
                     </button>
+
+                    <button onClick={() => handleUpdate()}>actualizar</button>
                   </div>
                 </div>
               )}
