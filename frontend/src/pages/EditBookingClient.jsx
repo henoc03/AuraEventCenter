@@ -61,6 +61,7 @@ function EditBookingClient({ sections }) {
   const { bookingId } = useParams();
   const [paymentSummary, setPaymentSummary] = useState(null);
   const [paymentLoading, setPaymentLoading] = useState(false);
+  const [previousPayment, setPreviousPayment] = useState(0);
   const navigate = useNavigate();
 
   // Obtener informacion de usuario para el header
@@ -72,31 +73,23 @@ function EditBookingClient({ sections }) {
       }
 
       const sessionUserData = jwtDecode(token);
+      const res = await fetch(`${DEFAULT_ROUTE}/users/${sessionUserData.id}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
 
-      try {
-        const res = await fetch(`${DEFAULT_ROUTE}/users/${sessionUserData.id}`, {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-        });
-
-        if (!res.ok) {
-          const errorData = await res.json();
-          alert(errorData.message || 'Error traer la información de usuario');
-          return;
-        }
-
-        const userData = await res.json();
-
-        // Guarda los datos traidos
-        setUserID(userData.USER_ID)
-        setName(userData.FIRST_NAME)
-        setEmail(userData.EMAIL)
-        setLastname(userData.LAST_NAME_1)
-        setRole(userData.USER_TYPE)
-      } catch {
-        alert('Ocurrió un error al obtener la información de usuario.');
-        navigate('/login');
+      if (!res.ok) {
+        const errorData = await res.json();
+        alert(errorData.message || 'Error traer la información de usuario');
+        return;
       }
+
+      const userData = await res.json();
+      setUserID(userData.USER_ID)
+      setName(userData.FIRST_NAME)
+      setEmail(userData.EMAIL)
+      setLastname(userData.LAST_NAME_1)
+      setRole(userData.USER_TYPE)
     };
 
     getSetUserInfo();
@@ -305,15 +298,8 @@ function EditBookingClient({ sections }) {
           }
 
           const menusData = await res.json();
-
-          let ids = [];
-          if (menusData.length > 0 && typeof menusData[0] === 'object') {
-            const key = Object.keys(menusData[0]).find(k => k.toLowerCase().includes('id'));
-            ids = menusData.map(m => m[key]);
-          } else {
-            ids = menusData;
-          }
-          menusByRoom[roomId] = ids;
+          // menusData ya es [{ ID_MENU, CANTIDAD }]
+          menusByRoom[roomId] = menusData;
         }
         setSelectedMenus(menusByRoom);
       } catch (error) {
@@ -415,7 +401,7 @@ function EditBookingClient({ sections }) {
         bookingInfo: step1Data,
         rooms: selectedRooms,
         services: newServices,
-        menus: newMenus,
+        menus: selectedMenus,
         equipments: newEquipments
       })
     });
@@ -616,13 +602,14 @@ function EditBookingClient({ sections }) {
     const fetchPaymentSummary = async () => {
       setPaymentLoading(true);
       try {
-        // Construir el payload con la selección actual
         const payload = {
           rooms: selectedRooms,
-          menus: Object.fromEntries(selectedRooms.map(id => [id, selectedMenus[id] || []])),
+          menus: Object.fromEntries(
+            selectedRooms.map(id => [id, selectedMenus[id] || []])
+          ),
           services: Object.fromEntries(selectedRooms.map(id => [id, selectedServices[id] || []])),
           equipments: Object.fromEntries(selectedRooms.map(id => [id, selectedEquipments[id] || []])),
-          startTime: step1Data.startTime, // asegúrate que esté en formato "HH:MM"
+          startTime: step1Data.startTime,
           endTime: step1Data.endTime
         };
         console.log("Hora inicio;", payload.startTime);
@@ -658,6 +645,22 @@ function EditBookingClient({ sections }) {
     // eslint-disable-next-line
   }, [step, selectedRooms, selectedMenus, selectedServices, selectedEquipments]);
 
+  // Obtener pago anterior
+  useEffect(() => {
+    const fetchPreviousPayment = async () => {
+      try {
+        const res = await fetch(`${DEFAULT_ROUTE}/bookings/by-booking/${bookingId}`);
+        if (res.ok) {
+          const invoice = await res.json();
+          setPreviousPayment(invoice?.CURRENT_PAYMENT || 0);
+        }
+      } catch (err) {
+        setPreviousPayment(0);
+      }
+    };
+    if (bookingId) fetchPreviousPayment();
+  }, [bookingId]);
+
   if (loading) return <LoadingPage />;
 
   // Nombres de los pasos
@@ -672,6 +675,8 @@ function EditBookingClient({ sections }) {
   const selectedEquipmentsForRoom = selectedEquipments[selectedRooms[currentRoomIndex]] || [];
   const selectedMenusForRoom = selectedMenus[selectedRooms[currentRoomIndex]] || []
   const selectedServicesForRoom = selectedServices[selectedRooms[currentRoomIndex]] || []
+
+  const amountToPay = Math.max((paymentSummary?.totalConIva || 0) - (previousPayment || 0), 0);
 
   return (
     <>
@@ -864,26 +869,48 @@ function EditBookingClient({ sections }) {
                         {/* menus compactos */}
                         <div className="edit-booking-grid">
                           {modalCurrentElements.map((menu) => {
-                            const isSelected = selectedMenusForRoom.includes(menu.MENU_ID);
-                            const isNew = (newMenus[selectedRooms[currentRoomIndex]] || []).includes(menu.MENU_ID);
-                            let cardStyle = {};
-                            if (isNew && !isSelected) {
-                              cardStyle = { opacity: "100%" };
-                            } else if (isSelected) {
-                              cardStyle = { opacity: "50%" };
-                            }
+                            // Busca la cantidad actual en la reserva
+                            const menuEntry = selectedMenusForRoom.find(m => m.ID_MENU === menu.MENU_ID);
+                            const quantity = menuEntry ? menuEntry.CANTIDAD : 0;
+
                             return (
                               <div
                                 key={menu.MENU_ID}
-                                className={`edit-booking-card${isSelected ? " edit-booking-selected-card" : "" }`}
-                                onClick={() => handleMenuClicked(menu)}
-                                style={cardStyle}
+                                className={`edit-booking-card`}
                               >
                                 <CompactMenu
                                   menu={menu}
                                   isBooking={true}
-                                  isSelected={isSelected}
-                                  isNew={isNew}
+                                  isSelected={!!menuEntry}
+                                  quantity={quantity}
+                                  onIncrease={() => {
+                                    // Solo permite aumentar la cantidad
+                                    setSelectedMenus(prev => {
+                                      const current = prev[selectedRooms[currentRoomIndex]] || [];
+                                      // Si ya existe, aumenta la cantidad
+                                      if (menuEntry) {
+                                        return {
+                                          ...prev,
+                                          [selectedRooms[currentRoomIndex]]: current.map(m =>
+                                            m.ID_MENU === menu.MENU_ID
+                                              ? { ...m, CANTIDAD: m.CANTIDAD + 1 }
+                                              : m
+                                          ),
+                                        };
+                                      } else {
+                                        // Si no existe, lo agrega con cantidad 1
+                                        return {
+                                          ...prev,
+                                          [selectedRooms[currentRoomIndex]]: [
+                                            ...current,
+                                            { ID_MENU: menu.MENU_ID, CANTIDAD: 1 },
+                                          ],
+                                        };
+                                      }
+                                    });
+                                  }}
+                                  // No pases onDecrease ni onRemove
+                                  disableDecrease
                                 />
                               </div>
                             );
@@ -1010,13 +1037,69 @@ function EditBookingClient({ sections }) {
                   <CheckoutPayment
                     paymentSummary={paymentSummary}
                     paymentLoading={paymentLoading}
-                    onPaymentSuccess={(details) => {
-                      // Aquí puedes manejar lógica extra después del pago
+                    amountToPay={amountToPay}
+                    userEmail={email}
+                    userName={`${name} ${lastname}`}
+                    userID={userID}
+                    bookingId={bookingId}
+                    step1Data={step1Data}
+                    selectedRooms={selectedRooms}
+                    newServices={newServices}
+                    newMenus={newMenus}
+                    newEquipments={newEquipments}
+                    onPaymentSuccess={async (details) => {
+                      // 1. Actualiza la reserva con los nuevos elementos
+                      const updateRes = await fetch(`${DEFAULT_ROUTE}/bookings/update`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          userId: userID,
+                          bookingId: bookingId,
+                          bookingInfo: step1Data,
+                          rooms: selectedRooms,
+                          services: newServices,
+                          menus: selectedMenus,
+                          equipments: newEquipments
+                        }),
+                      });
+
+                      if (!updateRes.ok) {
+                        alert("Error al actualizar la reserva");
+                        return;
+                      }
+
+                      // 2. Actualiza el pago en la factura
+                      await fetch(`${DEFAULT_ROUTE}/bookings/update-payment`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          bookingId,
+                          newPayment: paymentSummary.totalConIva // el nuevo total pagado
+                        }),
+                      });
+
+                      alert("Pago y actualización exitosos");
+                      navigate("/inicio");
                     }}
                     onPaymentError={(err) => {
-                      // Aquí puedes manejar errores de pago
+                      alert("Error en el pago");
                     }}
                   />
+
+                  <div className="checkout-summary">
+                    <div className="summary-line">
+                      <span>Pagado previamente:</span>
+                      <span>₡{previousPayment.toLocaleString()}</span>
+                    </div>
+                    <div className="summary-line">
+                      <span>Total actual:</span>
+                      <span>₡{paymentSummary?.totalConIva?.toLocaleString()}</span>
+                    </div>
+                    <div className="summary-total">
+                      <span>Total a pagar ahora:</span>
+                      <span>₡{amountToPay.toLocaleString()}</span>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>

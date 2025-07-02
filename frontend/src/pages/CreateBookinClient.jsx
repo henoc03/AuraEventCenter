@@ -49,12 +49,13 @@ function CreateBookingClient({ sections }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId:userId,
+          userId: user.USER_ID,
           bookingInfo: step1Data,
           rooms: selectedRooms,
           services: selectedServices,
           menus: selectedMenus,
-          equipments: selectedEquipments
+          equipments: selectedEquipments,
+          currentPayment: paymentSummary.totalConIva // <--- aquí
         })
       });
 
@@ -181,29 +182,39 @@ function CreateBookingClient({ sections }) {
               />
             )}
 
-            {step === 3 && (
-            <ConfirmBooking
-              userId={user.USER_ID}
-              step1Data={step1Data}
-              selectedRooms={selectedRooms}
-              selectedServices={selectedServices}
-              selectedMenus={selectedMenus}
-              selectedEquipments={selectedEquipments}
-              onBack={() => setStep(2)}
-            />
-    /*     <div className="checkout-container">
-            <CheckoutPayment
-              paymentSummary={paymentSummary}
-              paymentLoading={paymentLoading}
-              onPaymentSuccess={(details) => {
-              handleSubmit();
-                // Aquí puedes manejar lógica extra después del pago
-              }}
-              onPaymentError={(err) => {
-                // Aquí puedes manejar errores de pago
-              }}
-            />
-          </div> */
+          {step === 3 && (
+            <>
+              <ConfirmBooking
+                userId={user.USER_ID}
+                step1Data={step1Data}
+                selectedRooms={selectedRooms}
+                selectedServices={selectedServices}
+                selectedMenus={selectedMenus}
+                selectedEquipments={selectedEquipments}
+                onBack={() => setStep(2)}
+              />
+              <div className="checkout-container">
+                <CheckoutPayment
+                  paymentSummary={paymentSummary}
+                  paymentLoading={paymentLoading}
+                  userEmail={user.EMAIL}
+                  userName={`${user.FIRST_NAME} ${user.LAST_NAME_1}`}
+                  userID={user.USER_ID}
+                  step1Data={step1Data}
+                  selectedRooms={selectedRooms}
+                  newServices={selectedServices}
+                  newMenus={selectedMenus}
+                  newEquipments={selectedEquipments}
+                  onPaymentSuccess={() => {
+                    // Puedes navegar o mostrar un mensaje aquí si quieres
+                    navigate("/inicio");
+                  }}
+                  onPaymentError={() => {
+                    // Aquí puedes manejar errores de pago
+                  }}
+                />
+              </div>
+            </>
           )}
 
             </div>

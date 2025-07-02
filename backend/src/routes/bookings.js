@@ -12,5 +12,7 @@ router.post('/create', bookingsController.createBooking);
 router.post('/update', bookingsController.updateBooking);
 router.delete('/:id', bookingsController.deleteBooking);
 router.post('/payment-summary', bookingsController.getPaymentSummary);
+router.post('/update-payment', bookingsController.updateInvoicePayment);
+router.get('/by-booking/:bookingId', bookingsController.getInvoiceByBooking);
 
 module.exports = router;

@@ -74,6 +74,9 @@
 
 .paypal-buttons {
   margin-top: 1.5rem;
+  min-width: none;
+  justify-content: center;
+  align-items: center;
 }
 
 .checkout-sidebar {

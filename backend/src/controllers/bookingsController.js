@@ -247,16 +247,16 @@ exports.getBookingMenus = async (req, res) => {
     conn = await getConnection();
 
     const menus_result = await conn.execute(
-      `SELECT MENU_ID FROM CLIENT_SCHEMA.BOOKINGS_ZONES_MENUS WHERE BOOKING_ID = :bookingId AND ZONE_ID = :roomId`,
+      `SELECT MENU_ID, QUANTITY FROM CLIENT_SCHEMA.BOOKINGS_ZONES_MENUS WHERE BOOKING_ID = :bookingId AND ZONE_ID = :roomId`,
       [bookingId, roomId],
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
 
-    const menus = menus_result.rows.map(menu => {
-      return {
-        ID: menu.MENU_ID,
-      };
-    });
+    // Devuelve [{ ID_MENU, CANTIDAD }]
+    const menus = menus_result.rows.map(menu => ({
+      ID_MENU: menu.MENU_ID,
+      CANTIDAD: menu.QUANTITY
+    }));
 
     res.json(menus || []);
   } catch (err) {
@@ -461,9 +461,23 @@ const bookingId = result.outBinds.outBookingId;
       }
     }
 
+    // Después de crear la reserva y obtener bookingId:
+    const currentPayment = req.body.currentPayment || 0; // O calcula el total en backend si prefieres
+
+    await conn.execute(
+      `INSERT INTO CLIENT_SCHEMA.INVOICES (USER_ID, BOOKING_ID, CURRENT_PAYMENT, INVOICE_DATE, INVOICE_STATUS)
+       VALUES (:userId, :bookingId, :currentPayment, SYSDATE, 'pago')`,
+      {
+        userId,
+        bookingId,
+        currentPayment
+      },
+      { autoCommit: false }
+    );
+
     await conn.commit();
 
-    res.status(201).json({ message: "Reserva creada exitosamente", bookingId });
+    res.status(201).json({ message: "Reserva y factura creadas exitosamente", bookingId });
 
   } catch (err) {
     console.error("Error al crear reserva:", err);
@@ -519,15 +533,14 @@ exports.updateBooking = async (req, res) => {
     );
 
     for (const zoneId of rooms) {
+      // Verifica si ya existe la sala para la reserva
       const exists = await conn.execute(
         `SELECT 1 FROM CLIENT_SCHEMA.BOOKINGS_ZONES WHERE BOOKING_ID = :bookingId AND ZONE_ID = :zoneId`,
         { bookingId, zoneId }
       );
-
       if (exists.rows.length === 0) {
         await conn.execute(
-          `INSERT INTO CLIENT_SCHEMA.BOOKINGS_ZONES (BOOKING_ID, ZONE_ID)
-          VALUES (:bookingId, :zoneId)`,
+          `INSERT INTO CLIENT_SCHEMA.BOOKINGS_ZONES (BOOKING_ID, ZONE_ID) VALUES (:bookingId, :zoneId)`,
           { bookingId, zoneId },
           { autoCommit: false }
         );
@@ -535,33 +548,92 @@ exports.updateBooking = async (req, res) => {
 
       const zoneServices = services?.[zoneId] || [];
       for (const serviceId of zoneServices) {
-        await conn.execute(
-          `INSERT INTO CLIENT_SCHEMA.BOOKINGS_ZONES_SERVICES (BOOKING_ID, ZONE_ID, ADDITIONAL_SERVICE_ID)
-           VALUES (:bookingId, :zoneId, :serviceId)`,
-          { bookingId, zoneId, serviceId },
-          { autoCommit: false }
+        const exists = await conn.execute(
+          `SELECT 1 FROM CLIENT_SCHEMA.BOOKINGS_ZONES_SERVICES WHERE BOOKING_ID = :bookingId AND ZONE_ID = :zoneId AND ADDITIONAL_SERVICE_ID = :serviceId`,
+          { bookingId, zoneId, serviceId }
         );
+        if (exists.rows.length === 0) {
+          await conn.execute(
+            `INSERT INTO CLIENT_SCHEMA.BOOKINGS_ZONES_SERVICES (BOOKING_ID, ZONE_ID, ADDITIONAL_SERVICE_ID)
+            VALUES (:bookingId, :zoneId, :serviceId)`,
+            { bookingId, zoneId, serviceId },
+            { autoCommit: false }
+          );
+        }
       }
 
-      const zoneMenus = menus?.[zoneId] || [];
-      for (const menuId of zoneMenus) {
-        await conn.execute(
-          `INSERT INTO CLIENT_SCHEMA.BOOKINGS_ZONES_MENUS (BOOKING_ID, ZONE_ID, MENU_ID)
-           VALUES (:bookingId, :zoneId, :menuId)`,
-          { bookingId, zoneId, menuId },
-          { autoCommit: false }
-        );
-      }
+      // 1. Obtener los menús actuales en la BD para esta zona y reserva
+  const dbMenusRes = await conn.execute(
+    `SELECT MENU_ID FROM CLIENT_SCHEMA.BOOKINGS_ZONES_MENUS WHERE BOOKING_ID = :bookingId AND ZONE_ID = :zoneId`,
+    { bookingId, zoneId }
+  );
+  const dbMenuIds = dbMenusRes.rows.map(row => row[0]);
+
+  // 2. Unifica menús por ID_MENU y suma cantidades si hay repetidos en el payload
+  const zoneMenus = menus?.[zoneId] || [];
+  const menuMap = new Map();
+  for (const menu of zoneMenus) {
+    const key = menu.ID_MENU;
+    if (menuMap.has(key)) {
+      menuMap.get(key).CANTIDAD += menu.CANTIDAD || 1;
+    } else {
+      menuMap.set(key, { ...menu, CANTIDAD: menu.CANTIDAD || 1 });
+    }
+  }
+  const uniqueZoneMenus = Array.from(menuMap.values());
+  const payloadMenuIds = uniqueZoneMenus.map(m => m.ID_MENU);
+
+  // 3. Eliminar menús que ya no están en el payload
+  for (const dbMenuId of dbMenuIds) {
+    if (!payloadMenuIds.includes(dbMenuId)) {
+      await conn.execute(
+        `DELETE FROM CLIENT_SCHEMA.BOOKINGS_ZONES_MENUS
+         WHERE BOOKING_ID = :bookingId AND ZONE_ID = :zoneId AND MENU_ID = :menuId`,
+        { bookingId, zoneId, menuId: dbMenuId },
+        { autoCommit: false }
+      );
+    }
+  }
+
+  // 4. Insertar o actualizar los menús del payload
+  for (const menu of uniqueZoneMenus) {
+    const exists = await conn.execute(
+      `SELECT QUANTITY FROM CLIENT_SCHEMA.BOOKINGS_ZONES_MENUS
+       WHERE BOOKING_ID = :bookingId AND ZONE_ID = :zoneId AND MENU_ID = :menuId`,
+      { bookingId, zoneId, menuId: menu.ID_MENU }
+    );
+    if (exists.rows.length === 0) {
+      await conn.execute(
+        `INSERT INTO CLIENT_SCHEMA.BOOKINGS_ZONES_MENUS (BOOKING_ID, ZONE_ID, MENU_ID, QUANTITY)
+         VALUES (:bookingId, :zoneId, :menuId, :quantity)`,
+        { bookingId, zoneId, menuId: menu.ID_MENU, quantity: menu.CANTIDAD },
+        { autoCommit: false }
+      );
+    } else {
+      await conn.execute(
+        `UPDATE CLIENT_SCHEMA.BOOKINGS_ZONES_MENUS
+         SET QUANTITY = :quantity
+         WHERE BOOKING_ID = :bookingId AND ZONE_ID = :zoneId AND MENU_ID = :menuId`,
+        { quantity: menu.CANTIDAD, bookingId, zoneId, menuId: menu.ID_MENU },
+        { autoCommit: false }
+      );
+    }
+  }
 
       const zoneEquipments = equipments?.[zoneId] || [];
       console.log(zoneEquipments)
       for (const equipmentId of zoneEquipments) {
-        await conn.execute(
-          `INSERT INTO CLIENT_SCHEMA.BOOKINGS_ZONES_EQUIPMENTS (BOOKING_ID, ZONE_ID, EQUIPMENT_ID)
-           VALUES (:bookingId, :zoneId, :equipmentId)`,
-          { bookingId:bookingId, zoneId:zoneId, equipmentId:equipmentId },
-          { autoCommit: false }
+        const exists = await conn.execute(
+          `SELECT 1 FROM CLIENT_SCHEMA.BOOKINGS_ZONES_EQUIPMENTS WHERE BOOKING_ID = :bookingId AND ZONE_ID = :zoneId AND EQUIPMENT_ID = :equipmentId`,
+          { bookingId, zoneId, equipmentId }
         );
+        if (exists.rows.length === 0) {
+          await conn.execute(
+            `INSERT INTO CLIENT_SCHEMA.BOOKINGS_ZONES_EQUIPMENTS (BOOKING_ID, ZONE_ID, EQUIPMENT_ID) VALUES (:bookingId, :zoneId, :equipmentId)`,
+            { bookingId, zoneId, equipmentId },
+            { autoCommit: false }
+          );
+        }
       }
     }
 
@@ -659,17 +731,26 @@ exports.getPaymentSummary = async (req, res) => {
       if (!zone) continue;
 
       // Menús
-      const menuIds = menus[zoneId] || [];
+      const menuObjs = menus[zoneId] || [];
+      const menuIds = menuObjs.map(m => m.ID_MENU);
+      const { clause, binds } = makeInClause(menuIds, 'menu');
       let menuList = [];
       let subtotalMenus = 0;
       if (menuIds.length > 0) {
-        const { clause, binds } = makeInClause(menuIds, 'menu');
         const menusRes = await conn.execute(
           `SELECT MENU_ID, NAME, PRICE FROM ADMIN_SCHEMA.CATERING_MENUS WHERE MENU_ID IN ${clause}`,
           binds,
           { outFormat: oracledb.OUT_FORMAT_OBJECT }
         );
-        menuList = menusRes.rows;
+        // Multiplica el precio por la cantidad seleccionada
+        menuList = menuObjs.map(selMenu => {
+          const menuInfo = menusRes.rows.find(m => m.MENU_ID === selMenu.ID_MENU);
+          return {
+            ...menuInfo,
+            CANTIDAD: selMenu.CANTIDAD,
+            PRICE: (Number(menuInfo.PRICE) || 0) * (selMenu.CANTIDAD || 1)
+          };
+        });
         subtotalMenus = menuList.reduce((sum, m) => sum + (Number(m.PRICE) || 0), 0);
       }
 
@@ -744,6 +825,56 @@ exports.getPaymentSummary = async (req, res) => {
   } catch (err) {
     console.error('Error al calcular el resumen de pago:', err);
     res.status(500).json({ message: 'Error al calcular el resumen de pago.' });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
+exports.updateInvoicePayment = async (req, res) => {
+  let conn;
+  try {
+    const { bookingId, newPayment } = req.body;
+    conn = await getConnection();
+    await conn.execute(
+      `UPDATE CLIENT_SCHEMA.INVOICES
+       SET CURRENT_PAYMENT = :newPayment
+       WHERE BOOKING_ID = :bookingId`,
+      { newPayment, bookingId },
+      { autoCommit: true }
+    );
+    res.json({ message: "Pago actualizado correctamente" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
+exports.getInvoiceByBooking = async (req, res) => {
+  let conn;
+  try {
+    const { bookingId } = req.params;
+    conn = await getConnection();
+    const result = await conn.execute(
+      `SELECT INVOICE_ID, USER_ID, BOOKING_ID, INVOICE_DATE, INVOICE_STATUS, CURRENT_PAYMENT
+       FROM CLIENT_SCHEMA.INVOICES WHERE BOOKING_ID = :bookingId`,
+      { bookingId }
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "No se encontró la factura" });
+    }
+    // Usa outFormat para obtener objetos, o mapea manualmente
+    const row = result.rows[0];
+    res.json({
+      INVOICE_ID: row[0],
+      USER_ID: row[1],
+      BOOKING_ID: row[2],
+      INVOICE_DATE: row[3],
+      INVOICE_STATUS: row[4],
+      CURRENT_PAYMENT: row[5]
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   } finally {
     if (conn) await conn.close();
   }
