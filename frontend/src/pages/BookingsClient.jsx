@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../components/common/Header";
 import SideNav from "../components/common/SideNav";
 import AlertMessage from "../components/common/AlertMessage";
@@ -28,6 +29,12 @@ const BookingsClient = ({ sections }) => {
   const bookingsPerPage = 4;
 
   const uniqueTypes = Array.from(new Set(bookings.map(b => b.status).filter(Boolean)));
+
+  const navigate = useNavigate();
+
+  const goToCreateBooking = () => {
+    navigate("/reservar");
+  };
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -202,7 +209,7 @@ const BookingsClient = ({ sections }) => {
                         booking={booking}
                         onView={() => openModal("view", booking)}
                         onDelete={() => openModal("delete", booking)}
-                        onEdit={() => console.log("Hay que implementar")}
+                        onEdit={(booking) => navigate(`/reserva/editar/${booking.id}`)}
                       />
                     ))
                   )}
@@ -216,7 +223,7 @@ const BookingsClient = ({ sections }) => {
                       <br />
                       <strong>Rápido · Seguro · 100% en línea</strong>
                     </p>
-                    <button className="btn-add-booking">Reservar ahora</button>
+                    <button className="btn-add-booking" onClick={goToCreateBooking}>Reservar ahora</button>
                   </div>
                 </aside>
               </div>

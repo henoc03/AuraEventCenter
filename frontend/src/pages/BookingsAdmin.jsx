@@ -33,6 +33,10 @@ const Bookings = ({ sections }) => {
   const bookingsPerPage = 8;
 
   const uniqueTypes = Array.from(new Set(bookings.map(b => b.status).filter(Boolean)));
+  
+  const goToCreateBooking = () => {
+    navigate("/root-admin/reservas/crear");
+  };
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -139,7 +143,7 @@ const Bookings = ({ sections }) => {
             <section className="bookings-section">
               <div className="bookings-section-header">
                 <h2 className="bookings-section-title">Reservas</h2>
-                <button className="btn-add-booking" onClick={() => navigate(`${location.pathname.replace(/\/$/, "")}/crear`)}>
+                <button className="btn-add-booking" onClick={goToCreateBooking}>
                   Agregar
                 </button>
               </div>
@@ -196,7 +200,7 @@ const Bookings = ({ sections }) => {
                     booking={booking}
                     onView={() => openModal("view", booking)}
                     onDelete={() => openModal("delete", booking)}
-                    onEdit={() => console.log("Hay que implementar")}
+                    onEdit={(booking) => navigate(`/root-admin/reservas/editar/${booking.id}`)}
                   />
                 ))}
               </div>
