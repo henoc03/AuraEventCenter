@@ -290,7 +290,7 @@
 .booking-card-date-time {
   color: #555;
   font-size: 0.95rem;
-  margin-bottom: 16px;
+  margin-bottom: 0px;
 }
 
 .booking-card-price {
@@ -322,4 +322,26 @@
 
 .bookings-two-column .promo-text-block {
   width: 100%;
+}
+
+.booking-card-status {
+  color: #555;
+  font-size: 0.95rem;
+  margin-bottom: 16px;
+}
+
+.status-pending-font {
+  color: #facc15; 
+}
+
+.status-cancelled-font {
+  color: #ef4444; 
+}
+
+.status-in-progress-font {
+  color: #3b82f6; 
+}
+
+.status-completed-font {
+  color: #22c55e; 
 }

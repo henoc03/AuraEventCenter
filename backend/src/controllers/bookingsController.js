@@ -75,14 +75,14 @@ exports.getAllBookings = async (req, res) => {
 
       bookings.push({
         id: b.BOOKING_ID,
-        booking_name: b.BOOKING_NAME,
+        bookingName: b.BOOKING_NAME,
         status: b.STATUS,
-        additional_note: b.ADDITIONAL_NOTE,
-        start_time: b.START_TIME,
-        end_time: b.END_TIME,
-        id_card: b.ID_CARD,
-        event_type: b.EVENT_TYPE,
-        event_date: b.EVENT_DATE,
+        additionalNote: b.ADDITIONAL_NOTE,
+        startTime: b.START_TIME,
+        endTime: b.END_TIME,
+        idCard: b.ID_CARD,
+        eventType: b.EVENT_TYPE,
+        eventDate: b.EVENT_DATE,
         owner: `${b.FIRST_NAME} ${b.LAST_NAME_1} ${b.LAST_NAME_2}`,
         email: b.EMAIL,
         phone: b.PHONE,
@@ -135,10 +135,14 @@ exports.getMyBookings = async (req, res) => {
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
 
+    // 👇 Aquí van los console.log:
+    console.log("Reservas encontradas:", result.rows.length);
+    console.log("Reservas con estado:", result.rows.map(r => r.STATUS));
+
     const bookings = [];
 
     for (const b of result.rows) {
-      const [zonesRes, servicesRes, equipmentsRes] = await Promise.all([
+      const [zonesRes, servicesRes, menusRes, equipmentsRes] = await Promise.all([
         conn.execute(`
           SELECT Z.NAME AS ZONE_NAME
           FROM CLIENT_SCHEMA.BOOKINGS_ZONES BZ
@@ -154,6 +158,13 @@ exports.getMyBookings = async (req, res) => {
           [b.BOOKING_ID], { outFormat: oracledb.OUT_FORMAT_OBJECT }),
 
         conn.execute(`
+          SELECT DISTINCT M.NAME AS MENU_NAME
+          FROM CLIENT_SCHEMA.BOOKINGS_ZONES_MENUS BZM
+          JOIN ADMIN_SCHEMA.CATERING_MENUS M ON BZM.MENU_ID = M.MENU_ID
+          WHERE BZM.BOOKING_ID = :id`,
+          [b.BOOKING_ID], { outFormat: oracledb.OUT_FORMAT_OBJECT }),
+
+        conn.execute(`
           SELECT DISTINCT E.NAME AS EQUIPMENT_NAME
           FROM CLIENT_SCHEMA.BOOKINGS_ZONES_EQUIPMENTS BZE
           JOIN ADMIN_SCHEMA.EQUIPMENTS E ON BZE.EQUIPMENT_ID = E.ID
@@ -166,9 +177,9 @@ exports.getMyBookings = async (req, res) => {
         bookingName: b.BOOKING_NAME,
         status: b.STATUS,
         additionalNote: b.ADDITIONAL_NOTE,
-        date: b.EVENT_DATE ? b.EVENT_DATE.toISOString().split('T')[0] : null,
-        startTime: b.START_TIME ? b.START_TIME.toISOString().split('T')[1].slice(0, 8) : null,
-        endTime: b.END_TIME ? b.END_TIME.toISOString().split('T')[1].slice(0, 8) : null,
+        eventDate: b.EVENT_DATE,
+        startTime: b.START_TIME,
+        endTime: b.END_TIME,
         eventType: b.EVENT_TYPE,
         idCard: b.ID_CARD,
         owner: `${b.FIRST_NAME} ${b.LAST_NAME_1} ${b.LAST_NAME_2}`,
@@ -176,6 +187,7 @@ exports.getMyBookings = async (req, res) => {
         phone: b.PHONE,
         zones: zonesRes.rows.map(z => z.ZONE_NAME),
         services: servicesRes.rows.map(s => s.SERVICE_NAME),
+        menus: menusRes.rows.map(m => m.MENU_NAME),
         equipments: equipmentsRes.rows.map(e => e.EQUIPMENT_NAME)
       });
     }
@@ -391,6 +403,37 @@ exports.deleteBooking = async (req, res) => {
     const bookingId = req.params.id;
     conn = await getConnection();
 
+    // 1. Obtener la fecha del evento
+    // Obtener la fecha del evento desde la base de datos
+    const eventDateRes = await conn.execute(
+      `SELECT EVENT_DATE FROM CLIENT_SCHEMA.BOOKINGS WHERE BOOKING_ID = :id`,
+      [bookingId],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    if (eventDateRes.rows.length === 0) {
+      return res.status(404).json({ message: "Reserva no encontrada." });
+    }
+
+    const eventDate = new Date(eventDateRes.rows[0].EVENT_DATE);
+    const today = new Date();
+
+    // Quitar la parte de la hora para asegurar cálculo correcto
+    eventDate.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+
+    const diffTime = eventDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    console.log("Diferencia en días:", diffDays);
+
+    if (diffDays < 7) {
+      return res.status(400).json({
+        message: "No se puede cancelar la reserva: debe hacerse con al menos 7 días de antelación."
+      });
+    }
+    
+    // 3. Cancelar y limpiar asociaciones
     await conn.execute(
       `UPDATE CLIENT_SCHEMA.BOOKINGS 
        SET STATUS = 'cancelada' 
@@ -423,6 +466,7 @@ exports.deleteBooking = async (req, res) => {
     if (conn) await conn.close();
   }
 };
+
 
 /**
  * Calcula el resumen de pago para una reserva en edición.

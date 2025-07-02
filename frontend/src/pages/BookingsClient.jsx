@@ -5,6 +5,7 @@ import AlertMessage from "../components/common/AlertMessage";
 import LoadingPage from "../components/common/LoadingPage";
 import Pagination from "../components/common/Pagination";
 import ClientBookingCard from "../components/common/ClientBookingCard";
+import BookingModal from "../components/common/BookingModal";
 import { jwtDecode } from 'jwt-decode';
 import "../style/admin-bookings.css";
 
@@ -12,10 +13,13 @@ const PORT = "http://localhost:1522";
 
 const BookingsClient = ({ sections }) => {
   const [bookings, setBookings] = useState([]);
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
+  const [modalMode, setModalMode] = useState("");
 
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("todos");
@@ -66,6 +70,39 @@ const BookingsClient = ({ sections }) => {
   useEffect(() => {
     fetchBookings();
   }, []);
+
+    const openModal = (mode, booking) => {
+    setModalMode(mode);
+    setSelectedBooking(booking);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setSelectedBooking(null);
+    setIsModalOpen(false);
+  };
+
+  const handleDelete = async (booking) => {
+    try {
+      const res = await fetch(`${PORT}/bookings/${booking.id}`, {
+        method: "DELETE"
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Error al cancelar reserva");
+      }
+
+      setMessage("Reserva eliminada correctamente");
+      setMessageType("success");
+      fetchBookings();
+    } catch (err) {
+      console.error("Error al eliminar reserva:", err);
+      setMessage(err.message || "Error al eliminar reserva");
+      setMessageType("error");
+    }
+  };
 
   const filteredBookings = bookings
     .filter((b) => {
@@ -156,24 +193,20 @@ const BookingsClient = ({ sections }) => {
               </div>
               <div className="bookings-two-column">
                 <div className="bookings-client-grid">
-                  {currentBookings.map((booking) => (
-                    <ClientBookingCard
-                      key={booking.id}
-                      booking={booking}
-                      onView={() => console.log("Ver reserva", booking)}
-                      onEdit={() => console.log("Editar reserva", booking)}
-                      onDelete={() => console.log("Eliminar reserva", booking)}
-                    />
-                  ))}
+                  {currentBookings.length === 0 ? (
+                    <p className="no-bookings-message">No hay reservas disponibles.</p>
+                  ) : (
+                    currentBookings.map((booking) => (
+                      <ClientBookingCard
+                        key={booking.id}
+                        booking={booking}
+                        onView={() => openModal("view", booking)}
+                        onDelete={() => openModal("delete", booking)}
+                        onEdit={() => console.log("Hay que implementar")}
+                      />
+                    ))
+                  )}
                 </div>
-
-                {totalPages > 1 && (
-                  <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={setCurrentPage}
-                  />
-                )}
                 <aside className="bookings-sidebar">
                   <div className="promo-text-block">
                     <h3><strong>Reserva tu evento en minutos</strong></h3>
@@ -187,10 +220,24 @@ const BookingsClient = ({ sections }) => {
                   </div>
                 </aside>
               </div>
+              {totalPages > 1 && (
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                  />
+                )}
             </section>
           </div>
         </main>
       </div>
+      <BookingModal
+        isOpen={isModalOpen}
+        mode={modalMode}
+        booking={selectedBooking}
+        onClose={closeModal}
+        onDelete={handleDelete}
+      />
     </div>
   );
 };

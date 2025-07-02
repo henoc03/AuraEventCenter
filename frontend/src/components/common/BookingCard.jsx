@@ -4,8 +4,8 @@ import "../../style/admin-bookings.css";
 
 const BookingCard = ({ booking, onView, onDelete, onEdit }) => {
 	const { 
-		booking_name, 
-		event_date, 
+		bookingName, 
+		eventDate, 
 		status = "pendiente"
 	} = booking;
 
@@ -29,8 +29,8 @@ const BookingCard = ({ booking, onView, onDelete, onEdit }) => {
   return (
 		<div className="booking-card-container">
 			<div className="booking-card-info">
-				<h3 className="booking-card-type">{booking_name}</h3>
-				<p className="booking-card-date">{event_date.slice(0, 10)}</p>
+				<h3 className="booking-card-type">{bookingName}</h3>
+				<p className="booking-card-date">{eventDate.slice(0, 10)}</p>
 			</div>
 
 			<p className="booking-card-status-text">
@@ -51,9 +51,9 @@ export default BookingCard;
 
 BookingCard.propTypes = {
   booking: PropTypes.shape({
-    event_type: PropTypes.string.isRequired,
-    booking_name: PropTypes.string.isRequired,
-    event_date: PropTypes.string.isRequired,
+    eventType: PropTypes.string.isRequired,
+    bookingName: PropTypes.string.isRequired,
+    eventDate: PropTypes.string.isRequired,
     status: PropTypes.string
   }).isRequired,
   onView: PropTypes.func.isRequired,

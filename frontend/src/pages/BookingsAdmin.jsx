@@ -25,7 +25,7 @@ const Bookings = ({ sections }) => {
   const [typeFilter, setTypeFilter] = useState("todos");
   const [sortOrder, setSortOrder] = useState("asc");
   const [currentPage, setCurrentPage] = useState(1);
-  const bookingsPerPage = 4;
+  const bookingsPerPage = 8;
 
   const uniqueTypes = Array.from(new Set(bookings.map(b => b.status).filter(Boolean)));
 
@@ -94,13 +94,13 @@ const Bookings = ({ sections }) => {
 
   const filteredBookings = bookings
     .filter((b) => {
-      const matchesSearch = b.booking_name.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = b.bookingName.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesType = typeFilter === "todos" || b.status?.toLowerCase() === typeFilter;
       return matchesSearch && matchesType;
     })
     .sort((a, b) => {
-      const nameA = a.booking_name.toLowerCase();
-      const nameB = b.booking_name.toLowerCase();
+      const nameA = a.bookingName.toLowerCase();
+      const nameB = b.bookingName.toLowerCase();
       return sortOrder === "asc" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
     });
 

@@ -6,29 +6,46 @@ import { faCalendar } from '@fortawesome/free-solid-svg-icons';
 
 const ClientBookingCard = ({ booking, onView, onDelete, onEdit }) => {
   const {
-    date,
+    bookingName,
+    eventDate,
     startTime,
     endTime,
-    zones = []
+    status,
   } = booking;
 
-  const formattedDate = date
-    ? new Date(date).toLocaleDateString("es-CR", {
+  const formattedDate = eventDate
+    ? new Date(eventDate).toLocaleDateString("es-CR", {
         day: "2-digit",
         month: "short",
         year: "numeric",
       })
     : "Fecha no disponible";
 
+  const getStatusClass = (status) => {
+  const normalized = status.toLowerCase();
+  switch (normalized) {
+    case "completada":
+      return "status-completed-font";
+    case "en_progreso":
+      return "status-in-progress-font";
+    case "cancelada":
+      return "status-cancelled-font";
+    case "pendiente":
+    default:
+      return "status-pending-font";
+  }
+};
+
   return (
      <div className="booking-card-horizontal">
       <FontAwesomeIcon icon={faCalendar} className="booking-card-icon" />
 
       <div className="booking-card-content">
-        <h3 className="booking-card-title">Reserva {zones[0]}</h3>
+        <h3 className="booking-card-title">{bookingName}</h3>
         <p className="booking-card-date-time">
-          {formattedDate} • {startTime} - {endTime}
+          {formattedDate} • {startTime.slice(11, 16)} - {endTime.slice(11, 16)}
         </p>
+        <p className={`booking-card-status ${getStatusClass(status)}`}>{status.charAt(0).toUpperCase() + status.slice(1)}</p>
 
         <div className="booking-card-actions">
           <button onClick={() => onView(booking)} className="btn-booking-card">Detalles</button>
@@ -43,7 +60,8 @@ const ClientBookingCard = ({ booking, onView, onDelete, onEdit }) => {
 ClientBookingCard.propTypes = {
   booking: PropTypes.shape({
     bookingName: PropTypes.string,
-    date: PropTypes.string,
+    eventDate: PropTypes.string,
+    status:PropTypes.string,
     startTime: PropTypes.string,
     endTime: PropTypes.string,
     zones: PropTypes.arrayOf(PropTypes.string)
