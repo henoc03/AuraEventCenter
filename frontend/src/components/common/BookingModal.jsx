@@ -21,7 +21,7 @@ const BookingModal = ({ isOpen, mode, booking, onClose, onDelete }) => {
 
         {isViewMode && booking && (
           <div className="info-container">
-            <h3><strong>{booking.booking_name}</strong></h3>
+            <h3><strong>{booking.bookingName}</strong></h3>
 
             <div className="modal-section">
               <h5><strong>Contacto</strong></h5>
@@ -32,9 +32,9 @@ const BookingModal = ({ isOpen, mode, booking, onClose, onDelete }) => {
 
             <div className="modal-section">
               <h5><strong>Detalles</strong></h5>
-              <p><strong>Tipo:</strong> {booking.event_type}</p>
-              <p><strong>Fecha:</strong> {booking.event_date?.split("T")[0]}</p>
-              <p><strong>Horario:</strong> {booking.start_time.slice(11, 16)} - {booking.end_time.slice(11, 16)}</p>
+              <p><strong>Tipo:</strong> {booking.eventType}</p>
+              <p><strong>Fecha:</strong> {booking.eventDate?.split("T")[0]}</p>
+              <p><strong>Horario:</strong> {booking.startTime.slice(11, 16)} - {booking.endTime.slice(11, 16)}</p>
             </div>
 
             {booking.zones?.length > 0 && (
@@ -70,7 +70,7 @@ const BookingModal = ({ isOpen, mode, booking, onClose, onDelete }) => {
         {isDeleteMode && booking && (
           <>
             <h2>¿Eliminar reserva?</h2>
-            <p><strong>{booking.booking_name}</strong> será eliminada permanentemente.</p>
+            <p><strong>{booking.bookingName}</strong> será eliminada permanentemente.</p>
             <div className="booking-modal-actions">
               <button className="booking-delete-actions-btn" onClick={handleDelete} style={{ color: "red" }}>Eliminar</button>
               <button className="booking-delete-actions-btn" onClick={onClose}>Cancelar</button>
@@ -86,12 +86,12 @@ BookingModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   mode: PropTypes.oneOf(["view", "delete"]).isRequired,
   booking: PropTypes.shape({
-    event_type: PropTypes.string.isRequired,
-    booking_name: PropTypes.string.isRequired,
-    event_date: PropTypes.string.isRequired,
-    start_time: PropTypes.string,            
-    end_time: PropTypes.string,            
-    id_card: PropTypes.string,                
+    eventType: PropTypes.string.isRequired,
+    bookingName: PropTypes.string.isRequired,
+    eventDate: PropTypes.string.isRequired,
+    startTime: PropTypes.string,            
+    endTime: PropTypes.string,            
+    idCard: PropTypes.string,                
     status: PropTypes.string,                
     owner: PropTypes.string,                  
     email: PropTypes.string,                   

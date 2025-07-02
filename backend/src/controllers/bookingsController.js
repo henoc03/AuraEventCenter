@@ -1,3 +1,4 @@
+
 /**
  * @abstract Controlador encargado de gestionar las operaciones CRUD para las reservas
  * dentro del esquema CLIENT_SCHEMA..
@@ -74,14 +75,14 @@ exports.getAllBookings = async (req, res) => {
 
       bookings.push({
         id: b.BOOKING_ID,
-        booking_name: b.BOOKING_NAME,
+        bookingName: b.BOOKING_NAME,
         status: b.STATUS,
-        additional_note: b.ADDITIONAL_NOTE,
-        start_time: b.START_TIME,
-        end_time: b.END_TIME,
-        id_card: b.ID_CARD,
-        event_type: b.EVENT_TYPE,
-        event_date: b.EVENT_DATE,
+        additionalNote: b.ADDITIONAL_NOTE,
+        startTime: b.START_TIME,
+        endTime: b.END_TIME,
+        idCard: b.ID_CARD,
+        eventType: b.EVENT_TYPE,
+        eventDate: b.EVENT_DATE,
         owner: `${b.FIRST_NAME} ${b.LAST_NAME_1} ${b.LAST_NAME_2}`,
         email: b.EMAIL,
         phone: b.PHONE,
@@ -95,6 +96,104 @@ exports.getAllBookings = async (req, res) => {
     res.json(bookings);
   } catch (err) {
     console.error("Error al obtener reservas completas:", err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
+/**
+ * Obtiene todas las reservas del usuario autenticado, con información completa.
+ */
+exports.getMyBookings = async (req, res) => {
+  let conn;
+  try {
+    const userId = req.user.id; // desde el token
+    conn = await getConnection();
+
+    const result = await conn.execute(
+      `SELECT 
+        B.BOOKING_ID,
+        B.BOOKING_NAME,
+        B.STATUS,
+        B.ADDITIONAL_NOTE,
+        B.START_TIME,
+        B.END_TIME,
+        B.ID_CARD,
+        B.EVENT_TYPE,
+        B.EVENT_DATE,
+        U.FIRST_NAME,
+        U.LAST_NAME_1,
+        U.LAST_NAME_2,
+        U.EMAIL,
+        U.PHONE
+      FROM CLIENT_SCHEMA.BOOKINGS B
+      JOIN CLIENT_SCHEMA.USERS U ON B.USER_ID = U.USER_ID
+      WHERE B.USER_ID = :userId
+      ORDER BY B.EVENT_DATE DESC`,
+      [userId],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    console.log("Reservas encontradas:", result.rows.length);
+    console.log("Reservas con estado:", result.rows.map(r => r.STATUS));
+
+    const bookings = [];
+
+    for (const b of result.rows) {
+      const [zonesRes, servicesRes, menusRes, equipmentsRes] = await Promise.all([
+        conn.execute(`
+          SELECT Z.NAME AS ZONE_NAME
+          FROM CLIENT_SCHEMA.BOOKINGS_ZONES BZ
+          JOIN ADMIN_SCHEMA.ZONES Z ON BZ.ZONE_ID = Z.ZONE_ID
+          WHERE BZ.BOOKING_ID = :id`, 
+          [b.BOOKING_ID], { outFormat: oracledb.OUT_FORMAT_OBJECT }),
+
+        conn.execute(`
+          SELECT DISTINCT S.NAME AS SERVICE_NAME
+          FROM CLIENT_SCHEMA.BOOKINGS_ZONES_SERVICES BZS
+          JOIN ADMIN_SCHEMA.ADDITIONAL_SERVICES S ON BZS.ADDITIONAL_SERVICE_ID = S.ADDITIONAL_SERVICE_ID
+          WHERE BZS.BOOKING_ID = :id`,
+          [b.BOOKING_ID], { outFormat: oracledb.OUT_FORMAT_OBJECT }),
+
+        conn.execute(`
+          SELECT DISTINCT M.NAME AS MENU_NAME
+          FROM CLIENT_SCHEMA.BOOKINGS_ZONES_MENUS BZM
+          JOIN ADMIN_SCHEMA.CATERING_MENUS M ON BZM.MENU_ID = M.MENU_ID
+          WHERE BZM.BOOKING_ID = :id`,
+          [b.BOOKING_ID], { outFormat: oracledb.OUT_FORMAT_OBJECT }),
+
+        conn.execute(`
+          SELECT DISTINCT E.NAME AS EQUIPMENT_NAME
+          FROM CLIENT_SCHEMA.BOOKINGS_ZONES_EQUIPMENTS BZE
+          JOIN ADMIN_SCHEMA.EQUIPMENTS E ON BZE.EQUIPMENT_ID = E.ID
+          WHERE BZE.BOOKING_ID = :id`,
+          [b.BOOKING_ID], { outFormat: oracledb.OUT_FORMAT_OBJECT })
+      ]);
+
+      bookings.push({
+        id: b.BOOKING_ID,
+        bookingName: b.BOOKING_NAME,
+        status: b.STATUS,
+        additionalNote: b.ADDITIONAL_NOTE,
+        eventDate: b.EVENT_DATE,
+        startTime: b.START_TIME,
+        endTime: b.END_TIME,
+        eventType: b.EVENT_TYPE,
+        idCard: b.ID_CARD,
+        owner: `${b.FIRST_NAME} ${b.LAST_NAME_1} ${b.LAST_NAME_2}`,
+        email: b.EMAIL,
+        phone: b.PHONE,
+        zones: zonesRes.rows.map(z => z.ZONE_NAME),
+        services: servicesRes.rows.map(s => s.SERVICE_NAME),
+        menus: menusRes.rows.map(m => m.MENU_NAME),
+        equipments: equipmentsRes.rows.map(e => e.EQUIPMENT_NAME)
+      });
+    }
+
+    res.json(bookings);
+  } catch (err) {
+    console.error("Error al obtener historial del usuario:", err);
     res.status(500).json({ error: err.message });
   } finally {
     if (conn) await conn.close();
@@ -654,6 +753,33 @@ exports.deleteBooking = async (req, res) => {
   try {
     const bookingId = req.params.id;
     conn = await getConnection();
+
+    const eventDateRes = await conn.execute(
+      `SELECT EVENT_DATE FROM CLIENT_SCHEMA.BOOKINGS WHERE BOOKING_ID = :id`,
+      [bookingId],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    if (eventDateRes.rows.length === 0) {
+      return res.status(404).json({ message: "Reserva no encontrada." });
+    }
+
+    const eventDate = new Date(eventDateRes.rows[0].EVENT_DATE);
+    const today = new Date();
+
+    eventDate.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+
+    const diffTime = eventDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    console.log("Diferencia en días:", diffDays);
+
+    if (diffDays < 7) {
+      return res.status(400).json({
+        message: "No se puede cancelar la reserva: debe hacerse con al menos 7 días de antelación."
+      });
+    }
 
     await conn.execute(
       `UPDATE CLIENT_SCHEMA.BOOKINGS 
