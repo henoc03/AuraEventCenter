@@ -88,3 +88,78 @@
 .booking-next-button.active:hover {
   background-color: #0056b3;
 }
+
+/* MEDIA QUERY: Tablets y pantallas medianas (≤768px) */
+@media (max-width: 768px) {
+  .booking-form {
+    padding: 15px;
+    max-height: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .booking-form label,
+  .booking-form p {
+    font-size: 0.9rem;
+  }
+
+  .booking-form input,
+  .booking-form textarea {
+    font-size: 0.9rem;
+    padding: 9px 10px;
+  }
+
+  .booking-next-button {
+    width: 100%;
+    font-size: 1rem;
+  }
+
+  .event-type-radio-group {
+    flex-direction: column;
+  }
+}
+
+/* MEDIA QUERY: Móviles pequeños (≤480px) */
+@media (max-width: 480px) {
+  .booking-form {
+    padding: 12px;
+  }
+
+  .booking-form label,
+  .booking-form p {
+    font-size: 0.85rem;
+  }
+
+  .booking-form input,
+  .booking-form textarea {
+    font-size: 0.85rem;
+    padding: 8px 10px;
+  }
+
+  .booking-next-button {
+    font-size: 0.95rem;
+  }
+}
+
+/* MEDIA QUERY: Dispositivos muy pequeños (≤360px) */
+@media (max-width: 360px) {
+  .booking-form {
+    padding: 10px;
+  }
+
+  .booking-form label,
+  .booking-form p {
+    font-size: 0.8rem;
+  }
+
+  .booking-form input,
+  .booking-form textarea {
+    font-size: 0.8rem;
+    padding: 7px 8px;
+  }
+
+  .booking-next-button {
+    font-size: 0.9rem;
+    padding: 10px;
+  }
+}

@@ -47,11 +47,10 @@ function ConfirmBooking({
 
   return (
     <div className="booking-client-step4">
-      <h2>Confirmar reserva</h2>
-      <p>Revisa la información antes de guardar.</p>
 
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem' }}>
+
+      <div style={{ display: 'flex', gap: '20px', marginTop: '2rem' , marginLeft: '13rem'}}>
         <button
           type="button"
           className="booking-next-step-button active"

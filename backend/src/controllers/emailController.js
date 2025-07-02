@@ -10,6 +10,7 @@
 const { getConnection } = require('../config/db');
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -228,6 +229,8 @@ exports.verifyCode = async (req, res) => {
  */
 exports.resetPassword = async (req, res) => {
   const { email, newPassword } = req.body;
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(newPassword, salt);
 
   let conn;
   try {
@@ -235,8 +238,8 @@ exports.resetPassword = async (req, res) => {
 
     // Ejecuta actualización con autoCommit para guardar cambios
     const result = await conn.execute(
-      `UPDATE CLIENT_SCHEMA.USERS SET PASSWORD = :newPassword WHERE EMAIL = :email`,
-      { newPassword, email },
+      `UPDATE CLIENT_SCHEMA.USERS SET PASSWORD = :hashedPassword WHERE EMAIL = :email`,
+      { hashedPassword, email },
       { autoCommit: true }
     );
 

@@ -82,7 +82,8 @@ exports.getAllAvailableZones = async (req, res) => {
     const result = await conn.execute(
       `SELECT ZONE_ID, NAME, DESCRIPTION, CAPACITY, TYPE, EVENT_CENTER_ID, PRICE, IMAGE_PATH, ACTIVE
       FROM ADMIN_SCHEMA.ZONES z
-      WHERE z.zone_id NOT IN (
+      WHERE z.ACTIVE = 1
+       AND z.zone_id NOT IN (
         SELECT bz.zone_id
         FROM CLIENT_SCHEMA.BOOKINGS_ZONES bz
         JOIN CLIENT_SCHEMA.BOOKINGS b ON bz.booking_id = b.booking_id

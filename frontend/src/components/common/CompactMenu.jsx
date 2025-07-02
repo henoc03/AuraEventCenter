@@ -25,9 +25,9 @@ const CompactMenu = ({ menu, isBooking = false, isSelected = false, isNew = fals
         ) : (
           <>
             <div className="menu-quantity-control">
-              <button type="button" onClick={onIncrease}>+</button>
+              {!disableDecrease && <button type="button" onClick={onDecrease} disabled={quantity === 0}>-</button>}             
               <span>{quantity}</span>
-              {!disableDecrease && <button type="button" onClick={onDecrease} disabled={quantity === 0}>-</button>}
+              <button type="button" onClick={onIncrease}>+</button>
             </div>
           </>
         )}
