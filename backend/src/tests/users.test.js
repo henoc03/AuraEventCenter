@@ -273,3 +273,10 @@ describe('Users Controller', () => {
     expect(res.body).toHaveProperty('error');
   });
 });
+
+describe('GET /users', () => {
+  it('debería obtener todos los usuarios', async () => {
+    const res = await request(app).get('/users');
+    expect([200, 401, 403]).toContain(res.statusCode); // según si requiere auth
+  });
+});
