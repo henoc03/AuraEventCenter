@@ -478,3 +478,33 @@ exports.deleteMenu = async (req, res) => {
     if (conn) await conn.close();
   }
 };
+
+/**
+ * Obtiene los menús de una reserva específica.
+ */
+exports.getMenusByBooking = async (req, res) => {
+  let conn;
+  try {
+    const { bookingId, roomId } = req.params;
+    conn = await getConnection();
+
+    // Obtener los menús asociados a la reserva y zona (habitación)
+    const menus_result = await conn.execute(
+      `SELECT MENU_ID, QUANTITY FROM CLIENT_SCHEMA.BOOKINGS_ZONES_MENUS WHERE BOOKING_ID = :bookingId AND ZONE_ID = :roomId`,
+      [bookingId, roomId],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    const menus = menus_result.rows.map(menu => ({
+      ID_MENU: menu.MENU_ID,
+      CANTIDAD: menu.QUANTITY
+    }));
+
+    res.json(menus);
+  } catch (err) {
+    console.error('Error al obtener los menús de la reserva:', err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};

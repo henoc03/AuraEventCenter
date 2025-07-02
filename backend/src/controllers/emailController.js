@@ -281,3 +281,57 @@ const { name, email, subject, message } = req.body;
     res.status(500).json({ error: 'Error al enviar el correo.' });
   }
 };
+
+exports.sendBookingConfirmation = async (req, res) => {
+  const { email, name, paymentSummary } = req.body;
+  if (!email || !paymentSummary) {
+    console.log("[CONFIRM EMAIL] Faltan datos:", { email, paymentSummary });
+    return res.status(400).json({ message: "Faltan datos para enviar el correo." });
+  }
+
+  // Construir el desglose en HTML
+  let zonasHtml = paymentSummary.zonas.map(zona => `
+    <div style="margin-bottom:16px;">
+      <h3 style="margin:0 0 4px 0;">${zona.name}</h3>
+      <ul>
+        <li><b>Precio base:</b> ₡${zona.basePrice.toLocaleString()} (${zona.hours} hora${zona.hours !== 1 ? "s" : ""})</li>
+        ${zona.menus.map(m => `<li>Menú: ${m.NAME} - ₡${m.PRICE.toLocaleString()}</li>`).join("")}
+        ${zona.services.map(s => `<li>Servicio: ${s.NAME} - ₡${s.PRICE.toLocaleString()}</li>`).join("")}
+        ${zona.equipments.map(e => `<li>Equipo: ${e.NAME} - ₡${e.UNITARY_PRICE.toLocaleString()}</li>`).join("")}
+      </ul>
+      <b>Subtotal zona:</b> ₡${zona.subtotal.toLocaleString()}
+    </div>
+  `).join("");
+
+  const html = `
+    <html>
+      <body style="font-family: Arial, sans-serif;">
+        <h2>¡Gracias por tu reserva${name ? ', ' + name : ''}!</h2>
+        <p>Te confirmamos que tu pago fue exitoso. Aquí tienes el desglose de tu reserva:</p>
+        ${zonasHtml}
+        <hr>
+        <p><b>Subtotal:</b> ₡${paymentSummary.total.toLocaleString()}</p>
+        <p><b>IVA (13%):</b> ₡${paymentSummary.iva.toLocaleString()}</p>
+        <p><b>Total pagado:</b> ₡${paymentSummary.totalConIva.toLocaleString()}</p>
+        <p>¡Te esperamos en Aura Event Center!</p>
+      </body>
+    </html>
+  `;
+
+  try {
+    console.log("[CONFIRM EMAIL] Enviando correo a:", email);
+    console.log("[CONFIRM EMAIL] Nombre:", name);
+    console.log("[CONFIRM EMAIL] Resumen zonas:", JSON.stringify(paymentSummary.zonas, null, 2));
+    await transporter.sendMail({
+      from: process.env.MAIL_USER,
+      to: email,
+      subject: "Confirmación de reserva - Aura Event Center",
+      html
+    });
+    console.log("[CONFIRM EMAIL] Correo enviado correctamente a:", email);
+    res.json({ success: true });
+  } catch (error) {
+    console.error("[CONFIRM EMAIL] Error al enviar correo de confirmación:", error);
+    res.status(500).json({ message: "Error al enviar el correo de confirmación" });
+  }
+};
