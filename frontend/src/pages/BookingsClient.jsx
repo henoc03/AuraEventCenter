@@ -1,41 +1,39 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Header from "../components/common/Header";
 import SideNav from "../components/common/SideNav";
 import AlertMessage from "../components/common/AlertMessage";
 import LoadingPage from "../components/common/LoadingPage";
-import BookingCard from "../components/common/BookingCard";
-import BookingModal from "../components/common/BookingModal";
 import Pagination from "../components/common/Pagination";
+import ClientBookingCard from "../components/common/ClientBookingCard";
+import BookingModal from "../components/common/BookingModal";
 import { jwtDecode } from 'jwt-decode';
 import "../style/admin-bookings.css";
 
 const PORT = "http://localhost:1522";
 
-const Bookings = ({ sections }) => {
+const BookingsClient = ({ sections }) => {
   const [bookings, setBookings] = useState([]);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
-  const [modalMode, setModalMode] = useState("");
   const [messageType, setMessageType] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
-
-  const navigate = useNavigate();
-  const location = useLocation();
-
+  const [modalMode, setModalMode] = useState("");
 
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("todos");
   const [sortOrder, setSortOrder] = useState("asc");
   const [currentPage, setCurrentPage] = useState(1);
-  const bookingsPerPage = 8;
+  const bookingsPerPage = 4;
 
   const uniqueTypes = Array.from(new Set(bookings.map(b => b.status).filter(Boolean)));
-  
+
+  const navigate = useNavigate();
+
   const goToCreateBooking = () => {
-    navigate("/root-admin/reservas/crear");
+    navigate("/reservar");
   };
 
   useEffect(() => {
@@ -44,8 +42,8 @@ const Bookings = ({ sections }) => {
       if (!token) return;
 
       try {
-        const { id } = jwtDecode(token);
-        const res = await fetch(`${PORT}/users/${id}`);
+        const decoded = jwtDecode(token);
+        const res = await fetch(`${PORT}/users/${decoded.id}`);
         const user = await res.json();
         setCurrentUser(user);
       } catch (err) {
@@ -59,12 +57,17 @@ const Bookings = ({ sections }) => {
   const fetchBookings = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${PORT}/bookings`);
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${PORT}/bookings/my`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       const data = await res.json();
       setBookings(data);
     } catch (err) {
-      console.error("Error al obtener reservas:", err);
-      setMessage("Error al cargar las reservas");
+      console.error("Error al obtener reservas del cliente:", err);
+      setMessage("Error al cargar el historial de reservas");
       setMessageType("error");
     } finally {
       setLoading(false);
@@ -75,7 +78,7 @@ const Bookings = ({ sections }) => {
     fetchBookings();
   }, []);
 
-  const openModal = (mode, booking) => {
+    const openModal = (mode, booking) => {
     setModalMode(mode);
     setSelectedBooking(booking);
     setIsModalOpen(true);
@@ -88,15 +91,22 @@ const Bookings = ({ sections }) => {
 
   const handleDelete = async (booking) => {
     try {
-      await fetch(`${PORT}/bookings/${booking.id}`, {
+      const res = await fetch(`${PORT}/bookings/${booking.id}`, {
         method: "DELETE"
       });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Error al cancelar reserva");
+      }
+
       setMessage("Reserva eliminada correctamente");
       setMessageType("success");
       fetchBookings();
     } catch (err) {
       console.error("Error al eliminar reserva:", err);
-      setMessage("Error al eliminar reserva");
+      setMessage(err.message || "Error al eliminar reserva");
       setMessageType("error");
     }
   };
@@ -104,7 +114,7 @@ const Bookings = ({ sections }) => {
   const filteredBookings = bookings
     .filter((b) => {
       const matchesSearch = b.bookingName.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesType = typeFilter === "todos" || b.status?.toLowerCase() === typeFilter;
+      const matchesType = typeFilter === "todos" || (b.status && b.status.toLowerCase() === typeFilter);
       return matchesSearch && matchesType;
     })
     .sort((a, b) => {
@@ -117,7 +127,6 @@ const Bookings = ({ sections }) => {
   const indexOfFirstBooking = indexOfLastBooking - bookingsPerPage;
   const currentBookings = filteredBookings.slice(indexOfFirstBooking, indexOfLastBooking);
   const totalPages = Math.ceil(filteredBookings.length / bookingsPerPage);
-
 
   if (loading) return <LoadingPage />;
 
@@ -143,9 +152,6 @@ const Bookings = ({ sections }) => {
             <section className="bookings-section">
               <div className="bookings-section-header">
                 <h2 className="bookings-section-title">Reservas</h2>
-                <button className="btn-add-booking" onClick={goToCreateBooking}>
-                  Agregar
-                </button>
               </div>
 
               <div className="bookings-controls">
@@ -192,31 +198,46 @@ const Bookings = ({ sections }) => {
                   <option value="desc">Z-A</option>
                 </select>
               </div>
-
-              <div className="bookings-grid">
-                {currentBookings.map((booking) => (
-                  <BookingCard
-                    key={booking.id}
-                    booking={booking}
-                    onView={() => openModal("view", booking)}
-                    onDelete={() => openModal("delete", booking)}
-                    onEdit={(booking) => navigate(`/root-admin/reservas/editar/${booking.id}`)}
-                  />
-                ))}
+              <div className="bookings-two-column">
+                <div className="bookings-client-grid">
+                  {currentBookings.length === 0 ? (
+                    <p className="no-bookings-message">No hay reservas disponibles.</p>
+                  ) : (
+                    currentBookings.map((booking) => (
+                      <ClientBookingCard
+                        key={booking.id}
+                        booking={booking}
+                        onView={() => openModal("view", booking)}
+                        onDelete={() => openModal("delete", booking)}
+                        onEdit={(booking) => navigate(`/reserva/editar/${booking.id}`)}
+                      />
+                    ))
+                  )}
+                </div>
+                <aside className="bookings-sidebar">
+                  <div className="promo-text-block">
+                    <h3><strong>Reserva tu evento en minutos</strong></h3>
+                    <p>
+                      Selecciona zonas, servicios y horarios desde tu navegador. <br />
+                      Sin instalar nada. Sin complicaciones.
+                      <br />
+                      <strong>Rápido · Seguro · 100% en línea</strong>
+                    </p>
+                    <button className="btn-add-booking" onClick={goToCreateBooking}>Reservar ahora</button>
+                  </div>
+                </aside>
               </div>
-
               {totalPages > 1 && (
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={setCurrentPage}
-                />
-              )}
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                  />
+                )}
             </section>
           </div>
         </main>
       </div>
-
       <BookingModal
         isOpen={isModalOpen}
         mode={modalMode}
@@ -228,4 +249,4 @@ const Bookings = ({ sections }) => {
   );
 };
 
-export default Bookings;
+export default BookingsClient;

@@ -22,6 +22,8 @@ import AboutPage from './pages/About';
 import EditBookingClient from './pages/EditBookingClient';
 import CreateBookingClient from './pages/CreateBookinClient';
 import ChatBotWrapper from './components/utils/ChatBotWrapper';
+import BookingsClient from './pages/BookingsClient';
+
 // Páginas protegidas
 import AdminDashboard from "./pages/AdminDashBoard";
 import Clients from './pages/Clients';
@@ -84,6 +86,7 @@ function App() {
           <Route path="/servicios/equipos" element={<EquipmentsClient />} />
           <Route path="/contacto" element={<ContactForm />} />
           <Route path="/acerca" element={<AboutPage />} />
+          <Route path="/historial" element={<BookingsClient sections={SectionProfile}/>} />
 
           <Route element={<PrivateRoute allowedRoles={['cliente']} />}>
           <Route path="/reservar" element={<CreateBookingClient sections={SectionProfile} />} />
