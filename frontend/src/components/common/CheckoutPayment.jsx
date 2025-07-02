@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
-import PayPalCard from "../../assets/images/paypal-card.png";
+import PayPalCard from "../../assets/images/paypal-card.jpg";
 import "../../style/checkout-payment.css";
 import LoadingPage from "./LoadingPage";
+import AlertMessage from "./AlertMessage.jsx";
 
 const DEFAULT_ROUTE = "http://localhost:1522";
 
@@ -28,7 +29,7 @@ function CheckoutPayment({
   if (!paymentSummary) {
     return <div>No se pudo calcular el resumen de pago.</div>;
   }
-
+  const [stateMessage, setMessage] = useState("");
   // Función para enviar el correo de confirmación
   const sendConfirmationEmail = async () => {
     try {
@@ -103,6 +104,7 @@ function CheckoutPayment({
       });
       const data = await res.json();
       console.log("[CheckoutPayment] Respuesta backend create:", data);
+      
       if (!res.ok) {
         alert(data.message || "Error al crear la reserva");
       }
@@ -114,6 +116,7 @@ function CheckoutPayment({
 
   return (
     <div className="checkout-content">
+      <AlertMessage message={stateMessage.message} type={stateMessage.type} className="success" />
       <div className="checkout-grid">
         <div className="checkout-main">
           <h2 className="checkout-subtitle">Proceder al pago</h2>
@@ -149,14 +152,16 @@ function CheckoutPayment({
                     return actions.order.capture().then(async (details) => {
                       if (bookingId) {
                         await updateBooking();
-                        console.log("[CheckoutPayment] Reserva actualizada con éxito");
+                        setMessage({  message: `Reserva actualizada con exito!`, type: 'alert-floating' });
+                        setTimeout(() => setMessage(null), 4000);
                       } else {
                         await createBooking();
-                        console.log("[CheckoutPayment] Reserva creada con éxito");
+                        setMessage({  message: `Reserva realizada con exito!`, type: 'alert-floating' });
+                        setTimeout(() => setMessage(null), 4000);
                       }
                       await sendConfirmationEmail();
                       if (onPaymentSuccess) onPaymentSuccess(details);
-                      alert(`Pago completado por ${details.payer.name.given_name}`);
+                      
                     });
                   }}
                   onError={(err) => {

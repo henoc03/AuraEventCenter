@@ -184,15 +184,6 @@ function CreateBookingClient({ sections }) {
 
           {step === 3 && (
             <>
-              <ConfirmBooking
-                userId={user.USER_ID}
-                step1Data={step1Data}
-                selectedRooms={selectedRooms}
-                selectedServices={selectedServices}
-                selectedMenus={selectedMenus}
-                selectedEquipments={selectedEquipments}
-                onBack={() => setStep(2)}
-              />
               <div className="checkout-container">
                 <CheckoutPayment
                   paymentSummary={paymentSummary}
