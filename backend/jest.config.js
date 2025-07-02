@@ -1,13 +1,5 @@
 module.exports = {
-  testEnvironment: 'node',
-  setupFiles: ['dotenv/config'],
+  testEnvironment: "node",
   collectCoverage: true,
-  collectCoverageFrom: [
-    'controllers/**/*.js',
-    'routes/**/*.js',
-    'middleware/**/*.js',
-    '!**/node_modules/**',
-    '!**/tests/**',
-  ],
-  coverageDirectory: 'coverage',
+  coverageDirectory: "coverage",
 };
