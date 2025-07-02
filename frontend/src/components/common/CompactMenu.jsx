@@ -7,7 +7,7 @@ const DEFAULT_ROUTE = "http://localhost:1522";
 
 const CompactMenu = ({ menu, isBooking = false, isSelected = false, isNew = false, quantity = 0,
   onIncrease,
-  onDecrease , onQuantityChange}) => {
+  onDecrease , onQuantityChange, disableDecrease }) => {
 
 
   return (
@@ -25,19 +25,9 @@ const CompactMenu = ({ menu, isBooking = false, isSelected = false, isNew = fals
         ) : (
           <>
             <div className="menu-quantity-control">
-              <button type="button" onClick={onDecrease} disabled={quantity === 0}>-</button>
-               <input
-                type="number"
-                min={0}
-                value={quantity}
-                onChange={(e) => {
-                  const value = parseInt(e.target.value, 10);
-                  if (!isNaN(value)) {
-                    onQuantityChange(menu.ID_MENU, value);
-                  }
-                }}
-              />
               <button type="button" onClick={onIncrease}>+</button>
+              <span>{quantity}</span>
+              {!disableDecrease && <button type="button" onClick={onDecrease} disabled={quantity === 0}>-</button>}
             </div>
           </>
         )}

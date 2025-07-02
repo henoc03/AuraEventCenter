@@ -5,21 +5,112 @@ import PayPalCard from "../../assets/images/paypal-card.png";
 import "../../style/checkout-payment.css";
 import LoadingPage from "./LoadingPage";
 
-// Ejemplo de datos enviados al backend para ese componente
-        // const payload = {
-        //   rooms: selectedRooms,
-        //   menus: Object.fromEntries(selectedRooms.map(id => [id, selectedMenus[id] || []])),
-        //   services: Object.fromEntries(selectedRooms.map(id => [id, selectedServices[id] || []])),
-        //   equipments: Object.fromEntries(selectedRooms.map(id => [id, selectedEquipments[id] || []])),
-        //   startTime: step1Data.startTime, // asegúrate que esté en formato "HH:MM"
-        //   endTime: step1Data.endTime
-        // };
-function CheckoutPayment({ paymentSummary, paymentLoading, onPaymentSuccess, onPaymentError }) {
+const DEFAULT_ROUTE = "http://localhost:1522";
+
+function CheckoutPayment({
+  paymentSummary,
+  paymentLoading,
+  onPaymentSuccess,
+  onPaymentError,
+  userEmail,
+  userName,
+  userID,
+  bookingId,
+  step1Data,
+  selectedRooms,
+  newServices,
+  newMenus,
+  newEquipments,
+  amountToPay, // <-- Nuevo prop para el monto a pagar
+}) {
   if (paymentLoading) return <LoadingPage />;
 
   if (!paymentSummary) {
     return <div>No se pudo calcular el resumen de pago.</div>;
   }
+
+  // Función para enviar el correo de confirmación
+  const sendConfirmationEmail = async () => {
+    try {
+      console.log("[CheckoutPayment] Enviando correo a:", userEmail, "Nombre:", userName);
+      const res = await fetch(`${DEFAULT_ROUTE}/email/send-booking-confirmation`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: userEmail,
+          name: userName,
+          paymentSummary
+        })
+      });
+      const data = await res.json();
+      console.log("[CheckoutPayment] Respuesta backend email:", data);
+    } catch (err) {
+      console.error("[CheckoutPayment] Error enviando correo de confirmación:", err);
+    }
+  };
+
+  // Función para actualizar la reserva
+  const updateBooking = async () => {
+    try {
+      console.log("[CheckoutPayment] Actualizando reserva...", {
+        userID,
+        bookingId,
+        step1Data,
+        selectedRooms,
+        newServices,
+        newMenus,
+        newEquipments
+      });
+      const res = await fetch(`${DEFAULT_ROUTE}/bookings/update`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: userID,
+          bookingId: bookingId,
+          bookingInfo: step1Data,
+          rooms: selectedRooms,
+          services: newServices,
+          menus: newMenus,
+          equipments: newEquipments
+        })
+      });
+      const data = await res.json();
+      console.log("[CheckoutPayment] Respuesta backend update:", data);
+      if (!res.ok) {
+        alert(data.message || "Error al actualizar la reserva");
+      }
+    } catch (err) {
+      console.error("[CheckoutPayment] Error actualizando la reserva:", err);
+      alert("Ocurrió un error al actualizar la reserva.");
+    }
+  };
+
+  // Función para crear una nueva reserva
+  const createBooking = async () => {
+    try {
+      const res = await fetch("http://localhost:1522/bookings/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: userID,
+          bookingInfo: step1Data,
+          rooms: selectedRooms,
+          services: newServices,
+          menus: newMenus,
+          equipments: newEquipments,
+          currentPayment: paymentSummary.totalConIva
+        })
+      });
+      const data = await res.json();
+      console.log("[CheckoutPayment] Respuesta backend create:", data);
+      if (!res.ok) {
+        alert(data.message || "Error al crear la reserva");
+      }
+    } catch (err) {
+      console.error("[CheckoutPayment] Error creando la reserva:", err);
+      alert("Ocurrió un error al crear la reserva.");
+    }
+  };
 
   return (
     <div className="checkout-content">
@@ -39,26 +130,37 @@ function CheckoutPayment({ paymentSummary, paymentLoading, onPaymentSuccess, onP
                 <PayPalButtons
                   style={{ layout: "horizontal", label: "pay" }}
                   createOrder={(data, actions) => {
+                    // Si amountToPay está definido, es edición; si no, es creación
+                    const monto = typeof amountToPay === "number"
+                      ? amountToPay
+                      : paymentSummary?.totalConIva || 0;
                     return actions.order.create({
                       purchase_units: [
                         {
                           amount: {
-                            value: (paymentSummary.total / 540).toFixed(2),
+                            value: (monto / 500).toFixed(2), // en USD
                             currency_code: "USD",
                           },
                         },
                       ],
                     });
                   }}
-                  onApprove={(data, actions) => {
-                    return actions.order.capture().then((details) => {
+                  onApprove={async (data, actions) => {
+                    return actions.order.capture().then(async (details) => {
+                      if (bookingId) {
+                        await updateBooking();
+                        console.log("[CheckoutPayment] Reserva actualizada con éxito");
+                      } else {
+                        await createBooking();
+                        console.log("[CheckoutPayment] Reserva creada con éxito");
+                      }
+                      await sendConfirmationEmail();
                       if (onPaymentSuccess) onPaymentSuccess(details);
                       alert(`Pago completado por ${details.payer.name.given_name}`);
                     });
                   }}
                   onError={(err) => {
                     if (onPaymentError) onPaymentError(err);
-                    console.error(err);
                     alert("Error en el pago con PayPal");
                   }}
                 />
@@ -82,7 +184,14 @@ function CheckoutPayment({ paymentSummary, paymentLoading, onPaymentSuccess, onP
                 <ul className="room-options-list">
                   {zona.menus.map((menu) => (
                     <li key={menu.MENU_ID}>
-                      {menu.NAME} - ₡{menu.PRICE.toLocaleString()}
+                      {menu.NAME}
+                      {menu.CANTIDAD ? ` x ${menu.CANTIDAD}` : ""} - ₡
+                      {menu.PRICE.toLocaleString()}
+                      {menu.CANTIDAD > 1 && (
+                        <span style={{ color: "#888", fontSize: "0.95em" }}>
+                          {" "}({`₡${(menu.PRICE / menu.CANTIDAD).toLocaleString()} c/u`})
+                        </span>
+                      )}
                     </li>
                   ))}
                   {zona.services.map((s) => (
@@ -125,6 +234,15 @@ CheckoutPayment.propTypes = {
   paymentLoading: PropTypes.bool,
   onPaymentSuccess: PropTypes.func,
   onPaymentError: PropTypes.func,
+  userEmail: PropTypes.string.isRequired,
+  userName: PropTypes.string,
+  userID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  bookingId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  step1Data: PropTypes.object,
+  selectedRooms: PropTypes.array,
+  newServices: PropTypes.object,
+  newMenus: PropTypes.object,
+  newEquipments: PropTypes.object,
 };
 
 export default CheckoutPayment;

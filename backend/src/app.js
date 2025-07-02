@@ -38,4 +38,8 @@ app.get('/', (req, res) => {
   res.send('API REST Oracle con tabla USERS ✅');
 });
 
+const emailController = require('./controllers/emailController');
+
+app.post('/send-booking-confirmation', emailController.sendBookingConfirmation);
+
 module.exports = app;
