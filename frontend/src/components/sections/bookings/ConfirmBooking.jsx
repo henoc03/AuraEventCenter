@@ -1,7 +1,8 @@
 // components/sections/bookings/ConfirmBooking.jsx
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
+import AlertMessage from "../../common/AlertMessage.jsx";
 
 const DEFAULT_ROUTE = "http://localhost:1522";
 
@@ -15,6 +16,7 @@ function ConfirmBooking({
   onBack
 }) {
   const navigate = useNavigate();
+  const [alert, setAlert] = useState(null);
 
   const handleSubmit = async () => {
     try {
@@ -34,21 +36,22 @@ function ConfirmBooking({
       });
 
       if (res.ok) {
-        alert("Reserva creada con éxito");
-        navigate("/inicio");
+        setAlert({ type: 'success', message: 'Reserva creada con éxito' });
+        setTimeout(() => navigate("/inicio"), 2000); //
       } else {
-        alert("Error al crear la reserva");
+         setAlert({ type: 'error', message: 'Error al crear la reserva' });
+         setTimeout(() => setAlert(null), 3000); 
       }
     } catch (err) {
       console.error("Error al crear reserva:", err);
-      alert("Hubo un error al enviar la reserva.");
+      setAlert({ type: 'error', message: 'Hubo un error al enviar la reserva.' });
+      setTimeout(() => setAlert(null), 3000); 
     }
   };
 
   return (
     <div className="booking-client-step4">
-
-
+      {alert && <AlertMessage type={alert.type} message={alert.message} />}
 
       <div style={{ display: 'flex', gap: '20px', marginTop: '2rem' , marginLeft: '13rem'}}>
         <button
