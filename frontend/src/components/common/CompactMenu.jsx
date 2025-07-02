@@ -5,13 +5,10 @@ import defaultImage from "../../assets/images/default_no_image.jpg";
 
 const DEFAULT_ROUTE = "http://localhost:1522";
 
-const CompactMenu = ({ menu, isBooking = false, isSelected = false, isNew = false }) => {
-  let buttonLabel = "Agregar";
-  if (isSelected && isNew) {
-    buttonLabel = "Desagregar";
-  } else if (isSelected && !isNew) {
-    buttonLabel = "Agregado";
-  }
+const CompactMenu = ({ menu, isBooking = false, isSelected = false, isNew = false, quantity = 0,
+  onIncrease,
+  onDecrease , onQuantityChange, disableDecrease }) => {
+
 
   return (
     <div className={`compact-menu ${isSelected ? "menu-is-selected" : ""} ${isNew ? " menu-is-new" : ""}`}>
@@ -26,12 +23,13 @@ const CompactMenu = ({ menu, isBooking = false, isSelected = false, isNew = fals
         {!isBooking ? (
           <span className="compact-menu-link">Ver más &gt; </span>
         ) : (
-          <button
-            className={`add-menu-booking-button${isSelected ? " menu-is-selected" : ""}${isNew ? " menu-is-new" : ""}`}
-            type="button"
-          >
-            {buttonLabel}
-          </button>
+          <>
+            <div className="menu-quantity-control">
+              <button type="button" onClick={onIncrease}>+</button>
+              <span>{quantity}</span>
+              {!disableDecrease && <button type="button" onClick={onDecrease} disabled={quantity === 0}>-</button>}
+            </div>
+          </>
         )}
       </div>
     </div>

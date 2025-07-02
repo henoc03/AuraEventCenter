@@ -135,7 +135,6 @@ exports.getMyBookings = async (req, res) => {
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
 
-    // 👇 Aquí van los console.log:
     console.log("Reservas encontradas:", result.rows.length);
     console.log("Reservas con estado:", result.rows.map(r => r.STATUS));
 
@@ -347,16 +346,16 @@ exports.getBookingMenus = async (req, res) => {
     conn = await getConnection();
 
     const menus_result = await conn.execute(
-      `SELECT MENU_ID FROM CLIENT_SCHEMA.BOOKINGS_ZONES_MENUS WHERE BOOKING_ID = :bookingId AND ZONE_ID = :roomId`,
+      `SELECT MENU_ID, QUANTITY FROM CLIENT_SCHEMA.BOOKINGS_ZONES_MENUS WHERE BOOKING_ID = :bookingId AND ZONE_ID = :roomId`,
       [bookingId, roomId],
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
 
-    const menus = menus_result.rows.map(menu => {
-      return {
-        ID: menu.MENU_ID,
-      };
-    });
+    // Devuelve [{ ID_MENU, CANTIDAD }]
+    const menus = menus_result.rows.map(menu => ({
+      ID_MENU: menu.MENU_ID,
+      CANTIDAD: menu.QUANTITY
+    }));
 
     res.json(menus || []);
   } catch (err) {
@@ -397,14 +396,364 @@ exports.getBookingEquipments = async (req, res) => {
   }
 };
 
+exports.updateBookingStatuses = async () => {
+  let conn;
+  try {
+    conn = await getConnection();
+
+    // 1. Obtener todas las reservas relevantes con sus fechas y horas
+    const result = await conn.execute(`
+      SELECT BOOKING_ID, STATUS, EVENT_DATE, START_TIME, END_TIME
+      FROM CLIENT_SCHEMA.BOOKINGS
+      WHERE STATUS IN ('pendiente', 'en_progreso')
+    `);
+
+    const now = new Date();
+
+    for (const row of result.rows) {
+      const [bookng_id, status, eventDate, startTime, endTime] = row;
+
+      // Combinar EVENT_DATE con horas
+      const startDateTime = new Date(
+        eventDate.getFullYear(),
+        eventDate.getMonth(),
+        eventDate.getDate(),
+        startTime.getHours(),
+        startTime.getMinutes(),
+        startTime.getSeconds()
+      );
+
+      const endDateTime = new Date(
+        eventDate.getFullYear(),
+        eventDate.getMonth(),
+        eventDate.getDate(),
+        endTime.getHours(),
+        endTime.getMinutes(),
+        endTime.getSeconds()
+      );
+
+      let newStatus = null;
+
+      if (status === 'pendiente') {
+        if (now >= startDateTime) {
+          newStatus = 'en_progreso';
+        } else if (now > endDateTime) {
+          // Si ya pasó el evento y no se inició, cancelar
+          newStatus = 'cancelada';
+        }
+      } else if (status === 'en_progreso' && now >= endDateTime) {
+        newStatus = 'completada';
+      }
+
+      // Actualizar estado solo si cambió
+      if (newStatus && newStatus !== status) {
+        await conn.execute(
+          `UPDATE CLIENT_SCHEMA.BOOKINGS SET STATUS = :newStatus WHERE BOOKING_ID = :bookng_id`,
+          { newStatus, bookng_id },
+          { autoCommit: false }
+        );
+      }
+    }
+
+    await conn.commit();
+
+    console.log(`[CRON] Estados de reservas actualizados correctamente`);
+  } catch (err) {
+    console.error('[CRON] Error al actualizar estados de reservas:', err.message);
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
+exports.createBooking = async (req, res) => {
+  let conn;
+  try {
+    const { userId, bookingInfo, rooms, services, menus, equipments } = req.body;
+
+    conn = await getConnection();
+
+    const {
+      owner, bookingName, idCard, email, phone,
+      eventType, startTime, endTime, date, additionalNote
+    } = bookingInfo;
+
+const result = await conn.execute(
+  `BEGIN
+     INSERT INTO CLIENT_SCHEMA.BOOKINGS (
+       USER_ID, BOOKING_NAME, STATUS, ADDITIONAL_NOTE,
+       START_TIME, END_TIME, ID_CARD, EVENT_TYPE, EVENT_DATE
+     ) VALUES (
+       :userId, :bookingName, 'pendiente', :note,
+       TO_DATE(:startTime, 'HH24:MI'), TO_DATE(:endTime, 'HH24:MI'),
+       :idCard, :eventType, TO_DATE(:eventDate, 'YYYY-MM-DD')
+     )
+     RETURNING BOOKING_ID INTO :outBookingId;
+   END;`,
+  {
+    userId,
+    bookingName,
+    note: additionalNote,
+    startTime,
+    endTime,
+    idCard,
+    eventType,
+    eventDate: date,
+    outBookingId: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER }
+  },
+  { autoCommit: false }
+);
+
+const bookingId = result.outBinds.outBookingId;
+
+
+    for (const zoneId of rooms) {
+
+      await conn.execute(
+        `INSERT INTO CLIENT_SCHEMA.BOOKINGS_ZONES (BOOKING_ID, ZONE_ID)
+         VALUES (:bookingId, :zoneId)`,
+        { bookingId, zoneId },
+        { autoCommit: false }
+      );
+
+  
+      const zoneServices = services?.[zoneId] || [];
+      for (const serviceId of zoneServices) {
+        await conn.execute(
+          `INSERT INTO CLIENT_SCHEMA.BOOKINGS_ZONES_SERVICES (BOOKING_ID, ZONE_ID, ADDITIONAL_SERVICE_ID)
+           VALUES (:bookingId, :zoneId, :serviceId)`,
+          { bookingId, zoneId, serviceId },
+          { autoCommit: false }
+        );
+      }
+
+ 
+      const zoneMenus = menus?.[zoneId] || [];
+      console.log(zoneMenus)
+      for (const { ID_MENU, CANTIDAD } of zoneMenus) {
+  await conn.execute(
+    `INSERT INTO CLIENT_SCHEMA.BOOKINGS_ZONES_MENUS (
+      BOOKING_ID, ZONE_ID, MENU_ID, QUANTITY
+    ) VALUES (
+      :bookingId, :zoneId, :menuId, :quantity
+    )`,
+    {
+      bookingId,
+      zoneId,
+      menuId: ID_MENU,
+      quantity: CANTIDAD
+    },
+    { autoCommit: false }
+  );
+}
+
+
+
+
+      const zoneEquipments = equipments?.[zoneId] || [];
+      for (const equipmentId of zoneEquipments) {
+        await conn.execute(
+          `INSERT INTO CLIENT_SCHEMA.BOOKINGS_ZONES_EQUIPMENTS (BOOKING_ID, ZONE_ID, EQUIPMENT_ID)
+           VALUES (:bookingId, :zoneId, :equipmentId)`,
+          { bookingId, zoneId, equipmentId },
+          { autoCommit: false }
+        );
+      }
+    }
+
+    // Después de crear la reserva y obtener bookingId:
+    const currentPayment = req.body.currentPayment || 0; // O calcula el total en backend si prefieres
+
+    await conn.execute(
+      `INSERT INTO CLIENT_SCHEMA.INVOICES (USER_ID, BOOKING_ID, CURRENT_PAYMENT, INVOICE_DATE, INVOICE_STATUS)
+       VALUES (:userId, :bookingId, :currentPayment, SYSDATE, 'pago')`,
+      {
+        userId,
+        bookingId,
+        currentPayment
+      },
+      { autoCommit: false }
+    );
+
+    await conn.commit();
+
+    res.status(201).json({ message: "Reserva y factura creadas exitosamente", bookingId });
+
+  } catch (err) {
+    console.error("Error al crear reserva:", err);
+    if (conn) await conn.rollback();
+    res.status(500).json({ error: "Error al crear la reserva" });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
+exports.updateBooking = async (req, res) => {
+  let conn;
+  try {
+    const { userId, bookingId, bookingInfo, rooms, services, menus, equipments } = req.body;
+    console.log(services);
+
+    conn = await getConnection();
+
+    const {
+      owner, bookingName, idCard, email, phone,
+      eventType, startTime, endTime, date, additionalNote
+    } = bookingInfo;
+
+    const cleanTime = t => t.length > 5 ? t.slice(0,5) : t;
+    const startTimeOnly = cleanTime(startTime);
+    const endTimeOnly = cleanTime(endTime);
+
+    const result = await conn.execute(
+      `UPDATE CLIENT_SCHEMA.BOOKINGS
+       SET
+        USER_ID = :userId,
+        BOOKING_NAME = :bookingName,
+        STATUS = 'pendiente',
+        ADDITIONAL_NOTE = :note,
+        START_TIME = TO_DATE(:startTime, 'HH24:MI'),
+        END_TIME = TO_DATE(:endTime, 'HH24:MI'),
+        ID_CARD = :idCard,
+        EVENT_TYPE = :eventType,
+        EVENT_DATE = TO_DATE(:eventDate, 'YYYY-MM-DD')
+       WHERE BOOKING_ID = :bookingId`,
+      {
+        userId: userId,
+        bookingName: bookingName,
+        note: additionalNote,
+        startTime: startTimeOnly,
+        endTime: endTimeOnly,
+        idCard: idCard,
+        eventType: eventType,
+        eventDate: date,
+        bookingId: bookingId
+      },
+      { autoCommit: false }
+    );
+
+    for (const zoneId of rooms) {
+      // Verifica si ya existe la sala para la reserva
+      const exists = await conn.execute(
+        `SELECT 1 FROM CLIENT_SCHEMA.BOOKINGS_ZONES WHERE BOOKING_ID = :bookingId AND ZONE_ID = :zoneId`,
+        { bookingId, zoneId }
+      );
+      if (exists.rows.length === 0) {
+        await conn.execute(
+          `INSERT INTO CLIENT_SCHEMA.BOOKINGS_ZONES (BOOKING_ID, ZONE_ID) VALUES (:bookingId, :zoneId)`,
+          { bookingId, zoneId },
+          { autoCommit: false }
+        );
+      }
+
+      const zoneServices = services?.[zoneId] || [];
+      for (const serviceId of zoneServices) {
+        const exists = await conn.execute(
+          `SELECT 1 FROM CLIENT_SCHEMA.BOOKINGS_ZONES_SERVICES WHERE BOOKING_ID = :bookingId AND ZONE_ID = :zoneId AND ADDITIONAL_SERVICE_ID = :serviceId`,
+          { bookingId, zoneId, serviceId }
+        );
+        if (exists.rows.length === 0) {
+          await conn.execute(
+            `INSERT INTO CLIENT_SCHEMA.BOOKINGS_ZONES_SERVICES (BOOKING_ID, ZONE_ID, ADDITIONAL_SERVICE_ID)
+            VALUES (:bookingId, :zoneId, :serviceId)`,
+            { bookingId, zoneId, serviceId },
+            { autoCommit: false }
+          );
+        }
+      }
+
+      // 1. Obtener los menús actuales en la BD para esta zona y reserva
+  const dbMenusRes = await conn.execute(
+    `SELECT MENU_ID FROM CLIENT_SCHEMA.BOOKINGS_ZONES_MENUS WHERE BOOKING_ID = :bookingId AND ZONE_ID = :zoneId`,
+    { bookingId, zoneId }
+  );
+  const dbMenuIds = dbMenusRes.rows.map(row => row[0]);
+
+  // 2. Unifica menús por ID_MENU y suma cantidades si hay repetidos en el payload
+  const zoneMenus = menus?.[zoneId] || [];
+  const menuMap = new Map();
+  for (const menu of zoneMenus) {
+    const key = menu.ID_MENU;
+    if (menuMap.has(key)) {
+      menuMap.get(key).CANTIDAD += menu.CANTIDAD || 1;
+    } else {
+      menuMap.set(key, { ...menu, CANTIDAD: menu.CANTIDAD || 1 });
+    }
+  }
+  const uniqueZoneMenus = Array.from(menuMap.values());
+  const payloadMenuIds = uniqueZoneMenus.map(m => m.ID_MENU);
+
+  // 3. Eliminar menús que ya no están en el payload
+  for (const dbMenuId of dbMenuIds) {
+    if (!payloadMenuIds.includes(dbMenuId)) {
+      await conn.execute(
+        `DELETE FROM CLIENT_SCHEMA.BOOKINGS_ZONES_MENUS
+         WHERE BOOKING_ID = :bookingId AND ZONE_ID = :zoneId AND MENU_ID = :menuId`,
+        { bookingId, zoneId, menuId: dbMenuId },
+        { autoCommit: false }
+      );
+    }
+  }
+
+  // 4. Insertar o actualizar los menús del payload
+  for (const menu of uniqueZoneMenus) {
+    const exists = await conn.execute(
+      `SELECT QUANTITY FROM CLIENT_SCHEMA.BOOKINGS_ZONES_MENUS
+       WHERE BOOKING_ID = :bookingId AND ZONE_ID = :zoneId AND MENU_ID = :menuId`,
+      { bookingId, zoneId, menuId: menu.ID_MENU }
+    );
+    if (exists.rows.length === 0) {
+      await conn.execute(
+        `INSERT INTO CLIENT_SCHEMA.BOOKINGS_ZONES_MENUS (BOOKING_ID, ZONE_ID, MENU_ID, QUANTITY)
+         VALUES (:bookingId, :zoneId, :menuId, :quantity)`,
+        { bookingId, zoneId, menuId: menu.ID_MENU, quantity: menu.CANTIDAD },
+        { autoCommit: false }
+      );
+    } else {
+      await conn.execute(
+        `UPDATE CLIENT_SCHEMA.BOOKINGS_ZONES_MENUS
+         SET QUANTITY = :quantity
+         WHERE BOOKING_ID = :bookingId AND ZONE_ID = :zoneId AND MENU_ID = :menuId`,
+        { quantity: menu.CANTIDAD, bookingId, zoneId, menuId: menu.ID_MENU },
+        { autoCommit: false }
+      );
+    }
+  }
+
+      const zoneEquipments = equipments?.[zoneId] || [];
+      console.log(zoneEquipments)
+      for (const equipmentId of zoneEquipments) {
+        const exists = await conn.execute(
+          `SELECT 1 FROM CLIENT_SCHEMA.BOOKINGS_ZONES_EQUIPMENTS WHERE BOOKING_ID = :bookingId AND ZONE_ID = :zoneId AND EQUIPMENT_ID = :equipmentId`,
+          { bookingId, zoneId, equipmentId }
+        );
+        if (exists.rows.length === 0) {
+          await conn.execute(
+            `INSERT INTO CLIENT_SCHEMA.BOOKINGS_ZONES_EQUIPMENTS (BOOKING_ID, ZONE_ID, EQUIPMENT_ID) VALUES (:bookingId, :zoneId, :equipmentId)`,
+            { bookingId, zoneId, equipmentId },
+            { autoCommit: false }
+          );
+        }
+      }
+    }
+
+    await conn.commit();
+    res.status(201).json({ message: "Reserva actualizada exitosamente", bookingId });
+
+  } catch (err) {
+    console.error("Error al actualizar la reserva:", err);
+    if (conn) await conn.rollback();
+    res.status(500).json({ error: "Error al actualizar la reserva" });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
 exports.deleteBooking = async (req, res) => {
   let conn;
   try {
     const bookingId = req.params.id;
     conn = await getConnection();
 
-    // 1. Obtener la fecha del evento
-    // Obtener la fecha del evento desde la base de datos
     const eventDateRes = await conn.execute(
       `SELECT EVENT_DATE FROM CLIENT_SCHEMA.BOOKINGS WHERE BOOKING_ID = :id`,
       [bookingId],
@@ -418,7 +767,6 @@ exports.deleteBooking = async (req, res) => {
     const eventDate = new Date(eventDateRes.rows[0].EVENT_DATE);
     const today = new Date();
 
-    // Quitar la parte de la hora para asegurar cálculo correcto
     eventDate.setHours(0, 0, 0, 0);
     today.setHours(0, 0, 0, 0);
 
@@ -432,8 +780,7 @@ exports.deleteBooking = async (req, res) => {
         message: "No se puede cancelar la reserva: debe hacerse con al menos 7 días de antelación."
       });
     }
-    
-    // 3. Cancelar y limpiar asociaciones
+
     await conn.execute(
       `UPDATE CLIENT_SCHEMA.BOOKINGS 
        SET STATUS = 'cancelada' 
@@ -467,7 +814,6 @@ exports.deleteBooking = async (req, res) => {
   }
 };
 
-
 /**
  * Calcula el resumen de pago para una reserva en edición.
  * Espera en req.body:
@@ -481,7 +827,8 @@ exports.deleteBooking = async (req, res) => {
 exports.getPaymentSummary = async (req, res) => {
   let conn;
   try {
-    const { rooms = [], menus = {}, services = {}, equipments = {} } = req.body;
+    // 1. Obtén las horas de la reserva (asegúrate de recibirlas en el payload)
+    const { rooms = [], menus = {}, services = {}, equipments = {}, startTime, endTime } = req.body;
     conn = await getConnection();
 
     // Helper para IN clause
@@ -510,17 +857,26 @@ exports.getPaymentSummary = async (req, res) => {
       if (!zone) continue;
 
       // Menús
-      const menuIds = menus[zoneId] || [];
+      const menuObjs = menus[zoneId] || [];
+      const menuIds = menuObjs.map(m => m.ID_MENU);
+      const { clause, binds } = makeInClause(menuIds, 'menu');
       let menuList = [];
       let subtotalMenus = 0;
       if (menuIds.length > 0) {
-        const { clause, binds } = makeInClause(menuIds, 'menu');
         const menusRes = await conn.execute(
           `SELECT MENU_ID, NAME, PRICE FROM ADMIN_SCHEMA.CATERING_MENUS WHERE MENU_ID IN ${clause}`,
           binds,
           { outFormat: oracledb.OUT_FORMAT_OBJECT }
         );
-        menuList = menusRes.rows;
+        // Multiplica el precio por la cantidad seleccionada
+        menuList = menuObjs.map(selMenu => {
+          const menuInfo = menusRes.rows.find(m => m.MENU_ID === selMenu.ID_MENU);
+          return {
+            ...menuInfo,
+            CANTIDAD: selMenu.CANTIDAD,
+            PRICE: (Number(menuInfo.PRICE) || 0) * (selMenu.CANTIDAD || 1)
+          };
+        });
         subtotalMenus = menuList.reduce((sum, m) => sum + (Number(m.PRICE) || 0), 0);
       }
 
@@ -546,7 +902,7 @@ exports.getPaymentSummary = async (req, res) => {
       if (equipmentIds.length > 0) {
         const { clause, binds } = makeInClause(equipmentIds, 'eq');
         const eqRes = await conn.execute(
-          `SELECT EQUIPMENT_ID, NAME, UNITARY_PRICE FROM ADMIN_SCHEMA.EQUIPMENTS WHERE EQUIPMENT_ID IN ${clause}`,
+          `SELECT ID AS EQUIPMENT_ID, NAME, UNITARY_PRICE FROM ADMIN_SCHEMA.EQUIPMENTS WHERE ID IN ${clause}`,
           binds,
           { outFormat: oracledb.OUT_FORMAT_OBJECT }
         );
@@ -554,13 +910,26 @@ exports.getPaymentSummary = async (req, res) => {
         subtotalEquipments = equipmentList.reduce((sum, e) => sum + (Number(e.UNITARY_PRICE) || 0), 0);
       }
 
-      const basePrice = Number(zone.PRICE) || 0;
-      const subtotal = basePrice + subtotalMenus + subtotalServices + subtotalEquipments;
+      // Calcula la cantidad de horas
+      function getHourDelta(start, end) {
+        // start y end en formato "HH:MM"
+        const [sh, sm] = start.split(":").map(Number);
+        const [eh, em] = end.split(":").map(Number);
+        let delta = (eh + em/60) - (sh + sm/60);
+        if (delta < 0) delta += 24; // por si cruza medianoche
+        return delta;
+      }
+      const hours = getHourDelta(startTime, endTime);
 
+      const basePrice = (Number(zone.PRICE) || 0) * hours;
+      const subtotal = basePrice + subtotalMenus + subtotalServices + subtotalEquipments;
+      console.log({ startTime, endTime, hours });
+      
       zonas.push({
         zoneId: zone.ZONE_ID,
         name: zone.NAME,
         basePrice,
+        hours,
         menus: menuList,
         services: serviceList,
         equipments: equipmentList,
@@ -582,6 +951,56 @@ exports.getPaymentSummary = async (req, res) => {
   } catch (err) {
     console.error('Error al calcular el resumen de pago:', err);
     res.status(500).json({ message: 'Error al calcular el resumen de pago.' });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
+exports.updateInvoicePayment = async (req, res) => {
+  let conn;
+  try {
+    const { bookingId, newPayment } = req.body;
+    conn = await getConnection();
+    await conn.execute(
+      `UPDATE CLIENT_SCHEMA.INVOICES
+       SET CURRENT_PAYMENT = :newPayment
+       WHERE BOOKING_ID = :bookingId`,
+      { newPayment, bookingId },
+      { autoCommit: true }
+    );
+    res.json({ message: "Pago actualizado correctamente" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
+exports.getInvoiceByBooking = async (req, res) => {
+  let conn;
+  try {
+    const { bookingId } = req.params;
+    conn = await getConnection();
+    const result = await conn.execute(
+      `SELECT INVOICE_ID, USER_ID, BOOKING_ID, INVOICE_DATE, INVOICE_STATUS, CURRENT_PAYMENT
+       FROM CLIENT_SCHEMA.INVOICES WHERE BOOKING_ID = :bookingId`,
+      { bookingId }
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "No se encontró la factura" });
+    }
+    // Usa outFormat para obtener objetos, o mapea manualmente
+    const row = result.rows[0];
+    res.json({
+      INVOICE_ID: row[0],
+      USER_ID: row[1],
+      BOOKING_ID: row[2],
+      INVOICE_DATE: row[3],
+      INVOICE_STATUS: row[4],
+      CURRENT_PAYMENT: row[5]
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   } finally {
     if (conn) await conn.close();
   }

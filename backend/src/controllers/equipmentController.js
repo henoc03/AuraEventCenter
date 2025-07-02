@@ -62,6 +62,114 @@ exports.getAllEquipments = async (req, res) => {
   }
 };
 
+exports.getAllEquipmentsActive = async (req, res) => {
+  let conn;
+  try {
+    conn = await getConnection();
+    const result = await conn.execute(
+      `SELECT ID, NAME, TYPE, DESCRIPTION, QUANTITY, IMAGE_PATH, UNITARY_PRICE 
+       FROM ADMIN_SCHEMA.EQUIPMENTS 
+       WHERE ACTIVE = 1`,
+      [],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    const equipments = result.rows.map(e => ({
+      ID: e.ID,
+      name: e.NAME,
+      type: e.TYPE,
+      description: e.DESCRIPTION,
+      quantity: e.QUANTITY,
+      imagePath: e.IMAGE_PATH ? decrypt(e.IMAGE_PATH) : null,
+      unitaryPrice: e.UNITARY_PRICE,
+    }));
+
+    res.json(equipments);
+  } catch (err) {
+    console.error("Error al obtener equipos activos:", err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
+
+/**
+ * Obtiene todos los servicios disponibles para reservar en una fecha especifica.
+ */
+exports.getAllAvailableEquipments = async (req, res) => {
+  const { date, startTime, endTime, bookingId } = req.body;
+
+  if (!date || !startTime || !endTime) {
+    return res.status(400).json({ error: "Faltan parámetros requeridos: date, startTime o endTime." });
+  }
+
+  const cleanTime = t => t.length > 5 ? t.slice(0,5) : t;
+  const startTimeOnly = cleanTime(startTime);
+  const endTimeOnly = cleanTime(endTime);
+
+  console.log(date);
+
+  let conn;
+  try {
+    conn = await getConnection();
+
+    const result = await conn.execute(
+      `SELECT e.ID, e.NAME, e.TYPE, e.DESCRIPTION, e.QUANTITY - NVL(SUM(
+        CASE 
+          WHEN b.BOOKING_ID != :booking_id 
+            AND b.EVENT_DATE = TO_DATE(:event_date, 'YYYY-MM-DD')
+            AND b.START_TIME < TO_DATE(:end_time, 'HH24:MI')
+            AND b.END_TIME > TO_DATE(:start_time, 'HH24:MI')
+          THEN bze.QUANTITY
+          ELSE 0
+        END
+      ), 0) AS AVAILABLE_QUANTITY, e.IMAGE_PATH, e.UNITARY_PRICE
+      FROM ADMIN_SCHEMA.EQUIPMENTS e
+      LEFT JOIN CLIENT_SCHEMA.BOOKINGS_ZONES_EQUIPMENTS bze
+        ON e.ID = bze.EQUIPMENT_ID
+      LEFT JOIN CLIENT_SCHEMA.BOOKINGS b
+        ON bze.BOOKING_ID = b.BOOKING_ID
+      GROUP BY e.ID, e.NAME, e.TYPE, e.DESCRIPTION, e.QUANTITY, e.IMAGE_PATH, e.UNITARY_PRICE
+      HAVING 
+        e.QUANTITY - NVL(SUM(
+          CASE 
+            WHEN b.BOOKING_ID != :booking_id 
+              AND b.EVENT_DATE = TO_DATE(:event_date, 'YYYY-MM-DD')
+              AND b.START_TIME < TO_DATE(:end_time, 'HH24:MI')
+              AND b.END_TIME > TO_DATE(:start_time, 'HH24:MI')
+            THEN bze.QUANTITY
+            ELSE 0
+          END
+        ), 0) > 0`,
+      {
+        event_date: date,
+        start_time: startTimeOnly,
+        end_time: endTimeOnly,
+        booking_id: bookingId
+      },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    const equipments = result.rows.map(e => ({
+      ID: e.ID,
+      name: e.NAME,
+      type: e.TYPE,
+      description: e.DESCRIPTION,
+      quantity: e.QUANTITY,
+      imagePath: e.IMAGE_PATH ? decrypt(e.IMAGE_PATH) : null,
+      unitaryPrice: e.UNITARY_PRICE,
+    }));
+
+    res.json(equipments);
+  } catch (err) {
+    console.error('❌ Error al obtener los equipos disponibles:', err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
 /**
  * Obtiene un equipo específico por ID.
  */

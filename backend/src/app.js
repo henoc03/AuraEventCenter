@@ -13,6 +13,7 @@ const productsRoutes = require('./routes/products');
 const equipmentsRoutes = require('./routes/equipment');
 const chatbotRoutes = require('./routes/chatbot');
 const bookingsRoutes = require('./routes/bookings')
+const calendarRoutes = require('./routes/calendar')
 
 
 const app = express();
@@ -28,6 +29,7 @@ app.use('/products', productsRoutes);
 app.use('/equipments', equipmentsRoutes);
 app.use('/chatbot', chatbotRoutes);
 app.use('/bookings', bookingsRoutes);
+app.use('/calendar', calendarRoutes);
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -35,5 +37,9 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.get('/', (req, res) => {
   res.send('API REST Oracle con tabla USERS ✅');
 });
+
+const emailController = require('./controllers/emailController');
+
+app.post('/send-booking-confirmation', emailController.sendBookingConfirmation);
 
 module.exports = app;

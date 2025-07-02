@@ -26,14 +26,15 @@ const ServiceCard = ({ service, onView, onEdit, onDelete }) => {
         </h2>
 
         <div className="service-card-buttons">
-          <button className="btn btn-primary button" onClick={() => onDelete(service)}>
-            Eliminar
+
+          <button className="btn btn-primary button" onClick={() => onView(service)}>
+            Visualizar
           </button>
           <button className="btn btn-primary button" onClick={() => onEdit(service)}>
             Editar
           </button>
-          <button className="btn btn-primary button" onClick={() => onView(service)}>
-            Visualizar
+          <button className="btn btn-primary button" onClick={() => onDelete(service)}>
+            Eliminar
           </button>
         </div>
       </div>

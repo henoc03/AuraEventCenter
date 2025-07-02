@@ -75,6 +75,74 @@ exports.getAllMenus = async (req, res) => {
   }
 };
 
+
+/**
+ * Obtiene todos los menús disponibles (AVAILABLE = 1).
+ */
+exports.getAllMenusAvailable = async (req, res) => {
+  let conn;
+  try {
+    conn = await getConnection();
+
+    // Obtener todos los menús disponibles
+    const menusResult = await conn.execute(
+      `SELECT MENU_ID, NAME, DESCRIPTION, PRICE, IMAGE_PATH, AVAILABLE, TYPE
+       FROM ADMIN_SCHEMA.CATERING_MENUS
+       WHERE AVAILABLE = 1`,
+      [],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    // Agregar path de la imagen y array de productos al menú
+    const menus = menusResult.rows.map(menu => ({
+      ...menu,
+      IMAGE_PATH: menu.IMAGE_PATH ? decrypt(menu.IMAGE_PATH) : null,
+      PRODUCTS: []
+    }));
+
+    // Obtener todos los productos relacionados a los menús
+    const productsResult = await conn.execute(
+      `SELECT mp.MENU_ID, mp.PRODUCT_ID, p.NAME, p.DESCRIPTION, p.UNITARY_PRICE
+       FROM ADMIN_SCHEMA.CATERING_MENUS m
+       JOIN ADMIN_SCHEMA.PRODUCTS_MENUS mp ON m.MENU_ID = mp.MENU_ID
+       JOIN ADMIN_SCHEMA.PRODUCTS p ON mp.PRODUCT_ID = p.PRODUCT_ID
+       WHERE m.AVAILABLE = 1`,
+      [],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    // Agrupar productos por menú
+    const productsByMenu = {};
+    menus.forEach(menu => {
+      productsByMenu[menu.MENU_ID] = productsResult.rows
+        .filter(product => product.MENU_ID === menu.MENU_ID)
+        .map(product => ({
+          PRODUCT_ID: product.PRODUCT_ID,
+          NAME: product.NAME,
+          DESCRIPTION: product.DESCRIPTION,
+          UNITARY_PRICE: product.UNITARY_PRICE
+        }));
+    });
+
+    // Asignar productos a cada menú
+    menus.forEach(menu => {
+      menu.PRODUCTS = productsByMenu[menu.MENU_ID] || [];
+    });
+
+    // Calcular el precio total del menú
+    menus.forEach(menu => {
+      menu.PRICE = menu.PRODUCTS.reduce((sum, product) => sum + (product.UNITARY_PRICE || 0), 0);
+    });
+
+    res.json(menus);
+  } catch (err) {
+    console.error('❌ Error al obtener los menús disponibles:', err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
 /**
  * Obtiene un menú específico por su ID.
  */
@@ -405,6 +473,36 @@ exports.deleteMenu = async (req, res) => {
   } catch (err) {
     console.error('Error al eliminar el menú:', err);
     if (conn) await conn.rollback();
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.close();
+  }
+};
+
+/**
+ * Obtiene los menús de una reserva específica.
+ */
+exports.getMenusByBooking = async (req, res) => {
+  let conn;
+  try {
+    const { bookingId, roomId } = req.params;
+    conn = await getConnection();
+
+    // Obtener los menús asociados a la reserva y zona (habitación)
+    const menus_result = await conn.execute(
+      `SELECT MENU_ID, QUANTITY FROM CLIENT_SCHEMA.BOOKINGS_ZONES_MENUS WHERE BOOKING_ID = :bookingId AND ZONE_ID = :roomId`,
+      [bookingId, roomId],
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    const menus = menus_result.rows.map(menu => ({
+      ID_MENU: menu.MENU_ID,
+      CANTIDAD: menu.QUANTITY
+    }));
+
+    res.json(menus);
+  } catch (err) {
+    console.error('Error al obtener los menús de la reserva:', err);
     res.status(500).json({ error: err.message });
   } finally {
     if (conn) await conn.close();

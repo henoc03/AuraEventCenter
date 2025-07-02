@@ -19,6 +19,8 @@ import MenusClient from './pages/MenusClient';
 import ContactForm from './pages/ContactForm';
 import EquipmentsClient from './pages/EquipmentsClient';
 import AboutPage from './pages/About';
+import EditBookingClient from './pages/EditBookingClient';
+import CreateBookingClient from './pages/CreateBookinClient';
 import ChatBotWrapper from './components/utils/ChatBotWrapper';
 import BookingsClient from './pages/BookingsClient';
 
@@ -31,6 +33,7 @@ import ServicesAdmin from './pages/ServicesAdmin';
 import MenusAdmin from './pages/MenusAdmin';
 import Products from './pages/Products';
 import EquipmentAdmin from './pages/EquipmentAdmin';
+import CalendarView from './pages/CalendarView';
 import BookingsAdmin from './pages/BookingsAdmin';
 
 // Contexto y utilidades
@@ -77,6 +80,7 @@ function App() {
           <Route path="/cuenta" element={<AccountSettings sections={SectionProfile}/>} />
           <Route path="/cuenta/cambiar-contraseña" element={<ChangePassword sections={SectionProfile}/>} />
           <Route path="/cuenta/verificar-codigo" element={<VerifyAccountCode sections={SectionProfile}/>} />
+          <Route path="/reserva/editar/:bookingId" element={<EditBookingClient sections={SectionProfile}/>} />
           <Route path="/servicios" element={<ServicesClient />} />
           <Route path="/servicios/menus" element={<MenusClient />} />
           <Route path="/servicios/equipos" element={<EquipmentsClient />} />
@@ -84,6 +88,10 @@ function App() {
           <Route path="/acerca" element={<AboutPage />} />
           <Route path="/historial" element={<BookingsClient sections={SectionProfile}/>} />
 
+          <Route element={<PrivateRoute allowedRoles={['cliente']} />}>
+          <Route path="/reservar" element={<CreateBookingClient sections={SectionProfile} />} />
+          </Route>
+          
           {/* Rutas protegidas para administradores comunes */}
           <Route element={<PrivateRoute allowedRoles={['admin']} />}>
             <Route path="/admin/salas" element={<RoomsAdmin sections={SectionAdmin}/>} />
@@ -93,7 +101,10 @@ function App() {
             <Route path="/admin/servicios/catering/menus" element={<MenusAdmin sections={SectionAdmin} />} />
             <Route path="/admin/servicios/catering/productos" element={<Products sections={SectionAdmin} />} />
             <Route path="/admin/servicios/equipos" element={<EquipmentAdmin sections={SectionAdmin} />} />
+            <Route path="/admin/calendario" element={<CalendarView sections={SectionAdmin} />} />
             <Route path="/admin/reservas" element={<BookingsAdmin sections={SectionAdmin} />} />
+            <Route path="/admin/reservas/crear" element={<CreateBookingClient sections={SectionAdmin} />} />
+            <Route path="/admin/reservas/editar/:bookingId" element={<EditBookingClient sections={SectionAdmin} />} />
           </Route>
 
           {/* Rutas protegidas para root-admin */}
@@ -106,7 +117,10 @@ function App() {
             <Route path="/root-admin/servicios/catering/menus" element={<MenusAdmin sections={SectionRoot} />} />
             <Route path="/root-admin/servicios/catering/productos" element={<Products sections={SectionRoot} />} />
             <Route path="/root-admin/servicios/equipos" element={<EquipmentAdmin sections={SectionRoot} />} />
+            <Route path="/root-admin/calendario" element={<CalendarView sections={SectionRoot} />} />
             <Route path="/root-admin/reservas" element={<BookingsAdmin sections={SectionRoot} />} />
+            <Route path="/root-admin/reservas/crear" element={<CreateBookingClient sections={SectionRoot} />} />
+            <Route path="/root-admin/reservas/editar/:bookingId" element={<EditBookingClient sections={SectionRoot} />} />
           </Route>
 
           {/* Página 404 */}

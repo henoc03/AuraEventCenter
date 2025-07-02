@@ -1,0 +1,148 @@
+.checkout-container {
+  background-color: white;
+}
+
+.checkout-content {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.checkout-step {
+  margin-bottom: 1.5rem;
+}
+
+.step-bar {
+  margin: 5rem 0 2rem 0;
+}
+
+.step-bar > * {
+  max-width: 100%;
+}
+
+.step-bar-fill {
+  width: 100%;
+  height: 100%;
+  background-color: #3b82f6; /* blue-500 */
+  border-radius: 9999px;
+}
+
+.checkout-grid {
+  display: grid;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .checkout-grid {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+.checkout-main {
+  display: flex;
+  flex-direction: column;
+}
+
+.checkout-title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+}
+
+.checkout-subtitle {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.paypal-box {
+  background-color: #e0f2fe;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  text-align: center;
+}
+
+.paypal-image {
+  width: 40rem;
+  margin-bottom: 1rem;
+}
+
+.paypal-description {
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.paypal-buttons {
+  margin-top: 1.5rem;
+  min-width: none;
+  justify-content: center;
+  align-items: center;
+}
+
+.checkout-sidebar {
+  background-color: #e0f2fe;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.room-summary {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.room-image {
+  width: 6rem;
+  height: 6rem;
+  object-fit: cover;
+  border-radius: 0.375rem;
+}
+
+.room-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.room-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.room-price {
+  font-weight: 600;
+  color: #374151;
+}
+
+.room-options-label {
+  font-weight: 600;
+}
+
+.room-options-list {
+  list-style: disc;
+  margin-top: 0.25rem;
+  padding-left: 1rem;
+  font-size: 0.875rem;
+  color: #1f2937;
+}
+
+.checkout-summary {
+  border-top: 1px solid #d1d5db;
+  padding-top: 1rem;
+  font-size: 0.875rem;
+  margin-top: 1rem;
+}
+
+.summary-line {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
+}
+
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-top: 0.5rem;
+}
